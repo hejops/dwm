@@ -27,24 +27,26 @@ static const unsigned int borderpx	= 0;		/* border pixel of windows */
 static const unsigned int snap		= 32;		/* snap pixel */
 static const int showbar		= 1;		/* 0 means no bar */
 static const int topbar			= 0;		/* 0 means bottom bar */
-static const char *fonts[]		= { "monaco:size=8" };
+static const char *fonts[]		= { "monaco:size=8", "symbola:size=8" };
 static const char dmenufont[]		= "monaco:size=8";
 static const char col_gray1[]		= "#222222";
 static const char col_gray2[]		= "#444444";
 static const char col_gray3[]		= "#bbbbbb";
 static const char col_gray4[]		= "#eeeeee";
-static const char col_cyan[]		= "#005577";
+static const char col_cyan[]		= "#005577";	
 static const char *colors[][3]		= {
 	/*		fg		bg	 border	*/
-	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
+/*	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
+	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  }, */
+	[SchemeNorm] = { col_gray3, col_gray2, col_gray2 },
+	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },	/* do sth about the blue; it looks awful with a long status bar */
 };
 
 /* tagging ; custom names? */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
 static const Rule rules[] = {
-/* xprop(1):		1 << 8 probably means allowed on all workspaces?
+/* xprop(1):
  *	WM_CLASS(STRING) = instance, class;	reversed!
  *	WM_NAME(STRING) = title
  *	try to make do without regex first
@@ -65,12 +67,12 @@ static const int nmaster	= 1;	 /* number of clients in master area */
 static const int resizehints	= 1;	 /* 0 = force terminals to use up all extra space */
 
 static const Layout layouts[] = {
-	/* bstack, deck (good for latex) */
 	/* symbol	arrange function */
 	{ "DEF",	tile },		/* first entry is default []= */
 	{ "FUL",	monocle },	/* why [N]? */
 	{ "CEN",	centeredmaster },
 	{ ">M>",	centeredfloatingmaster },
+	/* bstack, deck (good for latex) */
 /*	{ "><>",	  NULL },	  no layout function means floating behavior */
 };
 
@@ -121,13 +123,14 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY,		XK_Return, 	zoom,		{0} },	/* switch master/stack, focus master */
 	{ MODKEY,		XK_Tab,  	setlayout,	{0} },	/* toggle between last 2 layouts */
 	{ MODKEY|ShiftMask,	XK_Tab,    	view,		{0} },	/* back and forth workspace */
-	{ MODKEY|ShiftMask,	XK_space,  	togglefloating,	{0} },
+	{ MODKEY|ShiftMask,	XK_grave,  	togglefloating,	{0} },
 	{ MODKEY,		XK_0,	   	view,		{.ui = ~0 } }, /* merge all workspaces, use mod+N to go back */
 	{ MODKEY|ShiftMask,	XK_0,	   	tag,		{.ui = ~0 } }, /* "sticky" */
 
-	{ MODKEY,		XK_grave,   	setlayout,	{.v = &layouts[0]} },	/* default; think of sensible keybinds - maybe ;':" */
+	{ MODKEY,		XK_space,   	setlayout,	{.v = &layouts[0]} },	/* default; think of sensible keybinds - maybe ;':" */
 	{ MODKEY,		XK_f,	   	setlayout,	{.v = &layouts[1]} },	/* fullscreen */
-	{ MODKEY|ShiftMask,	XK_grave,	setlayout,	{.v = &layouts[2]} },	/* centmast */
+	{ MODKEY|ControlMask,	XK_space,	setlayout,	{.v = &layouts[2]} },	/* centmast */
+	{ MODKEY|ShiftMask,	XK_space,	setlayout,	{.v = &layouts[3]} },	/* centmast float */
 /*	{ MODKEY|ShiftMask,	XK_f,	   	setlayout,	{.v = &layouts[1]} },	 all-float */
 
 	TAGKEYS(		XK_1,				0)
@@ -163,16 +166,18 @@ static Button buttons[] = {
 	{ ClkTagBar,		MODKEY,	        Button3,	toggletag,	{0} },
 };
 
-/* mpdscribble udiskie remind nm-applet ncmpcpp */
+/* remind nm-applet ncmpcpp */
 static const char *const autostart[] = {	/* cool_autostart */
 	"sh", "-c", "xinput --set-prop 9 287 -0.8", NULL,
 	"mpd", NULL,
-	"mpdscribble", NULL,	/* seems to end up with multi-instance */
+	"mpdscribble", NULL,	/* seems to end up with multi-instance; set up if cond */
 	"dunst", NULL,
+	"udiskie", NULL,
+	"sh", "-c", "pidof mpdscribble || mpdscribble", NULL,
+	"sh", "-c", "~/dwm/dwm_status_kai.sh", NULL,
 	"sh", "-c", "udisksctl mount -b /dev/sdb1", NULL,	/* takes a while, don't panic */
 	"sh", "-c", "while :; do feh -r --randomize --bg-fill '/run/media/joseph/My Passport/files/wg/'; sleep 10m; done", NULL,
 	/*
-	   udiskie --tray
 	   pkill remind; remind -z10 '-kdunstify %s &' /home/joseph/.reminders/.reminders.rem
 
 	   "hsetroot", "-center", "/usr/home/bit6tream/pic/wallapper.png", NULL,
