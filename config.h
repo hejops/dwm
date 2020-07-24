@@ -78,7 +78,7 @@ static const Layout layouts[] = {
 	{ "CEN",	centeredmaster },
 	{ "CEF",	centeredfloatingmaster },
 	{ "DEC",	deck },
-	/* bstack, deck (good for latex) */
+	{ "BST",	bstack },	/* absolute unit */
 /*	{ "><>",	  NULL },	  no layout function means floating behavior */
 };
 
@@ -116,6 +116,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY|ShiftMask,	XK_d,	   	spawn,		SHCMD("discord") },
 	{ MODKEY|ShiftMask,	XK_f,	   	spawn,		SHCMD("urxvt -e sh ~/scripts/ranga") },
 	{ MODKEY|ShiftMask,	XK_h,	   	spawn,		SHCMD("urxvt -e htop") },
+	{ MODKEY|ShiftMask,	XK_p,	   	spawn,		SHCMD("urxvt -e sh ~/scripts/mpcrym") },
 { Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,		SHCMD("urxvt -e bash ~/scripts/deeznuts") }, /* sh doesn't work, i think */
 
 /*	{ MODKEY,		XK_b,	   	togglebar,	{0} },			*/
@@ -125,20 +126,20 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY|ShiftMask,	XK_j,	   	incnmaster,	{.i = -1 } },
 	{ MODKEY|ShiftMask,	XK_k,	   	incnmaster,	{.i = +1 } }, /* +1 horiz in master */
 	{ MODKEY,		XK_h,	   	setmfact,	{.f = -0.05} }, /* widen master */
-	{ MODKEY,		XK_l,	   	setmfact,	{.f = +0.05} }, /* might just remove this */
+	{ MODKEY,		XK_l,	   	setmfact,	{.f = +0.05} }, /* i rarely use this */
 	{ MODKEY,		XK_Return, 	zoom,		{0} },	/* switch master/stack, focus master */
 	{ MODKEY,		XK_Tab,  	setlayout,	{0} },	/* toggle between last 2 layouts */
 	{ MODKEY|ShiftMask,	XK_Tab,    	view,		{0} },	/* back and forth workspace */
 	{ MODKEY,		XK_grave,  	togglefloating,	{0} },
-	{ MODKEY,		XK_0,	   	view,		{.ui = ~0 } }, /* merge all workspaces, use mod+N to go back */
+	{ MODKEY,		XK_0,	   	view,		{.ui = ~0 } }, /* merge all workspaces */
 	{ MODKEY|ShiftMask,	XK_0,	   	tag,		{.ui = ~0 } }, /* "sticky" */
 
-	{ MODKEY,		XK_space,   	setlayout,	{.v = &layouts[0]} },	/* default; think of sensible keybinds - maybe ;':" */
+	{ MODKEY,		XK_space,   	setlayout,	{.v = &layouts[0]} },	/* default */
 	{ MODKEY,		XK_f,	   	setlayout,	{.v = &layouts[1]} },	/* fullscreen */
 	{ MODKEY|ControlMask,	XK_space,	setlayout,	{.v = &layouts[2]} },	/* centmast */
 	{ MODKEY|ShiftMask,	XK_space,	setlayout,	{.v = &layouts[3]} },	/* centmast float */
-	{ MODKEY|ShiftMask,	XK_l,		setlayout,	{.v = &layouts[4]} },	/* deck */
-/*	{ MODKEY|ShiftMask,	XK_f,	   	setlayout,	{.v = &layouts[1]} },	 all-float */
+	{ Mod1Mask,		XK_space,	setlayout,	{.v = &layouts[4]} },	/* deck */
+	{ MODKEY,		XK_b,		setlayout,	{.v = &layouts[5]} },	/* bstack */
 
 	TAGKEYS(		XK_1,				0)
 	TAGKEYS(		XK_2,			        1)
@@ -173,12 +174,13 @@ static Button buttons[] = {
 	{ ClkTagBar,		MODKEY,	        Button3,	toggletag,	{0} },
 };
 
-/* remind nm-applet ncmpcpp */
+/* remind nm-applet */
 static const char *const autostart[] = {	/* cool_autostart */
 
+	"picom -b --config .picom.conf", NULL,
 	"dunst", NULL,
 	"mpd", NULL,
-	"sh", "-c", "pidof mpdscribble || mpdscribble", NULL,
+	"sh", "-c", "pkill mpdscribble; mpdscribble", NULL,	/* pidof || method -> running, but inactive */
 	"sh", "-c", "udisksctl mount -b /dev/sdb1", NULL,	/* takes a while, don't panic */
 	"sh", "-c", "while :; do feh -r --randomize --bg-fill '/run/media/joseph/My Passport/files/wg/'; sleep 10m; done", NULL,
 	"sh", "-c", "xinput --set-prop 9 287 -0.8", NULL,	/* may not always be 9 287 */
