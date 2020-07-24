@@ -5,11 +5,7 @@
  * todo: 
  * colors
  * program rules, scratchpad
- * status bar
  * perma-run (easy restart)
- * patches:
- * pertag (restrict monocle to 1 tag)
- * ws names: nametag?
  * patch --merge -i [file]
  * diff -u [old] [new] > [diff]
  * patch < [diff]		overwrites the file specified in [diff]
@@ -42,7 +38,9 @@ static const char *colors[][3]		= {
 	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },	/* do sth about the blue; it looks awful with a long status bar */
 };
 
-/* tagging ; custom names? */
+/* tagging ; custom names? 
+ * https://github.com/meinwald/DWM-config/blob/master/config.h#L16
+ * */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
 static const Rule rules[] = {
@@ -53,12 +51,19 @@ static const Rule rules[] = {
  *	https://github.com/ericpruitt/edge/blob/master/patches/dwm-00-regex-rules.diff
  */
 /* class	instance	title		tags mask	isfloating	 monitor */
-/*	{ "Firefox",	NULL,		NULL,		1 << 8,		0,		-1 }, */
-{ "Gimp",	NULL,		NULL,		0,		1,		-1 },
+/*{ "Firefox",	NULL,		NULL,		1 << 8,		0,		-1 }, */
+	
 { "discord",	NULL,		NULL,		0,		1,		-1 },
-{ "SoulseekQt",	NULL,		NULL,		0,		1,		-1 },
+{ "Thunar",	NULL,		NULL,		0,		1,		-1 },
+{ "TelegramDesktop", NULL,	NULL,		0,		1,		-1 },
+{ "Gimp",	NULL,		NULL,		0,		1,		-1 },
 { "mpv",	NULL,		NULL,		0,		1,		-1 },
-{ "Thunar",	NULL,		NULL,		1 << 4,		0,		-1 },
+{ "SoulseekQt",	NULL,		NULL,		1 << 1,		1,		-1 },
+{ "zoom",	NULL,		NULL,		1 << 2,		0,		-1 },
+{ "URxvt",	"urxvt",	"deeznuts",	1 << 2,		0,		-1 },
+{ "App.py",	NULL,		NULL,		1 << 3,		1,		-1 },	/* playitslowly */
+{ "VirtualBox Manager",	NULL,	NULL,		1 << 3,		1,		-1 },
+{ "VirtualBox Machine",	NULL,	NULL,		1 << 3,		0,		-1 },
 };
 
 /* layout(s) */
@@ -68,10 +73,11 @@ static const int resizehints	= 1;	 /* 0 = force terminals to use up all extra sp
 
 static const Layout layouts[] = {
 	/* symbol	arrange function */
-	{ "DEF",	tile },		/* first entry is default []= */
-	{ "FUL",	monocle },	/* why [N]? */
+	{ "DEF",	tile },
+	{ "FUL",	monocle },	/* overrides this if >1 window */
 	{ "CEN",	centeredmaster },
-	{ ">M>",	centeredfloatingmaster },
+	{ "CEF",	centeredfloatingmaster },
+	{ "DEC",	deck },
 	/* bstack, deck (good for latex) */
 /*	{ "><>",	  NULL },	  no layout function means floating behavior */
 };
@@ -100,17 +106,17 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY,		XK_d,		spawn,		{.v = dmenucmd } },
 	{ MODKEY,		XK_e,	   	spawn,		{.v = termcmd } },
 	{ MODKEY,		XK_m,	   	spawn,		SHCMD("urxvt -e ncmpcpp") },
-	{ MODKEY,		XK_t,	   	spawn,		SHCMD("telegram-desktop") },
 	{ MODKEY,		XK_n,	   	spawn,		SHCMD("urxvt -e newsboat") },
 	{ MODKEY,		XK_o,	   	spawn,		SHCMD("transmission-gtk") },
 	{ MODKEY,		XK_p,	   	spawn,		SHCMD("mpc toggle") },
 	{ MODKEY,		XK_q,	   	spawn,		SHCMD("soulseekqt") },
 	{ MODKEY,		XK_s,	   	spawn,		SHCMD("sh ~/scripts/menu-surfraw") },
+	{ MODKEY,		XK_t,	   	spawn,		SHCMD("telegram-desktop") },
 	{ MODKEY,		XK_w,	   	spawn,		SHCMD("firefox") },
 	{ MODKEY|ShiftMask,	XK_d,	   	spawn,		SHCMD("discord") },
 	{ MODKEY|ShiftMask,	XK_f,	   	spawn,		SHCMD("urxvt -e sh ~/scripts/ranga") },
 	{ MODKEY|ShiftMask,	XK_h,	   	spawn,		SHCMD("urxvt -e htop") },
-/*	{ MODKEY|ShiftMask,	XK_Return,	spawn,		{.v = termcmd } }, */
+{ Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,		SHCMD("urxvt -e bash ~/scripts/deeznuts") }, /* sh doesn't work, i think */
 
 /*	{ MODKEY,		XK_b,	   	togglebar,	{0} },			*/
 	{ ControlMask,		XK_q,	   	killclient,	{0} },  /* close window */
@@ -123,7 +129,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY,		XK_Return, 	zoom,		{0} },	/* switch master/stack, focus master */
 	{ MODKEY,		XK_Tab,  	setlayout,	{0} },	/* toggle between last 2 layouts */
 	{ MODKEY|ShiftMask,	XK_Tab,    	view,		{0} },	/* back and forth workspace */
-	{ MODKEY|ShiftMask,	XK_grave,  	togglefloating,	{0} },
+	{ MODKEY,		XK_grave,  	togglefloating,	{0} },
 	{ MODKEY,		XK_0,	   	view,		{.ui = ~0 } }, /* merge all workspaces, use mod+N to go back */
 	{ MODKEY|ShiftMask,	XK_0,	   	tag,		{.ui = ~0 } }, /* "sticky" */
 
@@ -131,6 +137,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY,		XK_f,	   	setlayout,	{.v = &layouts[1]} },	/* fullscreen */
 	{ MODKEY|ControlMask,	XK_space,	setlayout,	{.v = &layouts[2]} },	/* centmast */
 	{ MODKEY|ShiftMask,	XK_space,	setlayout,	{.v = &layouts[3]} },	/* centmast float */
+	{ MODKEY|ShiftMask,	XK_l,		setlayout,	{.v = &layouts[4]} },	/* deck */
 /*	{ MODKEY|ShiftMask,	XK_f,	   	setlayout,	{.v = &layouts[1]} },	 all-float */
 
 	TAGKEYS(		XK_1,				0)
@@ -168,15 +175,17 @@ static Button buttons[] = {
 
 /* remind nm-applet ncmpcpp */
 static const char *const autostart[] = {	/* cool_autostart */
-	"sh", "-c", "xinput --set-prop 9 287 -0.8", NULL,
-	"mpd", NULL,
-	"mpdscribble", NULL,	/* seems to end up with multi-instance; set up if cond */
+
 	"dunst", NULL,
-	"udiskie", NULL,
+	"mpd", NULL,
 	"sh", "-c", "pidof mpdscribble || mpdscribble", NULL,
-	"sh", "-c", "~/dwm/dwm_status_kai.sh", NULL,
 	"sh", "-c", "udisksctl mount -b /dev/sdb1", NULL,	/* takes a while, don't panic */
 	"sh", "-c", "while :; do feh -r --randomize --bg-fill '/run/media/joseph/My Passport/files/wg/'; sleep 10m; done", NULL,
+	"sh", "-c", "xinput --set-prop 9 287 -0.8", NULL,	/* may not always be 9 287 */
+	"sh", "-c", "~/dwm/dwm_status_kai.sh", NULL,	/* multi-instance */
+	"udiskie", NULL,
+	NULL
+
 	/*
 	   pkill remind; remind -z10 '-kdunstify %s &' /home/joseph/.reminders/.reminders.rem
 
@@ -184,5 +193,4 @@ static const char *const autostart[] = {	/* cool_autostart */
 	   "xrdb", "/usr/home/bit6tream/.config/X/Xresources", NULL,
 	   "sh", "-c", "while :; do dwmstatus.sh -; sleep 60; done", NULL,
 	   "picom", NULL, */
-	NULL
 };
