@@ -2,20 +2,23 @@
 # heavily modified version of:
 # https://raw.githubusercontent.com/kaihendry/dotfiles/master/bin/dwm_status
 # Network speed stuff stolen from http://linuxclues.blogspot.sg/2009/11/shell-script-show-network-speed.html
+# if i ever decide to learn c, this would be a nice project
+# see also: https://github.com/Cornu/dwmstatus/blob/master/status.c
+# https://github.com/joestandring/dwm-bar	bloat
+# https://github.com/jiji606/dwm-status/blob/master/dwm-status.sh	ok i guess
 
 # 2 intervals https://www.youtube.com/watch?v=6vTrVPpNodI
-# 2 loops; should show up twice in ps, or 4x whenever mpstat is running
 # temp: acpi -t
 
-if pgrep kai; then	# be stricter; check pgrep options
-echo "Already running, will not spawn another instance."; sleep 2; exit
-fi
+# using pgrep causes this script to check itself lol
 
 int=5
 sep="|"
 
+# todo: use awk on everything
+
 print_weather() { 
-	curl wttr.in/Singapore?format="%c+%t\n" 
+	curl wttr.in/Munich?format="%c+%t\n" || echo "Error"
 }
 
 print_mpc() {		# requires unicode font, e.g. symbola
@@ -28,11 +31,13 @@ print_mpc() {		# requires unicode font, e.g. symbola
 }
 
 print_network(){	# todo: SSID, down speed, vpn status
-	network=$(grep wlp3s0 /proc/net/dev | cut -d ':' -f 2 | awk '{print $1" "$9}')
+	ssid=$(nmcli | head -n1 | cut -d' ' -f4-)
+	nordvpn status | grep -q Connected && ssid="[$ssid]"
+	printf "%s" "$ssid"
+	#network=$(grep wlp3s0 /proc/net/dev | cut -d ':' -f 2 | awk '{print $1" "$9}')
 	# total bytes received/transmitted, then divide by $int
-	received=$(cut -d' ' -f1 <<< "$network")
+	#received=$(cut -d' ' -f1 <<< "$network")
 	#transmitted=$(cut -d' ' -f2 <<< "$network")
-	printf "%s" "$received"
 }
 
 print_bat(){		# todo: icon (plugged/discharging), time left, text color?
@@ -62,13 +67,13 @@ print_mem(){ free -h | awk 'NR==2 {print $3}' | tr -d i; }
 
 print_disk() { df -h /dev/sdb1 | tail -1 | tr -s ' ' | cut -d' ' -f4; }
 
-print_date(){ TZ=Asia/Singapore date '+%a %d/%m %H:%M' ; }
+print_date(){ date '+%a %d/%m %H:%M' ; }
 
-while true; do print_weather > /tmp/dwmweather	
-	sleep 30m
-done &
+# & puts the process into the background, where it cannot be killed by dwm
 
 while true; do
-	xsetroot -name "$(< /tmp/dwmweather) $sep $(print_mpc) $sep $(print_bat) $sep $(print_cpu) $sep $(print_mem) $sep $(print_disk) $sep $(print_date)"
+	#while true; do print_weather > /tmp/dwmweather; sleep 30m; done &
+	#$(< /tmp/dwmweather) 	i'll live with 5s weather for now
+	xsetroot -name "$(print_weather) $sep $(print_mpc) $sep $(print_network) $sep $(print_bat) $sep $(print_cpu) $sep $(print_mem) $sep $(print_disk) $sep $(print_date)"
 	sleep "$int"
-done &
+done
