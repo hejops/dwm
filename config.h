@@ -23,24 +23,24 @@
 // Exec=/usr/local/bin/dwm
 // Type=Application
 
-/* appearance */
-static const unsigned int borderpx	= 0;		/* border pixel of windows */
-static const unsigned int snap		= 32;		/* snap pixel */
-static const int showbar		= 1;		/* 0 means no bar */
-static const int topbar			= 0;		/* 0 means bottom bar */
+static const unsigned int borderpx	= 0;	// border pixel of windows
+static const unsigned int snap		= 32;	// snap pixel
+static const int showbar		= 1;	// 0 means no bar
+static const int topbar			= 0;	// 0 means bottom bar
 static const char *fonts[]		= { "monaco:size=8", "symbola:size=8" };
 static const char dmenufont[]		= "monaco:size=8";
 static const char col_gray1[]		= "#222222";
-static const char col_gray2[]		= "#444444";
+static const char col_gray2[]		= "#282828";
 static const char col_gray3[]		= "#bbbbbb";
 static const char col_gray4[]		= "#eeeeee";
-static const char col_cyan[]		= "#005577";	
+static const char col_cyan[]		= "#005577";
+static const char col_green[]		= "#98971a";
 static const char *colors[][3]		= {
-	/*		fg		bg	 border	*/
-/*	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  }, */
+//			fg		bg	 border
+//	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
+//	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
 	[SchemeNorm] = { col_gray3, col_gray2, col_gray2 },
-	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },	/* do sth about the blue; it looks awful with a long status bar */
+	[SchemeSel]  = { col_green, col_gray2, col_green },
 };
 
 /* tagging ; custom names? 
@@ -56,21 +56,23 @@ static const Rule rules[] = {
 	// https://github.com/ericpruitt/edge/blob/master/patches/dwm-00-regex-rules.diff
 	// https://www.tutorialspoint.com/c_standard_library/c_function_strstr.htm
 	// class	instance	title		tags mask	isfloating	 monitor
+
 	//{ "Firefox",	NULL,		NULL,		1 << 8,		0,		-1 }, 
-	{ "discord",	NULL,		NULL,		0,		1,		-1 },
-	{ "Thunar",	NULL,		NULL,		0,		1,		-1 },
-	{ "TelegramDesktop", NULL,	NULL,		0,		1,		-1 },
-	{ "Gimp",	NULL,		NULL,		0,		1,		-1 },
+	{ "App.py",	NULL,		NULL,		1 << 3,		1,		-1 },	// playitslowly
 	{ "Audacious",	NULL,		NULL,		0,		1,		-1 },
+	{ "discord",	NULL,		NULL,		0,		1,		-1 },
+	{ "Gimp",	NULL,		NULL,		0,		1,		-1 },
 	{ "mpv",	NULL,		NULL,		0,		1,		1 },	// -1 = current, 0  = 1st, etc; no fallback after disconnect! -- need autostart script to detect xrandr status and react accordingly
 	{ "SoulseekQt",	NULL,		NULL,		1 << 1,		1,		-1 },
+	{ "TelegramDesktop", NULL,	NULL,		0,		1,		-1 },
+	{ "Thunar",	NULL,		NULL,		0,		1,		-1 },
 	{ "Transmission-gtk",	NULL,	NULL,		1 << 1,		0,		-1 },
-	{ "zoom",	NULL,		NULL,		1 << 2,		0,		-1 },
+	{ "TuxGuitar",	NULL,		NULL,		1 << 3,		0,		-1 },
 	{ "URxvt",	"urxvt",	"deeznu",	1 << 2,		0,		-1 },	// unreliable
-	{ NULL,		NULL,		"deeznuts",	1 << 2,		0,		-1 },	// unreliable
-	{ "App.py",	NULL,		NULL,		1 << 3,		1,		-1 },	// playitslowly
-	{ "VirtualBox Manager",	NULL,	NULL,		1 << 3,		1,		-1 },
 	{ "VirtualBox Machine",	NULL,	NULL,		1 << 3,		0,		-1 },
+	{ "VirtualBox Manager",	NULL,	NULL,		1 << 3,		1,		-1 },
+	{ "zoom",	NULL,		NULL,		1 << 2,		0,		-1 },
+	{ NULL,		NULL,		"deeznuts",	1 << 2,		0,		-1 },	// unreliable
 };
 
 /* layout(s) */
@@ -115,7 +117,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	// still unbound: agiruvxz
 	{ 0,			0x1008ff02,	spawn,		{.v = brightup } },
 	{ 0,			0x1008ff03,	spawn,		{.v = brightdown } },
-	{ 0,			XK_Print,	spawn,		SHCMD("sleep 0.2; scrot -s /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
+	{ 0,			XK_Print,	spawn,		SHCMD("sleep 0.2; scrot -s /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },	// try flameshot
 	{ ControlMask,		XK_Print,	spawn,		SHCMD("scrot -u /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
 	{ MODKEY,		XK_c,		spawn,		SHCMD("urxvt -e neomutt") },
 	{ MODKEY,		XK_d,		spawn,		{.v = dmenucmd } },
@@ -135,7 +137,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY|ShiftMask,	XK_p,		spawn,		SHCMD("sh ~/scripts/mpcrym") },
 	{ ShiftMask,		XK_Print,	spawn,		SHCMD("scrot /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
 { Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,		SHCMD("urxvt -e bash ~/scripts/deeznuts") }, /* sh doesn't work, i think */
-    //virtualbox "/home/joseph/VirtualBox VMs/xp/xp.vbox" 
+    //virtualbox "/home/joseph/VirtualBox VMs/xp/xp.vbox" -- what keybind?
     //virtualbox "/home/joseph/VirtualBox VMs/7/7.vbox"
 
 // https://dwm.suckless.org/patches/keypressrelease/
@@ -149,6 +151,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY|ShiftMask,	XK_k,		incnmaster,	{.i = +1 } }, // +1 horiz in master
 	{ MODKEY,		XK_h,		setmfact,	{.f = -0.05} }, // widen master
 	{ MODKEY,		XK_l,		setmfact,	{.f = +0.05} }, // i rarely use this
+	{ MODKEY,		XK_Escape,	zoom,		{0} },
 	{ MODKEY,		XK_Return,	zoom,		{0} },	// switch master/stack, focus master
 	{ MODKEY,		XK_Tab,		setlayout,	{0} },	// toggle between last 2 layouts
 	{ MODKEY|ShiftMask,	XK_Tab,		view,		{0} },	// back and forth workspace
@@ -185,7 +188,7 @@ static Key keys[] = {		/* {0} just means no arg */
 static Button buttons[] = {
 
 	/* click		event mask	button		function	argument */
-	{ ClkClientWin,		ControlMask,	Button1,	movemouse,	{0} },
+	{ ClkClientWin,		0,		Button2,	movemouse,	{0} },	// testing
 	{ ClkClientWin,		MODKEY,		Button1,	movemouse,	{0} },	// anywhere in window
 	{ ClkClientWin,		MODKEY,		Button2,	togglefloating, {0} },
 	{ ClkClientWin,		MODKEY,		Button3,	resizemouse,	{0} },

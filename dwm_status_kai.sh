@@ -7,6 +7,8 @@
 # https://github.com/joestandring/dwm-bar	bloat
 # https://github.com/jiji606/dwm-status/blob/master/dwm-status.sh	ok i guess
 
+# polybar, lemonbar, succade
+
 # 2 intervals https://www.youtube.com/watch?v=6vTrVPpNodI
 # temp: acpi -t
 
@@ -18,7 +20,9 @@ sep="|"
 # todo: use awk on everything
 
 print_weather() { 
-	curl wttr.in/Munich?format="%c+%t\n" || echo "Error"
+	weather=$(curl wttr.in/Munich?format="%c+%t\n")
+	grep 'Unknown' <<< "$weather" && weather="Error"
+	echo "$weather"
 }
 
 print_mpc() {		# requires unicode font, e.g. symbola
