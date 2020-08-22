@@ -1,18 +1,15 @@
-/* https://github.com/LukeSmithxyz/dwm/blob/master/config.h
- * http://ratfactor.com/dwm 
- * https://www.youtube.com/watch?v=UEmPboaTDpQ
- * https://www.youtube.com/watch?v=fBrc_xgwQE8
- * todo: 
- * colors
- * perma-run (easy restart)
- * patch --merge -i [file]
- * diff -u [old] [new] > [diff]
- * patch < [diff]		overwrites the file specified in [diff]
- *				passable conflicts -> "fuzz"
- *				serious conflicts -> generates [old].rej -> change specified files manually
- * patch -R < [diff]		undo changes (also manual ones?)
- * git diff
- * */
+// https://github.com/LukeSmithxyz/dwm/blob/master/config.h
+// http://ratfactor.com/dwm 
+// https://www.youtube.com/watch?v=UEmPboaTDpQ
+// https://www.youtube.com/watch?v=fBrc_xgwQE8
+
+// patch --merge -i [file]
+// diff -u [old] [new] > [diff]
+// patch < [diff]		overwrites the file specified in [diff]
+//				passable conflicts -> "fuzz"
+//				serious conflicts -> generates [old].rej -> change specified files manually
+// patch -R < [diff]		undo changes (also manual ones?)
+// git diff
 
 // https://forum.manjaro.org/t/dwm-not-showing-in-lightdm-log-in-screen/98220/4
 // /usr/share/xsessions/dwm.desktop
@@ -29,23 +26,24 @@ static const int showbar		= 1;	// 0 means no bar
 static const int topbar			= 0;	// 0 means bottom bar
 static const char *fonts[]		= { "monaco:size=8", "symbola:size=8" };
 static const char dmenufont[]		= "monaco:size=8";
-static const char col_gray1[]		= "#222222";
-static const char col_gray2[]		= "#282828";
-static const char col_gray3[]		= "#bbbbbb";
-static const char col_gray4[]		= "#eeeeee";
-static const char col_cyan[]		= "#005577";
-static const char col_green[]		= "#98971a";
+
+// https://camo.githubusercontent.com/cdb2f2e986c564b515c0c698e6c45b4ab5d725a9/687474703a2f2f692e696d6775722e636f6d2f776136363678672e706e67
+static const char blue[]		= "#458688";
+static const char gray[]		= "#131313";
+static const char green[]		= "#98971a";
+static const char lightgray[]		= "#282828";
+static const char red[]			= "#cc241d";
+static const char white2[]		= "#ebdbb2";
+static const char white[]		= "#bbbbbb";
+
 static const char *colors[][3]		= {
-//			fg		bg	 border
-//	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-//	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
-	[SchemeNorm] = { col_gray3, col_gray2, col_gray2 },
-	[SchemeSel]  = { col_green, col_gray2, col_green },
+//			fg	bg	 border
+	[SchemeNorm] = { white2, gray, gray },
+	[SchemeSel]  = { blue, gray, blue },
 };
 
-/* tagging ; custom names? 
- * https://github.com/meinwald/DWM-config/blob/master/config.h#L16
- * */
+// tagging ; custom names? 
+// https://github.com/meinwald/DWM-config/blob/master/config.h#L16
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
 static const Rule rules[] = {
@@ -62,7 +60,9 @@ static const Rule rules[] = {
 	{ "Audacious",	NULL,		NULL,		0,		1,		-1 },
 	{ "discord",	NULL,		NULL,		0,		1,		-1 },
 	{ "Gimp",	NULL,		NULL,		0,		1,		-1 },
+	{ "Gpick",	"gpick",	NULL,		1 << 2,		0,		-1 },
 	{ "mpv",	NULL,		NULL,		0,		1,		1 },	// -1 = current, 0  = 1st, etc; no fallback after disconnect! -- need autostart script to detect xrandr status and react accordingly
+	{ "Pavucontrol",	NULL,	NULL,		0,		1,		-1 },
 	{ "SoulseekQt",	NULL,		NULL,		1 << 1,		1,		-1 },
 	{ "TelegramDesktop", NULL,	NULL,		0,		1,		-1 },
 	{ "Thunar",	NULL,		NULL,		0,		1,		-1 },
@@ -81,14 +81,13 @@ static const int nmaster	= 1;	 /* number of clients in master area */
 static const int resizehints	= 1;	 /* 0 = force terminals to use up all extra space */
 
 static const Layout layouts[] = {
-	/* symbol	arrange function */
 	{ "DEF",	tile },
-	{ "FUL",	monocle },	/* overrides this if >1 window */
+	{ "FUL",	monocle },	// this text is ignored
 	{ "CEN",	centeredmaster },
 	{ "CEF",	centeredfloatingmaster },
 	{ "DEC",	deck },
-	{ "BST",	bstack },	/* absolute unit */
-/*	{ "><>",	  NULL },	  no layout function means floating behavior */
+	{ "BST",	bstack },
+//	{ "><>",	  NULL },
 };
 
 /* key definitions */
@@ -105,7 +104,7 @@ static const Layout layouts[] = {
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "rofi", "-show", "run", NULL }; 
-/* static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL }; to change to rofi */
+/* static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", white, "-sb", col_cyan, "-sf", col_gray4, NULL }; to change to rofi */
 static const char *termcmd[]  = { "urxvt", NULL };
 static const char *brightup[]	    = { "xbacklight", "-inc", "10", NULL};	// acpilight needs root
 static const char *brightdown[]     = { "xbacklight", "-dec", "10", NULL};
@@ -113,19 +112,25 @@ static const char *brightdown[]     = { "xbacklight", "-dec", "10", NULL};
 static Key keys[] = {		/* {0} just means no arg */
 	/* modifier		key		function	argument */
 
-	// cleanup, use {.v = ... }
-	// still unbound: agiruvxz
+	// next tag? super+[/]
+	// still unbound: giruvxz
+	//misc: rofimoji
+	//virtualbox "/home/joseph/VirtualBox VMs/7/7.vbox"
+	//virtualbox "/home/joseph/VirtualBox VMs/xp/xp.vbox" -- what keybind?
 	{ 0,			0x1008ff02,	spawn,		{.v = brightup } },
 	{ 0,			0x1008ff03,	spawn,		{.v = brightdown } },
 	{ 0,			XK_Print,	spawn,		SHCMD("sleep 0.2; scrot -s /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },	// try flameshot
 	{ ControlMask,		XK_Print,	spawn,		SHCMD("scrot -u /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
+	{ Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,	SHCMD("urxvt -e bash ~/scripts/deeznuts") },
 	{ MODKEY,		XK_c,		spawn,		SHCMD("urxvt -e neomutt") },
 	{ MODKEY,		XK_d,		spawn,		{.v = dmenucmd } },
 	{ MODKEY,		XK_e,		spawn,		{.v = termcmd } },
 	{ MODKEY,		XK_m,		spawn,		SHCMD("urxvt -e ncmpcpp") },
+	{ MODKEY,		XK_minus,	spawn,		SHCMD("urxvt -e sh ~/scripts/not") },
 	{ MODKEY,		XK_n,		spawn,		SHCMD("urxvt -e newsboat") },
 	{ MODKEY,		XK_o,		spawn,		SHCMD("transmission-gtk") },
 	{ MODKEY,		XK_p,		spawn,		SHCMD("mpc toggle") },
+	{ MODKEY,		XK_Print,	spawn,		SHCMD("flameshot gui") },	// try flameshot
 	{ MODKEY,		XK_q,		spawn,		SHCMD("soulseekqt") },
 	{ MODKEY,		XK_s,		spawn,		SHCMD("sh ~/scripts/menu-surfraw") },
 	{ MODKEY,		XK_t,		spawn,		SHCMD("telegram-desktop") },
@@ -136,9 +141,6 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY|ShiftMask,	XK_h,		spawn,		SHCMD("urxvt -e htop") },
 	{ MODKEY|ShiftMask,	XK_p,		spawn,		SHCMD("sh ~/scripts/mpcrym") },
 	{ ShiftMask,		XK_Print,	spawn,		SHCMD("scrot /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
-{ Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,		SHCMD("urxvt -e bash ~/scripts/deeznuts") }, /* sh doesn't work, i think */
-    //virtualbox "/home/joseph/VirtualBox VMs/xp/xp.vbox" -- what keybind?
-    //virtualbox "/home/joseph/VirtualBox VMs/7/7.vbox"
 
 // https://dwm.suckless.org/patches/keypressrelease/
 // https://gitlab.com/rafa_99/dwm/blob/master/config.h#L152
@@ -151,15 +153,16 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY|ShiftMask,	XK_k,		incnmaster,	{.i = +1 } }, // +1 horiz in master
 	{ MODKEY,		XK_h,		setmfact,	{.f = -0.05} }, // widen master
 	{ MODKEY,		XK_l,		setmfact,	{.f = +0.05} }, // i rarely use this
-	{ MODKEY,		XK_Escape,	zoom,		{0} },
-	{ MODKEY,		XK_Return,	zoom,		{0} },	// switch master/stack, focus master
+	{ MODKEY,		XK_space,	zoom,		{0} },
+//	{ MODKEY,		XK_Return,	zoom,		{0} },	// switch master/stack, focus master
 	{ MODKEY,		XK_Tab,		setlayout,	{0} },	// toggle between last 2 layouts
 	{ MODKEY|ShiftMask,	XK_Tab,		view,		{0} },	// back and forth workspace
 	{ MODKEY,		XK_grave,	togglefloating,	{0} },
 //	{ MODKEY,		XK_0,		view,		{.ui = ~0 } }, // merge all workspaces; i almost never use this
 	{ MODKEY|ShiftMask,	XK_0,		tag,		{.ui = ~0 } }, // "sticky"
 
-	{ MODKEY,		XK_space,	setlayout,	{.v = &layouts[0]} },	// default
+	{ MODKEY,		XK_a,		setlayout,	{.v = &layouts[0]} },	// default
+	{ MODKEY,		XK_Return,	setlayout,	{.v = &layouts[0]} },
 	{ MODKEY,		XK_f,		setlayout,	{.v = &layouts[1]} },	// fullscreen
 	{ MODKEY|ControlMask,	XK_space,	setlayout,	{.v = &layouts[2]} },	// centmast
 	{ MODKEY|ShiftMask,	XK_space,	setlayout,	{.v = &layouts[3]} },	// centmast float
@@ -183,12 +186,10 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY|ShiftMask,	XK_q,		quit,		{0} },
 };
 
-/* button definitions */
 /* click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin */
 static Button buttons[] = {
 
 	/* click		event mask	button		function	argument */
-	{ ClkClientWin,		0,		Button2,	movemouse,	{0} },	// testing
 	{ ClkClientWin,		MODKEY,		Button1,	movemouse,	{0} },	// anywhere in window
 	{ ClkClientWin,		MODKEY,		Button2,	togglefloating, {0} },
 	{ ClkClientWin,		MODKEY,		Button3,	resizemouse,	{0} },
@@ -204,22 +205,20 @@ static Button buttons[] = {
 
 static const char *const autostart[] = {	// cool_autostart
 
-	"dunst", NULL,
+	"dunst", NULL,		// any command longer than 1 word needs the long syntax, apparently
 	"mpd", NULL,
-	"picom -b --config .picom.conf", NULL,
-	"pkill mpdscribble; mpdscribble", NULL,	// pidof || method -> running, but inactive -- testing syntax
-	"setxkbmap -option compose:rctrl", NULL,	// not working
-	"sh", "-c", "pkill redshift; redshift -b 1", NULL,	// same as mpdscribble
+	"sh", "-c", "picom -b --config .picom.conf", NULL,
+	"sh", "-c", "pkill mpdscribble; mpdscribble", NULL,	// pidof || method -> running, but inactive
+	"sh -c setxkbmap -option compose:rctrl", NULL,		// testing syntax
 	"sh", "-c", "udisksctl mount -b /dev/sdb1", NULL,	// takes a while, don't panic
 	"sh", "-c", "while :; do feh -r --randomize --bg-fill '/run/media/joseph/My Passport/files/wg/'; sleep 10m; done", NULL,	// 1st 10 min will fail; waiting to mount
-	"sh", "-c", "xinput --set-prop 10 287 -0.8", NULL,	/* may not always be 9 287 */
 	"sh", "-c", "~/dwm/dwm_status_kai.sh", NULL,	// unreliable; start manually, kill, then can autostart again
+	"sh", "-c", "~/scripts/mon", NULL,		// too slow?
+	"sh", "-c", "~/scripts/mouse", NULL,		// finally reliable
 	"udiskie", NULL,
+	//"sh", "-c", "pkill redshift; redshift -b 1", NULL,	// has its own autostart, probably systemd
 	NULL
 
 //	"hsetroot", "-center", "/usr/home/bit6tream/pic/wallapper.png", NULL,
-//	"sh", "-c", "while :; do dwmstatus.sh -; sleep 60; done", NULL,
-//	"xrdb", "/usr/home/bit6tream/.config/X/Xresources", NULL,
 //	pkill remind; remind -z10 '-kdunstify %s &' /home/joseph/.reminders/.reminders.rem
-//	remind nm-applet
 };

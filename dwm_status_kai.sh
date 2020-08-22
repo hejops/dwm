@@ -17,7 +17,7 @@
 int=5
 sep="|"
 
-# todo: use awk on everything
+# TODO: use awk on everything
 
 print_weather() { 
 	weather=$(curl wttr.in/Munich?format="%c+%t\n")
@@ -44,7 +44,9 @@ print_network(){	# todo: SSID, down speed, vpn status
 	#transmitted=$(cut -d' ' -f2 <<< "$network")
 }
 
-print_bat(){		# todo: icon (plugged/discharging), time left, text color?
+print_bat(){
+	# TODO: icon (plugged/discharging), time left, text color?
+	# TODO: do something about low batt (<1h, <10min)
 	hash acpi || return 0
 	batstat="$(cat /sys/class/power_supply/BAT*/status)"
 	charge="$(cat /sys/class/power_supply/BAT*/capacity)%"
@@ -60,7 +62,7 @@ print_bat(){		# todo: icon (plugged/discharging), time left, text color?
 	printf "%s" "$charge"
 }
 
-print_cpu() {		# why do all 4 commands show in ps -faux?
+print_cpu() {
 	cpu=$(mpstat "$int" 1 | awk 'NR==4 {print $3"%\n"$4"%\n"$5"%"}' | sort | tail -1)
 	printf "%s" "$cpu"
 	# top | sed -n 3p
@@ -69,7 +71,10 @@ print_cpu() {		# why do all 4 commands show in ps -faux?
 
 print_mem(){ free -h | awk 'NR==2 {print $3}' | tr -d i; }
 
-print_disk() { df -h /dev/sdb1 | tail -1 | tr -s ' ' | cut -d' ' -f4; }
+print_disk() {		# if hdd not connected, show ~
+	{ df -h /dev/sdb1 | tail -1 | tr -s ' ' | cut -d' ' -f4 ; } ||
+	{ df -h /dev/sda1 | tail -1 | tr -s ' ' | cut -d' ' -f4 ; }
+}
 
 print_date(){ date '+%a %d/%m %H:%M' ; }
 
