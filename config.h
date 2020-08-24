@@ -3,6 +3,7 @@
 // https://www.youtube.com/watch?v=UEmPboaTDpQ
 // https://www.youtube.com/watch?v=fBrc_xgwQE8
 
+// patches to try: regex rules, attachbottom, focusadjacenttag, focusonnetactive, swapfocus, switchtotag, warp, zoomswap
 // patch --merge -i [file]
 // diff -u [old] [new] > [diff]
 // patch < [diff]		overwrites the file specified in [diff]
@@ -42,9 +43,9 @@ static const char *colors[][3]		= {
 	[SchemeSel]  = { blue, gray, blue },
 };
 
-// tagging ; custom names? 
+// tag names -- testing
 // https://github.com/meinwald/DWM-config/blob/master/config.h#L16
-static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+static const char *tags[] = { "main", "down", "3", "vbox", "5", "6", "7", "8", "9" };
 
 static const Rule rules[] = {
 	// xprop(1):
@@ -53,26 +54,27 @@ static const Rule rules[] = {
 	// try to make do without regex first
 	// https://github.com/ericpruitt/edge/blob/master/patches/dwm-00-regex-rules.diff
 	// https://www.tutorialspoint.com/c_standard_library/c_function_strstr.htm
-	// class	instance	title		tags mask	isfloating	 monitor
+	// class	instance	title		tags mask	float	switch	monitor
+	// float = isfloating, switch = switchtotag (not switchtag)
 
-	//{ "Firefox",	NULL,		NULL,		1 << 8,		0,		-1 }, 
-	{ "App.py",	NULL,		NULL,		1 << 3,		1,		-1 },	// playitslowly
-	{ "Audacious",	NULL,		NULL,		0,		1,		-1 },
-	{ "discord",	NULL,		NULL,		0,		1,		-1 },
-	{ "Gimp",	NULL,		NULL,		0,		1,		-1 },
-	{ "Gpick",	"gpick",	NULL,		1 << 2,		0,		-1 },
-	{ "mpv",	NULL,		NULL,		0,		1,		1 },	// -1 = current, 0  = 1st, etc; no fallback after disconnect! -- need autostart script to detect xrandr status and react accordingly
-	{ "Pavucontrol",	NULL,	NULL,		0,		1,		-1 },
-	{ "SoulseekQt",	NULL,		NULL,		1 << 1,		1,		-1 },
-	{ "TelegramDesktop", NULL,	NULL,		0,		1,		-1 },
-	{ "Thunar",	NULL,		NULL,		0,		1,		-1 },
-	{ "Transmission-gtk",	NULL,	NULL,		1 << 1,		0,		-1 },
-	{ "TuxGuitar",	NULL,		NULL,		1 << 3,		0,		-1 },
-	{ "URxvt",	"urxvt",	"deeznu",	1 << 2,		0,		-1 },	// unreliable
-	{ "VirtualBox Machine",	NULL,	NULL,		1 << 3,		0,		-1 },
-	{ "VirtualBox Manager",	NULL,	NULL,		1 << 3,		1,		-1 },
-	{ "zoom",	NULL,		NULL,		1 << 2,		0,		-1 },
-	{ NULL,		NULL,		"deeznuts",	1 << 2,		0,		-1 },	// unreliable
+	//{ "Audacious",NULL,		NULL,		0,		1,	0,	-1 },
+	//{ "Firefox",	NULL,		NULL,		1 << 8,		0,	0,	-1 }, 
+	{ "App.py",	NULL,		NULL,		1 << 3,		1,	0,	-1 },	// playitslowly
+	{ "discord",	NULL,		NULL,		0,		1,	0,	-1 },
+	{ "Gimp",	NULL,		NULL,		0,		1,	0,	-1 },
+	{ "Gpick",	"gpick",	NULL,		0,		1,	0,	-1 },
+	{ "mpv",	NULL,		NULL,		0,		0,	0,	 1 },
+	{ "Pavucontrol",	NULL,	NULL,		0,		1,	0,	-1 },
+	{ "SoulseekQt",	NULL,		NULL,		1 << 1,		1,	0,	-1 },
+	{ "TelegramDesktop", NULL,	NULL,		0,		1,	0,	-1 },
+	{ "Thunar",	NULL,		NULL,		0,		1,	0,	-1 },
+	{ "Transmission-gtk",	NULL,	NULL,		1 << 1,		0,	0,	-1 },
+	{ "TuxGuitar",	NULL,		NULL,		1 << 3,		0,	0,	-1 },
+	{ "URxvt",	"urxvt",	"deeznu",	1 << 2,		0,	0,	-1 },	// unreliable
+	{ "VirtualBox Machine",	NULL,	NULL,		1 << 3,		0,	1,	-1 },
+	{ "VirtualBox Manager",	NULL,	NULL,		1 << 3,		1,	1,	-1 },
+	{ "zoom",	NULL,		NULL,		1 << 2,		0,	0,	-1 },
+	{ NULL,		NULL,		"deeznuts",	1 << 2,		0,	0,	-1 },	// unreliable
 };
 
 /* layout(s) */
@@ -82,8 +84,8 @@ static const int resizehints	= 1;	 /* 0 = force terminals to use up all extra sp
 
 static const Layout layouts[] = {
 	{ "DEF",	tile },
-	{ "FUL",	monocle },	// this text is ignored
-	{ "CEN",	centeredmaster },
+	{ "FUL",	monocle },
+	{ "CEN",	centeredmaster },	// TODO: remove
 	{ "CEF",	centeredfloatingmaster },
 	{ "DEC",	deck },
 	{ "BST",	bstack },
@@ -112,11 +114,10 @@ static const char *brightdown[]     = { "xbacklight", "-dec", "10", NULL};
 static Key keys[] = {		/* {0} just means no arg */
 	/* modifier		key		function	argument */
 
-	// next tag? super+[/]
-	// still unbound: giruvxz
-	//misc: rofimoji
-	//virtualbox "/home/joseph/VirtualBox VMs/7/7.vbox"
-	//virtualbox "/home/joseph/VirtualBox VMs/xp/xp.vbox" -- what keybind?
+	// misc: rofimoji
+	// still unbound: giruvxz; hl -- good candidate for push
+	// virtualbox "/home/joseph/VirtualBox VMs/7/7.vbox"
+	// virtualbox "/home/joseph/VirtualBox VMs/xp/xp.vbox" -- what keybind?
 	{ 0,			0x1008ff02,	spawn,		{.v = brightup } },
 	{ 0,			0x1008ff03,	spawn,		{.v = brightdown } },
 	{ 0,			XK_Print,	spawn,		SHCMD("sleep 0.2; scrot -s /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },	// try flameshot
@@ -147,21 +148,24 @@ static Key keys[] = {		/* {0} just means no arg */
 
 //	{ MODKEY,		XK_b,		togglebar,	{0} },
 	{ ControlMask,		XK_q,		killclient,	{0} },	// close window
-	{ MODKEY,		XK_j,		focusstack,	{.i = +1 } }, // cycle focus
+	{ MODKEY,		XK_j,		focusstack,	{.i = +1 } },	// cycle window focus
 	{ MODKEY,		XK_k,		focusstack,	{.i = -1 } },
-	{ MODKEY|ShiftMask,	XK_j,		incnmaster,	{.i = -1 } },
-	{ MODKEY|ShiftMask,	XK_k,		incnmaster,	{.i = +1 } }, // +1 horiz in master
-	{ MODKEY,		XK_h,		setmfact,	{.f = -0.05} }, // widen master
-	{ MODKEY,		XK_l,		setmfact,	{.f = +0.05} }, // i rarely use this
-	{ MODKEY,		XK_space,	zoom,		{0} },
-//	{ MODKEY,		XK_Return,	zoom,		{0} },	// switch master/stack, focus master
+	{ MODKEY,		XK_bracketright,shiftviewclients,	{ .i = +1 } },	// cycle tag focus
+	{ MODKEY,		XK_bracketleft, shiftviewclients,	{ .i = -1 } },
+	{ MODKEY,		XK_space,	zoom,		{0} },	// switch master/stack, focus master
 	{ MODKEY,		XK_Tab,		setlayout,	{0} },	// toggle between last 2 layouts
 	{ MODKEY|ShiftMask,	XK_Tab,		view,		{0} },	// back and forth workspace
 	{ MODKEY,		XK_grave,	togglefloating,	{0} },
 //	{ MODKEY,		XK_0,		view,		{.ui = ~0 } }, // merge all workspaces; i almost never use this
 	{ MODKEY|ShiftMask,	XK_0,		tag,		{.ui = ~0 } }, // "sticky"
 
-	{ MODKEY,		XK_a,		setlayout,	{.v = &layouts[0]} },	// default
+	// rarely used
+	{ MODKEY|ShiftMask,	XK_Down,	incnmaster,	{.i = -1 } },	// +1 horiz in master
+	{ MODKEY|ShiftMask,	XK_Up,		incnmaster,	{.i = +1 } }, 
+	{ MODKEY,		XK_Left,	setmfact,	{.f = -0.05} }, // widen master
+	{ MODKEY,		XK_Right,	setmfact,	{.f = +0.05} }, 
+
+	{ MODKEY,		XK_g,		setlayout,	{.v = &layouts[0]} },	// default
 	{ MODKEY,		XK_Return,	setlayout,	{.v = &layouts[0]} },
 	{ MODKEY,		XK_f,		setlayout,	{.v = &layouts[1]} },	// fullscreen
 	{ MODKEY|ControlMask,	XK_space,	setlayout,	{.v = &layouts[2]} },	// centmast
