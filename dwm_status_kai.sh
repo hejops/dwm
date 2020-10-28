@@ -17,12 +17,15 @@
 int=5
 sep="|"
 
+# TODO: check deps
 # TODO: use awk on everything
 
-print_weather() { 
-	weather=$(curl wttr.in/Munich?format="%c+%t\n")
-	grep 'Unknown' <<< "$weather" && weather="Error"
-	echo "$weather"
+print_weather() {
+	weather=$(curl -s wttr.in/Munich?format="%c+%t\n") # 2>&1)
+	# seriously inaccurate nowadays
+	grep -Pq 'Unknown|fritz' <<< "$weather" && weather="Error"
+	printf "%s" "$weather"
+	# return?
 }
 
 print_mpc() {		# requires unicode font, e.g. symbola
@@ -34,10 +37,13 @@ print_mpc() {		# requires unicode font, e.g. symbola
 	printf "%s" "$title"
 }
 
-print_network(){	# todo: SSID, down speed, vpn status
-	ssid=$(nmcli | head -n1 | cut -d' ' -f4-)
-	nordvpn status | grep -q Connected && ssid="[$ssid]"
+print_network(){
+	ssid=$(nmcli | grep wlp3s0 | cut -d' ' -f4-)	# use sed instead
+	# nordvpn status | grep -q Connected && ssid="[$ssid]"
+	# don't rely on nordvpn; breaks the entire output when it fails
+	ip tuntap show | grep -q queue && ssid="[$ssid]"
 	printf "%s" "$ssid"
+
 	#network=$(grep wlp3s0 /proc/net/dev | cut -d ':' -f 2 | awk '{print $1" "$9}')
 	# total bytes received/transmitted, then divide by $int
 	#received=$(cut -d' ' -f1 <<< "$network")
@@ -45,8 +51,7 @@ print_network(){	# todo: SSID, down speed, vpn status
 }
 
 print_bat(){
-	# TODO: icon (plugged/discharging), time left, text color?
-	# TODO: do something about low batt (<1h, <10min)
+	# TODO: icon (plugged/discharging), text color?
 	hash acpi || return 0
 	batstat="$(cat /sys/class/power_supply/BAT*/status)"
 	charge="$(cat /sys/class/power_supply/BAT*/capacity)%"
@@ -54,6 +59,7 @@ print_bat(){
 	if [[ "$batstat" = "Discharging" ]]; then
 		battime=$(acpi -V | head -n1 | cut -d' ' -f5) # get rid of seconds
 		charge="$charge ($battime)"
+		[[ "$battime" =~ ^\d:\d{2}$ ]] && notify-send -u critical "Critical battery" "$battime"
 	fi
 	# suspend when we close the lid
 	#systemctl --user stop inhibit-lid-sleep-on-battery.service
@@ -69,16 +75,16 @@ print_cpu() {
 	# sar
 }
 
-print_mem(){ free -h | awk 'NR==2 {print $3}' | tr -d i; }
+print_mem(){ free -h | awk 'NR==2 {print $3}' | tr -d i; }	# line 3, field 3
 
-print_disk() {		# if hdd not connected, show ~
+print_disk() {		# if hdd not (yet) mounted, shows ~ instead
+	# TODO: use awk
+	# TODO: use name instead, designation depends on port!
 	{ df -h /dev/sdb1 | tail -1 | tr -s ' ' | cut -d' ' -f4 ; } ||
 	{ df -h /dev/sda1 | tail -1 | tr -s ' ' | cut -d' ' -f4 ; }
-}
+	}
 
 print_date(){ date '+%a %d/%m %H:%M' ; }
-
-# & puts the process into the background, where it cannot be killed by dwm
 
 while true; do
 	#while true; do print_weather > /tmp/dwmweather; sleep 30m; done &
@@ -86,3 +92,5 @@ while true; do
 	xsetroot -name "$(print_weather) $sep $(print_mpc) $sep $(print_network) $sep $(print_bat) $sep $(print_cpu) $sep $(print_mem) $sep $(print_disk) $sep $(print_date)"
 	sleep "$int"
 done
+# & puts the process into the background, where it cannot be killed by dwm
+
