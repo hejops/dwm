@@ -22,7 +22,7 @@ sep="|"
 
 print_weather() {
 	weather=$(curl -s wttr.in/Munich?format="%c+%t\n") # 2>&1)
-	# seriously inaccurate nowadays
+	# kinda inaccurate nowadays
 	grep -Pq 'Unknown|fritz' <<< "$weather" && weather="Error"
 	printf "%s" "$weather"
 	# return?
@@ -38,10 +38,15 @@ print_mpc() {		# requires unicode font, e.g. symbola
 }
 
 print_network(){
-	ssid=$(nmcli | grep wlp3s0 | cut -d' ' -f4-)	# use sed instead
-	# nordvpn status | grep -q Connected && ssid="[$ssid]"
-	# don't rely on nordvpn; breaks the entire output when it fails
-	ip tuntap show | grep -q queue && ssid="[$ssid]"
+	state=$(nmcli)	# use sed instead
+	ssid=$(<<< "$state" grep wlp3s0 | cut -d' ' -f4-)	# use sed instead
+	if  [[ -z "$ssid" ]]; then
+		ssid="No network"
+	elif ip tuntap show | grep -q queue; then
+		ssid="[$ssid]"
+	elif [[ "$ssid" =~ LRZ ]]; then	# ip tuntap can't be used due to "persist" option
+		ssid="{$ssid}"
+	fi
 	printf "%s" "$ssid"
 
 	#network=$(grep wlp3s0 /proc/net/dev | cut -d ':' -f 2 | awk '{print $1" "$9}')
@@ -80,8 +85,12 @@ print_mem(){ free -h | awk 'NR==2 {print $3}' | tr -d i; }	# line 3, field 3
 print_disk() {		# if hdd not (yet) mounted, shows ~ instead
 	# TODO: use awk
 	# TODO: use name instead, designation depends on port!
-	{ df -h /dev/sdb1 | tail -1 | tr -s ' ' | cut -d' ' -f4 ; } ||
-	{ df -h /dev/sda1 | tail -1 | tr -s ' ' | cut -d' ' -f4 ; }
+	df_output=$(df -h)
+	if [[ $df_output = *sdb* ]]; then 
+		device=$(grep sdb <<< "$df_output")
+	else device=$(grep -P '/$')
+	fi
+	tr -s ' ' <<< "$device" | cut -d' ' -f4 
 	}
 
 print_date(){ date '+%a %d/%m %H:%M' ; }
