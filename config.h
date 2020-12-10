@@ -59,11 +59,22 @@ static const Rule rules[] = {
 	// class	instance	title		tags mask	switch	float	monitor
 	// switchtotag doesn't seem to handle windows spawned on new monitor -- can send to mon 1, but cannot switch to tag 9
 	// why does tag 0 mon 0 create a new tag?
-	{ "mednafen",	NULL,		NULL,		0,		0,	1,	1 },
-	{ "mpv",	NULL,		NULL,		0,		0,	1,	1 },
+	{ "Chromium",	NULL,		NULL,		0,		0,	0,	1 },
 	{ "PPSSPPQt",	NULL,		NULL,		0,		0,	1,	1 },
+	{ "discord",	NULL,		NULL,		0,		0,	1,	1 },
+	{ "mednafen",	NULL,		NULL,		0,		0,	1,	1 },
+	{ "mpv",	NULL,		NULL,		0,		1,	0,	1 },
+	{ NULL,		NULL,		"ncmpcpp",	0,		0,	0,	1 },	// testing
 
-	{ "discord",	NULL,		NULL,		0,		0,	1,	-1 },
+	{ "SoulseekQt",	NULL,		NULL,		1 << 1,		1,	1,	1 },
+
+	{ "Com.github.xournalpp.xournalpp",	NULL,	NULL,	1 << 2,	1,	0,	1 },
+	{ "MestReNova",	NULL,		NULL,		1 << 2,		1,	0,	1 },
+	{ "Zathura",	NULL,		NULL,		1 << 2,		1,	0,	1 },
+
+	{ "VirtualBox Machine",	NULL,	NULL,		1 << 3,		1,	0,	1 },
+	{ "VirtualBox Manager",	NULL,	NULL,		1 << 3,		1,	1,	1 },
+
 	{ "Gimp",	NULL,		NULL,		0,		0,	1,	-1 },
 	{ "Gpick",	"gpick",	NULL,		0,		0,	1,	-1 },
 	{ "matplotlib",	NULL,		NULL,		0,		0,	1,	-1 },
@@ -71,7 +82,6 @@ static const Rule rules[] = {
 	{ "TelegramDesktop", NULL,	NULL,		0,		0,	1,	-1 },
 	{ "Thunar",	NULL,		NULL,		0,		0,	1,	-1 },
 
-	{ "SoulseekQt",	NULL,		NULL,		1 << 1,		1,	1,	-1 },	// very strange behaviour; spawns empty tags and prevents switching to tag 1 -- or is it shiftview?
 	{ "Transmission-gtk",	NULL,	NULL,		1 << 1,		1,	0,	-1 },
 	{ "URxvt",	"urxvt",	"deeznu",	1 << 1,		0,	0,	-1 },	// unreliable
 	{ NULL,		NULL,		"deeznuts",	1 << 1,		0,	0,	-1 },	// unreliable
@@ -80,8 +90,6 @@ static const Rule rules[] = {
 
 	{ "App.py",	NULL,		NULL,		1 << 3,		1,	1,	-1 },	// playitslowly
 	{ "TuxGuitar",	NULL,		NULL,		1 << 3,		1,	0,	-1 },
-	{ "VirtualBox Machine",	NULL,	NULL,		1 << 3,		1,	0,	-1 },
-	{ "VirtualBox Manager",	NULL,	NULL,		1 << 3,		1,	1,	-1 },
 };
 
 /* layout(s) */
@@ -115,17 +123,19 @@ static const char *dmenucmd[] = { "rofi", "-show", "run", NULL };
 static const char *termcmd[]  = { "urxvt", NULL };
 static const char *brightup[]	    = { "xbacklight", "-inc", "10", NULL};	// acpilight needs root
 static const char *brightdown[]     = { "xbacklight", "-dec", "10", NULL};
+static const char *musiccmd[] = { "urxvt", "-title", "ncmpcpp", "-e", "ncmpcpp", NULL };	// testing; ncmpcpp always sets its own (long) title
 
 static Key keys[] = {		/* {0} just means no arg */
 	/* modifier		key		function	argument */
 
+	/* xfce4-screenshooter -w */
 	// misc: rofimoji
-	// still unbound: airu-=; zx (shiftview?); backspace (focus master), backslash
+	// still unbound: airu-=;':"[]{} zx (shiftview?); backspace (focus master), backslash, enter
 	// virtualbox "/home/joseph/VirtualBox VMs/7/7.vbox"
 	// virtualbox "/home/joseph/VirtualBox VMs/xp/xp.vbox" -- what keybind?
 	{ 0,			0x1008ff02,	spawn,		{.v = brightup } },
 	{ 0,			0x1008ff03,	spawn,		{.v = brightdown } },
-	{ 0,			XK_Print,	spawn,		SHCMD("sleep 0.2; scrot -s /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
+	{ 0,			XK_Print,	spawn,		SHCMD("sleep 0.2; scrot -s /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },	// not good
 	{ ControlMask,		XK_Print,	spawn,		SHCMD("scrot -u /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
 	{ Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,	SHCMD("urxvt -e bash ~/scripts/deeznuts") },
 	{ MODKEY,		XK_a,		spawn,		SHCMD("localc") },
@@ -133,7 +143,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY,		XK_d,		spawn,		{.v = dmenucmd } },
 	{ MODKEY,		XK_e,		spawn,		{.v = termcmd } },
 	{ MODKEY,		XK_m,		spawn,		SHCMD("urxvt -e ncmpcpp") },
-	{ MODKEY,		XK_minus,	spawn,		SHCMD("sh ~/scripts/not") },
+	{ MODKEY,		XK_minus,	spawn,		SHCMD("urxvt -e sh ~/scripts/not") },	// doesn't work without terminal?
 	{ MODKEY,		XK_n,		spawn,		SHCMD("urxvt -e newsboat") },
 	{ MODKEY,		XK_o,		spawn,		SHCMD("transmission-gtk") },
 	{ MODKEY,		XK_p,		spawn,		SHCMD("mpc toggle") },
@@ -146,7 +156,9 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY|ShiftMask,	XK_d,		spawn,		SHCMD("discord-ptb") },
 	{ MODKEY|ShiftMask,	XK_f,		spawn,		SHCMD("urxvt -e sh ~/scripts/ranga") },
 	{ MODKEY|ShiftMask,	XK_h,		spawn,		SHCMD("urxvt -e htop") },
+	{ MODKEY|ShiftMask,	XK_l,		spawn,		SHCMD("sh ~/scripts/lastscrob") },
 	{ MODKEY|ShiftMask,	XK_p,		spawn,		SHCMD("sh ~/scripts/mpcrym") },
+	{ MODKEY|ShiftMask,	XK_v,		spawn,		SHCMD("virtualbox") },
 	{ ShiftMask,		XK_Print,	spawn,		SHCMD("scrot /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
 
 // https://dwm.suckless.org/patches/keypressrelease/
@@ -188,10 +200,13 @@ static Key keys[] = {		/* {0} just means no arg */
 	TAGKEYS(		XK_8,				7)
 	TAGKEYS(		XK_9,				8)
 	{ MODKEY,		XK_0,		spawn,		SHCMD("sh ~/scripts/mon") },	// toggle 2nd mon
-	{ MODKEY,		XK_comma,	focusmon,	{.i = -1 } }, // change focus; cursor unaffected
-	{ MODKEY,		XK_period,	focusmon,	{.i = +1 } },
-	{ MODKEY|ShiftMask,	XK_comma,	tagmon,		{.i = -1 } }, // move window to mon
-	{ MODKEY|ShiftMask,	XK_period,	tagmon,		{.i = +1 } },
+
+	{ MODKEY|ShiftMask,	XK_space,	tagmon,		{.i = +1 } },	// send to mon
+	{ MODKEY,		XK_comma,	tagmon,		{.i = +1 } },	// send to mon
+	{ MODKEY,		XK_period,	focusmon,	{.i = +1 } },	// change focus (cursor unaffected); this is ok because i only use 2 mons anyway; i use period because it's more ergonomic
+	{ MODKEY,		XK_i,		focusmon,	{.i = +1 } },
+	/* { MODKEY|ShiftMask,	XK_comma,	tagmon,		{.i = -1 } }, */
+	/* { MODKEY|ShiftMask,	XK_period,	tagmon,		{.i = +1 } }, */
 	{ MODKEY|ShiftMask,	XK_q,		quit,		{0} },
 	{ MODKEY|ControlMask|ShiftMask,	XK_q,	quit,		{1} },
 };
@@ -218,6 +233,7 @@ static Button buttons[] = {
 static const char *const autostart[] = {	// cool_autostart
 
 	"dunst", NULL,		// any command longer than 1 word needs the long syntax, apparently
+	"./.fehbg", NULL,	// TESTING
 	"mpd", NULL,		// can be pretty slow on cold boot; e.g. "Cannot assign requested address"
 	"sh", "-c", "picom -b --config .picom.conf",	NULL,
 	"sh", "-c", "pkill mpdscribble; mpdscribble",	NULL,	// pidof || method -> running, but inactive
@@ -226,7 +242,7 @@ static const char *const autostart[] = {	// cool_autostart
 	"sh", "-c", "udisksctl mount -b /dev/sdb1",	NULL,	// takes a while, don't panic
 	"sh", "-c", "while :; do feh -r --randomize --bg-fill '/run/media/joseph/My Passport/files/wg/'; sleep 10m; done", NULL,	// 1st 10 min will fail; waiting to mount
 	"sh", "-c", "~/dwm/dwm_status_kai.sh",	NULL,	// unreliable; start manually, kill, then can autostart again
-	"sh", "-c", "~/scripts/mon",		NULL,	// needs work
+	"sh", "-c", "~/scripts/mon",		NULL,
 	"udiskie", NULL,
 	//"sh", "-c", "notify-send \"dwm started\"", NULL,
 	//"sh", "-c", "~/scripts/mouse",		NULL,
