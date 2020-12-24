@@ -57,16 +57,22 @@ static const Rule rules[] = {
 	// switch = switchtotag (not switchtag), float = isfloating
 
 	// class	instance	title		tags mask	switch	float	monitor
-	// switchtotag doesn't seem to handle windows spawned on new monitor -- can send to mon 1, but cannot switch to tag 9
+	// switchtag definitions: https://github.com/bakkeby/patches/wiki/switchtag
 	// why does tag 0 mon 0 create a new tag?
 	{ "Chromium",	NULL,		NULL,		0,		0,	0,	1 },
+	{ "libreoffice-calc",	NULL,	NULL,		0,		0,	0,	1 },	// doesn't work? try capital?
+	{ "libreoffice-writer",	NULL,	NULL,		0,		0,	0,	1 },
+	{ NULL,		NULL,		"LibreOffice",	0,		0,	0,	1 },
 	{ "PPSSPPQt",	NULL,		NULL,		0,		0,	1,	1 },
 	{ "discord",	NULL,		NULL,		0,		0,	1,	1 },
 	{ "mednafen",	NULL,		NULL,		0,		0,	1,	1 },
 	{ "mpv",	NULL,		NULL,		0,		1,	0,	1 },
-	{ NULL,		NULL,		"ncmpcpp",	0,		0,	0,	1 },	// testing
+	{ NULL,		NULL,		"ncmpcpp",	1 << 0,		0,	0,	1 },	// works!
 
-	{ "SoulseekQt",	NULL,		NULL,		1 << 1,		1,	1,	1 },
+	{ "SoulseekQt",	NULL,		NULL,		1 << 1,		1,	1,	1 },	// not sure which mon these should go to
+	{ "Transmission-gtk",	NULL,	NULL,		1 << 1,		1,	0,	1 },
+	{ NULL,		NULL,		"deeznuts",	1 << 1,		0,	0,	1 },	// testing
+
 
 	{ "Com.github.xournalpp.xournalpp",	NULL,	NULL,	1 << 2,	1,	0,	1 },
 	{ "MestReNova",	NULL,		NULL,		1 << 2,		1,	0,	1 },
@@ -79,12 +85,8 @@ static const Rule rules[] = {
 	{ "Gpick",	"gpick",	NULL,		0,		0,	1,	-1 },
 	{ "matplotlib",	NULL,		NULL,		0,		0,	1,	-1 },
 	{ "Pavucontrol",	NULL,	NULL,		0,		0,	1,	-1 },
-	{ "TelegramDesktop", NULL,	NULL,		0,		0,	1,	-1 },
+	{ "TelegramDesktop",	NULL,	NULL,		0,		0,	1,	-1 },
 	{ "Thunar",	NULL,		NULL,		0,		0,	1,	-1 },
-
-	{ "Transmission-gtk",	NULL,	NULL,		1 << 1,		1,	0,	-1 },
-	{ "URxvt",	"urxvt",	"deeznu",	1 << 1,		0,	0,	-1 },	// unreliable
-	{ NULL,		NULL,		"deeznuts",	1 << 1,		0,	0,	-1 },	// unreliable
 
 	{ "zoom",	NULL,		NULL,		1 << 2,		1,	0,	-1 },
 
@@ -123,7 +125,7 @@ static const char *dmenucmd[] = { "rofi", "-show", "run", NULL };
 static const char *termcmd[]  = { "urxvt", NULL };
 static const char *brightup[]	    = { "xbacklight", "-inc", "10", NULL};	// acpilight needs root
 static const char *brightdown[]     = { "xbacklight", "-dec", "10", NULL};
-static const char *musiccmd[] = { "urxvt", "-title", "ncmpcpp", "-e", "ncmpcpp", NULL };	// testing; ncmpcpp always sets its own (long) title
+// static const char *musiccmd[] = { "urxvt", "-title", "ncmpcpp", "-e", "ncmpcpp", NULL };	// testing; ncmpcpp always sets its own (long) title
 
 static Key keys[] = {		/* {0} just means no arg */
 	/* modifier		key		function	argument */
@@ -137,9 +139,9 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ 0,			0x1008ff03,	spawn,		{.v = brightdown } },
 	{ 0,			XK_Print,	spawn,		SHCMD("sleep 0.2; scrot -s /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },	// not good
 	{ ControlMask,		XK_Print,	spawn,		SHCMD("scrot -u /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
-	{ Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,	SHCMD("urxvt -e bash ~/scripts/deeznuts") },
+	{ MODKEY,		XK_Print,	spawn,		SHCMD("flameshot gui") },
 	{ MODKEY,		XK_a,		spawn,		SHCMD("localc") },
-	{ MODKEY,		XK_c,		spawn,		SHCMD("urxvt -e neomutt") },
+	{ MODKEY,		XK_c,		spawn,		SHCMD("urxvt -e neomutt") },	// why does -Z always report no new mail?
 	{ MODKEY,		XK_d,		spawn,		{.v = dmenucmd } },
 	{ MODKEY,		XK_e,		spawn,		{.v = termcmd } },
 	{ MODKEY,		XK_m,		spawn,		SHCMD("urxvt -e ncmpcpp") },
@@ -147,18 +149,20 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY,		XK_n,		spawn,		SHCMD("urxvt -e newsboat") },
 	{ MODKEY,		XK_o,		spawn,		SHCMD("transmission-gtk") },
 	{ MODKEY,		XK_p,		spawn,		SHCMD("mpc toggle") },
-	{ MODKEY,		XK_Print,	spawn,		SHCMD("flameshot gui") },
 	{ MODKEY,		XK_q,		spawn,		SHCMD("soulseekqt") },
 	{ MODKEY,		XK_s,		spawn,		SHCMD("sh ~/scripts/menu-surfraw") },
 	{ MODKEY,		XK_t,		spawn,		SHCMD("telegram-desktop") },
 	{ MODKEY,		XK_w,		spawn,		SHCMD("firefox") },
-	{ MODKEY,		XK_y,		spawn,		SHCMD("urxvt -e sh ~/scripts/nobrow") },
+	{ MODKEY,		XK_y,		spawn,		SHCMD("urxvt -e sh ~/scripts/nobrow") },	// or mpvopen?
 	{ MODKEY|ShiftMask,	XK_d,		spawn,		SHCMD("discord-ptb") },
+	{ MODKEY|ShiftMask,	XK_e,		spawn,		SHCMD("alacritty") },
 	{ MODKEY|ShiftMask,	XK_f,		spawn,		SHCMD("urxvt -e sh ~/scripts/ranga") },
 	{ MODKEY|ShiftMask,	XK_h,		spawn,		SHCMD("urxvt -e htop") },
 	{ MODKEY|ShiftMask,	XK_l,		spawn,		SHCMD("sh ~/scripts/lastscrob") },
 	{ MODKEY|ShiftMask,	XK_p,		spawn,		SHCMD("sh ~/scripts/mpcrym") },
 	{ MODKEY|ShiftMask,	XK_v,		spawn,		SHCMD("virtualbox") },
+	{ MODKEY|ShiftMask,	XK_w,		spawn,		SHCMD("sh ~/scripts/wttr") },
+	{ Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,	SHCMD("urxvt -e bash ~/scripts/deeznuts") },
 	{ ShiftMask,		XK_Print,	spawn,		SHCMD("scrot /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
 
 // https://dwm.suckless.org/patches/keypressrelease/
@@ -183,7 +187,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY|ShiftMask,	XK_Down,	incnmaster,	{.i = -1 } },	// +1 horiz in master
 	{ MODKEY|ShiftMask,	XK_Up,		incnmaster,	{.i = +1 } }, 
 	{ MODKEY,		XK_Left,	setmfact,	{.f = -0.05} }, // widen master
-	{ MODKEY,		XK_Right,	setmfact,	{.f = +0.05} }, 
+	{ MODKEY,		XK_Right,	setmfact,	{.f = +0.05} },	// since i rarely use this, might use shiftviewclients instead
 
 	{ MODKEY,		XK_g,		setlayout,	{.v = &layouts[0]} },	// default
 	{ MODKEY,		XK_f,		setlayout,	{.v = &layouts[1]} },	// fullscreen
@@ -202,7 +206,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY,		XK_0,		spawn,		SHCMD("sh ~/scripts/mon") },	// toggle 2nd mon
 
 	{ MODKEY|ShiftMask,	XK_space,	tagmon,		{.i = +1 } },	// send to mon
-	{ MODKEY,		XK_comma,	tagmon,		{.i = +1 } },	// send to mon
+	{ MODKEY,		XK_comma,	focusmon,		{.i = +1 } },	// send to mon
 	{ MODKEY,		XK_period,	focusmon,	{.i = +1 } },	// change focus (cursor unaffected); this is ok because i only use 2 mons anyway; i use period because it's more ergonomic
 	{ MODKEY,		XK_i,		focusmon,	{.i = +1 } },
 	/* { MODKEY|ShiftMask,	XK_comma,	tagmon,		{.i = -1 } }, */
