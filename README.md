@@ -7,8 +7,8 @@ Status bar: dwm_status_kai.sh
 Human-readable list of patches: https://github.com/bakkeby/dwm-flexipatch
 
 | markdown | table |
-remove switchtotag, add switchtag?
 https://github.com/bakkeby/patches/wiki/switchtag
+remove? deck
 
 ## Patches I use
 * attachbottom		-- less obtrusive window spawning; extra keypress when you actually want the master (e.g. zathura, sxiv, lynxreader)
@@ -17,11 +17,11 @@ https://github.com/bakkeby/patches/wiki/switchtag
 * deck			-- for latex work
 * hide_vacant_tags	-- i3-like
 * losefullscreen	-- disable true fs (not monocle) when focus changes
-* push_no_master	-- move windows up/down the stack
-* restartsig		-- auto-restart dwm; all windows get moved to tag 1; borks status bar font
+* push_no_master	-- move windows up/down the stack; does not allow pushing to master
+* restartsig		-- auto-restart dwm; all windows get moved to tag 1; may bork status bar font
 * shiftviewclients	-- cycle through tags (skip empty ones)
 * singularborders	-- remove outer borders, merge inner borders; borders have some inherent latency
-* switchtotag		-- auto-focus window on new tag (need extra window prop); mainly for vbox
+* switchtag		-- auto-focus window on new tag (need extra window prop)
 
 ## Patches I might use
 * actualfullscreen / togglefullscreen
@@ -48,5 +48,6 @@ https://github.com/bakkeby/patches/wiki/switchtag
 * scratchpad
 * sendmon_keepfocus	-- auto-focus window when moved to new monitor; but not newly spawned window!
 * swallow		-- i prefer floating
+* switchtotag		-- "switch back to previous tag" behaviour is very annoying!
 * systray		-- bloat
 * warp			-- move cursor when focus changes; more annoying than useful
