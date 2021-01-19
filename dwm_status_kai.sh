@@ -20,19 +20,30 @@ sep="|"
 # TODO: check deps
 # TODO: use awk on everything
 
-print_weather() {
+weather_count=0
+get_weather() {
 	weather=$(curl -s wttr.in/Munich?format="%c+%t\n") # 2>&1)
-	# kinda inaccurate nowadays
-	grep -Pq 'Unknown|fritz' <<< "$weather" && weather="Error"
+	[[ "$weather" =~ Unknown|fritz|requests ]] && weather="Error"
+
+}
+
+print_weather() {	# needs testing
+	if [[ "$weather_count" -eq 0 ]]; then
+		get_weather
+		weather_count=360		# every 30 min
+	fi
 	printf "%s" "$weather"
-	# return?
+	((weather_count-=1))
 }
 
 print_mpc() {		# requires unicode font, e.g. symbola
 	title=$(mpc current)
-	if [[ -z "$title" ]]; then title="Stopped"	# nothing playing
-	elif [[ $(mpc | sed -n '2p') =~ paused ]]; then title=" $title" 
-	else title=" $title"
+	if [[ -z "$title" ]]; then
+		title="Stopped"	# nothing playing
+	elif [[ $(mpc | sed -n '2p') =~ paused ]]; then
+		title=" $title" 
+	else
+		title=" $title"
 	fi
 	printf "%s" "$title"
 }
@@ -91,7 +102,7 @@ print_disk() {		# if hdd not (yet) mounted, shows ~ instead
 	else device=$(grep -P '/$')
 	fi
 	tr -s ' ' <<< "$device" | cut -d' ' -f4 
-	}
+}
 
 print_date(){ date '+%a %d/%m %H:%M' ; }
 
