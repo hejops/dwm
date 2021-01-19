@@ -49,8 +49,16 @@ print_mpc() {		# requires unicode font, e.g. symbola
 }
 
 print_network(){
-	state=$(nmcli)	# use sed instead
-	ssid=$(<<< "$state" grep wlp3s0 | cut -d' ' -f4-)	# use sed instead
+	state=$(nmcli)
+
+	if [[ "$state" =~ 'enp4s0: unmanaged' ]]; then
+		ssid="ethernet"
+	elif [[ "$state" =~ 'connected to' ]]; then
+		ssid=$(<<< "$state" sed -rn 's|.*connected to (.+)|\1|p')	# use sed instead
+	else
+		ssid="error"
+	fi
+
 	if  [[ -z "$ssid" ]]; then
 		ssid="No network"
 	elif ip tuntap show | grep -q queue; then
@@ -68,7 +76,8 @@ print_network(){
 
 print_bat(){
 	# TODO: icon (plugged/discharging), text color?
-	hash acpi || return 0
+	# hash acpi || return 0
+	# why disappears???
 	batstat="$(cat /sys/class/power_supply/BAT*/status)"
 	charge="$(cat /sys/class/power_supply/BAT*/capacity)%"
 	#charge="$(awk '{ sum += $1 } END { print sum }' /sys/class/power_supply/BAT*/capacity)"
