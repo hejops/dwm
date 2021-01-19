@@ -1,3 +1,5 @@
-*.rej
-*.orig
 *.diff
+*.orig
+*.pdf
+*.rej
+dwm
