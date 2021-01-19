@@ -243,6 +243,7 @@ static Button buttons[] = {
 static const char *const autostart[] = {	// cool_autostart
 
 	"dunst", NULL,		// any command longer than 1 word needs the long syntax, apparently
+	"sh", "-c", "setxkbmap us", NULL,		// TESTING
 	"./.fehbg", NULL,	// TESTING
 	"mpd", NULL,		// can be pretty slow on cold boot; e.g. "Cannot assign requested address"
 	"sh", "-c", "picom -b --config .picom.conf",	NULL,
