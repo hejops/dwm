@@ -71,6 +71,7 @@ static const Rule rules[] = {
 	{ NULL,		NULL,		"ncmpcpp",	1 << 0,		0,	0,	1 },	// yes, this works
 
 	{ "Com.github.xournalpp.xournalpp",	NULL,	NULL,	1 << 1,	1,	0,	1 },
+	{ "Evince",	NULL,		NULL,		1 << 1,		3,	0,	1 },
 	{ "MestReNova",	NULL,		NULL,		1 << 1,		1,	0,	1 },
 	{ "Zathura",	NULL,		NULL,		1 << 1,		3,	0,	1 },
 	{ "zoom",	NULL,		NULL,		1 << 1,		1,	0,	-1 },
@@ -143,6 +144,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY,		XK_a,		spawn,		SHCMD("localc") },
 	{ MODKEY,		XK_c,		spawn,		SHCMD("urxvt -e neomutt") },	// why does -Z always report no new mail?
 	{ MODKEY,		XK_d,		spawn,		{.v = dmenucmd } },
+	{ MODKEY,		XK_delete,	spawn,		SHCMD("i3lock") },	// testing
 	{ MODKEY,		XK_e,		spawn,		{.v = termcmd } },
 	{ MODKEY,		XK_m,		spawn,		SHCMD("urxvt -e ncmpcpp") },
 	{ MODKEY,		XK_minus,	spawn,		SHCMD("sh ~/scripts/nordtog --toggle") },	// doesn't work without terminal?
@@ -242,20 +244,20 @@ static Button buttons[] = {
 
 static const char *const autostart[] = {	// cool_autostart
 
-	"dunst", NULL,		// any command longer than 1 word needs the long syntax, apparently
-	"sh", "-c", "setxkbmap us", NULL,		// TESTING
 	"./.fehbg", NULL,	// TESTING
+	"dunst", NULL,		// any command longer than 1 word needs the long syntax, apparently
 	"mpd", NULL,		// can be pretty slow on cold boot; e.g. "Cannot assign requested address"
 	"sh", "-c", "picom -b --config .picom.conf",	NULL,
 	"sh", "-c", "pkill mpdscribble; mpdscribble",	NULL,	// pidof || method -> running, but inactive
 	"sh", "-c", "redshift -x; redshift -b 1",	NULL,		// pkill doesn't affect redshift!
 	"sh", "-c", "setxkbmap -option compose:rctrl",	NULL,
+	"sh", "-c", "setxkbmap -layout us", NULL,		// TESTING
 	"sh", "-c", "udisksctl mount -b /dev/sdb1",	NULL,	// takes a while, don't panic
-	"sh", "-c", "while :; do feh -r --randomize --bg-fill '/run/media/joseph/My Passport/files/wg/'; sleep 10m; done", NULL,	// 1st 10 min will fail; waiting to mount
 	"sh", "-c", "~/dwm/dwm_status_kai.sh",	NULL,	// unreliable; start manually, kill, then can autostart again
 	"sh", "-c", "~/scripts/mon",		NULL,
 	"udiskie", NULL,
 	//"sh", "-c", "notify-send \"dwm started\"", NULL,
+	//"sh", "-c", "while :; do feh -r --randomize --bg-fill '/run/media/joseph/My Passport/files/wg/'; sleep 10m; done", NULL,	// 1st 10 min will fail; waiting to mount
 	//"sh", "-c", "~/scripts/mouse",		NULL,
 	NULL
 
