@@ -1,17 +1,18 @@
+// http://ratfactor.com/dwm
 // https://github.com/LukeSmithxyz/dwm/blob/master/config.h
-// http://ratfactor.com/dwm 
 // https://www.youtube.com/watch?v=UEmPboaTDpQ
 // https://www.youtube.com/watch?v=fBrc_xgwQE8
 
 // patches to try: regex rules, focusadjacenttag, focusonnetactive, swapfocus, switchtotag, zoomswap
-// patch --merge -i [file]
 // diff -u [old] [new] > [diff]
 // patch < [diff]		overwrites the file specified in [diff]
 //				passable conflicts -> "fuzz"
 //				serious conflicts -> generates [old].rej -> change specified files manually
 // patch -R < [diff]		undo changes (also manual ones?)
-// git diff
 
+// set up dwm for xdm (ubuntu)
+// https://medium.com/hacker-toolbelt/dwm-windows-manager-in-ubuntu-14958224a782
+// set up dwm for lightdm
 // https://forum.manjaro.org/t/dwm-not-showing-in-lightdm-log-in-screen/98220/4
 // /usr/share/xsessions/dwm.desktop
 // [Desktop Entry]
@@ -45,7 +46,7 @@ static const char *colors[][3]		= {
 
 // tag names -- testing
 // https://github.com/meinwald/DWM-config/blob/master/config.h#L16
-static const char *tags[] = { "main", "down", "work", "vbox", "5", "6", "7", "8", "9" };
+static const char *tags[] = { "main", "work", "down", "vbox", "5", "6", "7", "8", "9" };
 
 static const Rule rules[] = {
 	// xprop(1):
@@ -58,27 +59,30 @@ static const Rule rules[] = {
 
 	// class	instance	title		tags mask	switch	float	monitor
 	// switchtag definitions: https://github.com/bakkeby/patches/wiki/switchtag
-	// why does tag 0 mon 0 create a new tag?
-	{ "Chromium",	NULL,		NULL,		0,		0,	0,	1 },
-	{ "libreoffice-calc",	NULL,	NULL,		0,		0,	0,	1 },	// doesn't work? try capital?
-	{ "libreoffice-writer",	NULL,	NULL,		0,		0,	0,	1 },
-	{ NULL,		NULL,		"LibreOffice",	0,		0,	0,	1 },
+	{ "Chromium",	NULL,		NULL,		1 << 0,		0,	0,	1 },
 	{ "PPSSPPQt",	NULL,		NULL,		0,		0,	1,	1 },
 	{ "discord",	NULL,		NULL,		0,		0,	1,	1 },
+	{ "firefox",	NULL,		NULL,		0,		3,	0,	1 },
+	{ "libreoffice-calc",	NULL,	NULL,		0,		0,	0,	1 },
+	{ "libreoffice-writer",	NULL,	NULL,		0,		0,	0,	1 },
 	{ "mednafen",	NULL,		NULL,		0,		0,	1,	1 },
-	{ "mpv",	NULL,		NULL,		0,		1,	0,	1 },
-	{ NULL,		NULL,		"ncmpcpp",	1 << 0,		0,	0,	1 },	// works!
+	{ "mpv",	NULL,		NULL,		1 << 0,		1,	0,	1 },
+	{ NULL,		NULL,		"LibreOffice",	0,		0,	0,	1 },	// this doesn't work
+	{ NULL,		NULL,		"ncmpcpp",	1 << 0,		0,	0,	1 },	// yes, this works
 
-	{ "SoulseekQt",	NULL,		NULL,		1 << 1,		1,	1,	1 },	// not sure which mon these should go to
-	{ "Transmission-gtk",	NULL,	NULL,		1 << 1,		1,	0,	1 },
-	{ NULL,		NULL,		"deeznuts",	1 << 1,		0,	0,	1 },	// testing
+	{ "Com.github.xournalpp.xournalpp",	NULL,	NULL,	1 << 1,	1,	0,	1 },
+	{ "MestReNova",	NULL,		NULL,		1 << 1,		1,	0,	1 },
+	{ "Zathura",	NULL,		NULL,		1 << 1,		3,	0,	1 },
+	{ "zoom",	NULL,		NULL,		1 << 1,		1,	0,	-1 },
+
+	{ "SoulseekQt",	NULL,		NULL,		1 << 2,		1,	1,	1 },	// not sure which mon these should go to
+	{ "Transmission-gtk",	NULL,	NULL,		1 << 2,		1,	0,	1 },
+	{ NULL,		NULL,		"deeznuts",	1 << 2,		0,	0,	1 },	// why doesn't this work like ncmpcpp?
 
 
-	{ "Com.github.xournalpp.xournalpp",	NULL,	NULL,	1 << 2,	1,	0,	1 },
-	{ "MestReNova",	NULL,		NULL,		1 << 2,		1,	0,	1 },
-	{ "Zathura",	NULL,		NULL,		1 << 2,		1,	0,	1 },
-
-	{ "VirtualBox Machine",	NULL,	NULL,		1 << 3,		1,	0,	1 },
+	{ "App.py",	NULL,		NULL,		1 << 3,		1,	1,	1 },	// playitslowly
+	{ "TuxGuitar",	NULL,		NULL,		1 << 3,		1,	0,	1 },
+	{ "VirtualBox Machine",	NULL,	NULL,		1 << 3,		1,	0,	1 },	// not triggered when run from terminal
 	{ "VirtualBox Manager",	NULL,	NULL,		1 << 3,		1,	1,	1 },
 
 	{ "Gimp",	NULL,		NULL,		0,		0,	1,	-1 },
@@ -88,10 +92,6 @@ static const Rule rules[] = {
 	{ "TelegramDesktop",	NULL,	NULL,		0,		0,	1,	-1 },
 	{ "Thunar",	NULL,		NULL,		0,		0,	1,	-1 },
 
-	{ "zoom",	NULL,		NULL,		1 << 2,		1,	0,	-1 },
-
-	{ "App.py",	NULL,		NULL,		1 << 3,		1,	1,	-1 },	// playitslowly
-	{ "TuxGuitar",	NULL,		NULL,		1 << 3,		1,	0,	-1 },
 };
 
 /* layout(s) */
@@ -120,7 +120,7 @@ static const Layout layouts[] = {
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "rofi", "-show", "run", NULL }; 
+static const char *dmenucmd[] = { "rofi", "-show", "run", NULL };
 /* static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", white, "-sb", col_cyan, "-sf", col_gray4, NULL }; to change to rofi */
 static const char *termcmd[]  = { "urxvt", NULL };
 static const char *brightup[]	    = { "xbacklight", "-inc", "10", NULL};	// acpilight needs root
@@ -130,14 +130,14 @@ static const char *brightdown[]     = { "xbacklight", "-dec", "10", NULL};
 static Key keys[] = {		/* {0} just means no arg */
 	/* modifier		key		function	argument */
 
-	/* xfce4-screenshooter -w */
-	// misc: rofimoji
-	// still unbound: airu-=;':"[]{} zx (shiftview?); backspace (focus master), backslash, enter
+	// https://github.com/LukeSmithxyz/voidrice/blob/be9490155fae85a877d49c7342a8814a184c414d/.local/bin/maimpick
+	// still unbound: ru-=;':"{} zx (shiftview?); backspace (focus master), backslash, enter
 	// virtualbox "/home/joseph/VirtualBox VMs/7/7.vbox"
 	// virtualbox "/home/joseph/VirtualBox VMs/xp/xp.vbox" -- what keybind?
+	//{ 0,			XK_Print,	spawn,		SHCMD("sleep 0.2; scrot -s /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },	// selection is buggy
 	{ 0,			0x1008ff02,	spawn,		{.v = brightup } },
 	{ 0,			0x1008ff03,	spawn,		{.v = brightdown } },
-	{ 0,			XK_Print,	spawn,		SHCMD("sleep 0.2; scrot -s /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },	// not good
+	{ 0,			XK_Print,	spawn,		SHCMD("maim -s | xclip -selection clipboard -t image/png") },
 	{ ControlMask,		XK_Print,	spawn,		SHCMD("scrot -u /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
 	{ MODKEY,		XK_Print,	spawn,		SHCMD("flameshot gui") },
 	{ MODKEY,		XK_a,		spawn,		SHCMD("localc") },
@@ -145,17 +145,16 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY,		XK_d,		spawn,		{.v = dmenucmd } },
 	{ MODKEY,		XK_e,		spawn,		{.v = termcmd } },
 	{ MODKEY,		XK_m,		spawn,		SHCMD("urxvt -e ncmpcpp") },
-	{ MODKEY,		XK_minus,	spawn,		SHCMD("urxvt -e sh ~/scripts/not") },	// doesn't work without terminal?
+	{ MODKEY,		XK_minus,	spawn,		SHCMD("sh ~/scripts/nordtog --toggle") },	// doesn't work without terminal?
 	{ MODKEY,		XK_n,		spawn,		SHCMD("urxvt -e newsboat") },
-	{ MODKEY,		XK_o,		spawn,		SHCMD("transmission-gtk") },
-	{ MODKEY,		XK_p,		spawn,		SHCMD("mpc toggle") },
+	{ MODKEY,		XK_o,		spawn,		SHCMD("sh ~/scripts/nordtog --on; transmission-gtk") },
 	{ MODKEY,		XK_q,		spawn,		SHCMD("soulseekqt") },
-	{ MODKEY,		XK_s,		spawn,		SHCMD("sh ~/scripts/menu-surfraw") },
+	{ MODKEY,		XK_s,		spawn,		SHCMD("sh ~/scripts/menu-surfraw") },	// add more functionality
 	{ MODKEY,		XK_t,		spawn,		SHCMD("telegram-desktop") },
 	{ MODKEY,		XK_w,		spawn,		SHCMD("firefox") },
-	{ MODKEY,		XK_y,		spawn,		SHCMD("urxvt -e sh ~/scripts/nobrow") },	// or mpvopen?
+	{ MODKEY,		XK_y,		spawn,		SHCMD("urxvt -e sh ~/scripts/mpvopen") },	// used to be nobrow
 	{ MODKEY|ShiftMask,	XK_d,		spawn,		SHCMD("discord-ptb") },
-	{ MODKEY|ShiftMask,	XK_e,		spawn,		SHCMD("alacritty") },
+	{ MODKEY|ShiftMask,	XK_e,		spawn,		SHCMD("kitty") },	// not working?
 	{ MODKEY|ShiftMask,	XK_f,		spawn,		SHCMD("urxvt -e sh ~/scripts/ranga") },
 	{ MODKEY|ShiftMask,	XK_h,		spawn,		SHCMD("urxvt -e htop") },
 	{ MODKEY|ShiftMask,	XK_l,		spawn,		SHCMD("sh ~/scripts/lastscrob") },
@@ -164,30 +163,36 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY|ShiftMask,	XK_w,		spawn,		SHCMD("sh ~/scripts/wttr") },
 	{ Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,	SHCMD("urxvt -e bash ~/scripts/deeznuts") },
 	{ ShiftMask,		XK_Print,	spawn,		SHCMD("scrot /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
+//	{ MODKEY,		XK_p,		spawn,		SHCMD("mpc toggle") },		// may deprecate
 
-// https://dwm.suckless.org/patches/keypressrelease/
-// https://gitlab.com/rafa_99/dwm/blob/master/config.h#L152
+	{ MODKEY,		XK_comma,	spawn,		SHCMD("sh ~/scripts/rempv -b") },	// seek backward
+	{ MODKEY,		XK_period,	spawn,		SHCMD("sh ~/scripts/rempv -t") },	// toggle
+	{ MODKEY,		XK_slash,	spawn,		SHCMD("sh ~/scripts/rempv -f") },	// seek forward
+	{ MODKEY,		XK_x,		spawn,		SHCMD("sh ~/scripts/rempv -q") },	// quit
 
-//	{ MODKEY,		XK_b,		togglebar,	{0} },
+//	https://dwm.suckless.org/patches/keypressrelease/
+//	https://gitlab.com/rafa_99/dwm/blob/master/config.h#L152
+
 	{ ControlMask,		XK_q,		killclient,	{0} },	// close window
+	{ MODKEY,		XK_Tab,		view,		{0} },	// back and forth workspace
+	{ MODKEY,		XK_bracketleft, shiftviewclients,	{ .i = -1 } },
+	{ MODKEY,		XK_bracketright,shiftviewclients,	{ .i = +1 } },	// cycle tag focus
+	{ MODKEY,		XK_grave,	togglefloating,	{0} },
+	{ MODKEY,		XK_h,		pushup,         {0} },
 	{ MODKEY,		XK_j,		focusstack,	{.i = +1 } },	// cycle window focus
 	{ MODKEY,		XK_k,		focusstack,	{.i = -1 } },
 	{ MODKEY,		XK_l,		pushdown,       {0} },
-	{ MODKEY,		XK_h,		pushup,         {0} },
-	{ MODKEY,		XK_bracketright,shiftviewclients,	{ .i = +1 } },	// cycle tag focus
-	{ MODKEY,		XK_bracketleft, shiftviewclients,	{ .i = -1 } },
-	{ MODKEY,		XK_space,	zoom,		{0} },	// switch master/stack, focus master
-	{ MODKEY,		XK_Tab,		view,		{0} },	// back and forth workspace
-	{ MODKEY|ShiftMask,	XK_Tab,		setlayout,	{0} },	// toggle between last 2 layouts
-	{ MODKEY,		XK_grave,	togglefloating,	{0} },
-//	{ MODKEY,		XK_0,		view,		{.ui = ~0 } }, // merge all workspaces; i almost never use this
-	{ MODKEY|ShiftMask,	XK_0,		tag,		{.ui = ~0 } }, // "sticky"
+	{ MODKEY,		XK_space,	zoom,		{0} },		// switch master/stack, focus master
+	{ MODKEY|ShiftMask,	XK_0,		tag,		{.ui = ~0 } },	// "sticky"
+	{ MODKEY|ShiftMask,	XK_Tab,		setlayout,	{0} },		// toggle between last 2 layouts
+//	{ MODKEY,		XK_0,		view,		{.ui = ~0 } },	// merge all workspaces; i almost never use this
+//	{ MODKEY,		XK_b,		togglebar,	{0} },
 
-	// rarely used
-	{ MODKEY|ShiftMask,	XK_Down,	incnmaster,	{.i = -1 } },	// +1 horiz in master
-	{ MODKEY|ShiftMask,	XK_Up,		incnmaster,	{.i = +1 } }, 
 	{ MODKEY,		XK_Left,	setmfact,	{.f = -0.05} }, // widen master
 	{ MODKEY,		XK_Right,	setmfact,	{.f = +0.05} },	// since i rarely use this, might use shiftviewclients instead
+	{ MODKEY|ShiftMask,	XK_Down,	incnmaster,	{.i = -1 } },	// +1 horiz in master
+	{ MODKEY|ShiftMask,	XK_Up,		incnmaster,	{.i = +1 } },
+//	rarely used
 
 	{ MODKEY,		XK_g,		setlayout,	{.v = &layouts[0]} },	// default
 	{ MODKEY,		XK_f,		setlayout,	{.v = &layouts[1]} },	// fullscreen
@@ -205,14 +210,15 @@ static Key keys[] = {		/* {0} just means no arg */
 	TAGKEYS(		XK_9,				8)
 	{ MODKEY,		XK_0,		spawn,		SHCMD("sh ~/scripts/mon") },	// toggle 2nd mon
 
-	{ MODKEY|ShiftMask,	XK_space,	tagmon,		{.i = +1 } },	// send to mon
-	{ MODKEY,		XK_comma,	focusmon,		{.i = +1 } },	// send to mon
-	{ MODKEY,		XK_period,	focusmon,	{.i = +1 } },	// change focus (cursor unaffected); this is ok because i only use 2 mons anyway; i use period because it's more ergonomic
 	{ MODKEY,		XK_i,		focusmon,	{.i = +1 } },
-	/* { MODKEY|ShiftMask,	XK_comma,	tagmon,		{.i = -1 } }, */
-	/* { MODKEY|ShiftMask,	XK_period,	tagmon,		{.i = +1 } }, */
-	{ MODKEY|ShiftMask,	XK_q,		quit,		{0} },
 	{ MODKEY|ControlMask|ShiftMask,	XK_q,	quit,		{1} },
+	{ MODKEY|ShiftMask,	XK_i,		tagmon,		{.i = +1 } },	// send to mon
+	{ MODKEY|ShiftMask,	XK_q,		quit,		{0} },
+	{ MODKEY|ShiftMask,	XK_space,	tagmon,		{.i = +1 } },
+//	{ MODKEY,		XK_comma,	focusmon,	{.i = +1 } },	// send to mon
+//	{ MODKEY,		XK_period,	focusmon,	{.i = +1 } },	// change focus (cursor unaffected); this is ok because i only use 2 mons anyway; i use period because it's more ergonomic
+//	{ MODKEY|ShiftMask,	XK_comma,	tagmon,		{.i = -1 } },
+//	{ MODKEY|ShiftMask,	XK_period,	tagmon,		{.i = +1 } },
 };
 
 /* click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin */
@@ -226,7 +232,7 @@ static Button buttons[] = {
 	{ ClkLtSymbol,		0,		Button3,	setlayout,	{.v = &layouts[1]} },
 	{ ClkStatusText,	0,		Button2,	spawn,		{.v = termcmd } },
 	{ ClkTagBar,		0,		Button1,	view,		{0} },
-	{ ClkTagBar,		MODKEY,		Button1,	tag,		{0} },
+	/* { ClkTagBar,		MODKEY,		Button1,	tag,		{0} }, */
 	{ ClkTagBar,		MODKEY,		Button3,	toggletag,	{0} },	// move to tag
 	{ ClkWinTitle,		0,		Button1,	focusstack,	{.i = +1 }},	// might seem useless but good for vbox
 	{ ClkWinTitle,		0,		Button2,	zoom,		{0} },	// togglefloating?
