@@ -123,9 +123,12 @@ static const Layout layouts[] = {
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "rofi", "-show", "run", NULL };
 /* static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", white, "-sb", col_cyan, "-sf", col_gray4, NULL }; to change to rofi */
-static const char *termcmd[]  = { "urxvt", NULL };
-static const char *brightup[]	    = { "xbacklight", "-inc", "10", NULL};	// acpilight needs root
-static const char *brightdown[]     = { "xbacklight", "-dec", "10", NULL};
+static const char *termcmd[]	= { "urxvt", NULL };
+static const char *brightup[]	= { "xbacklight", "-inc", "10", NULL};	// acpilight needs root
+static const char *brightdown[]	= { "xbacklight", "-dec", "10", NULL};
+static const char *volup[]	= { "pactl", "set-sink-volume", "0", "+10%", NULL};
+static const char *voldown[]	= { "pactl", "set-sink-volume", "0", "-10%", NULL};
+// https://github.com/TaylanTatli/dwm/blob/master/config.h#L15
 // static const char *musiccmd[] = { "urxvt", "-title", "ncmpcpp", "-e", "ncmpcpp", NULL };	// testing; ncmpcpp always sets its own (long) title
 
 static Key keys[] = {		/* {0} just means no arg */
@@ -138,6 +141,8 @@ static Key keys[] = {		/* {0} just means no arg */
 	//{ 0,			XK_Print,	spawn,		SHCMD("sleep 0.2; scrot -s /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },	// selection is buggy
 	{ 0,			0x1008ff02,	spawn,		{.v = brightup } },
 	{ 0,			0x1008ff03,	spawn,		{.v = brightdown } },
+	{ 0,			0x1008ff11,	spawn,		{.v = volup } },
+	{ 0,			0x1008ff13,	spawn,		{.v = voldown } },
 	{ 0,			XK_Print,	spawn,		SHCMD("maim -s | xclip -selection clipboard -t image/png") },
 	{ ControlMask,		XK_Print,	spawn,		SHCMD("scrot -u /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
 	{ MODKEY,		XK_Print,	spawn,		SHCMD("flameshot gui") },
