@@ -139,17 +139,17 @@ static Key keys[] = {		/* {0} just means no arg */
 	// virtualbox "/home/joseph/VirtualBox VMs/7/7.vbox"
 	// virtualbox "/home/joseph/VirtualBox VMs/xp/xp.vbox" -- what keybind?
 	//{ 0,			XK_Print,	spawn,		SHCMD("sleep 0.2; scrot -s /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },	// selection is buggy
-	{ 0,			0x1008ff02,	spawn,		{.v = brightup } },
+	{ 0,			0x1008ff02,	spawn,		{.v = brightup } },	// xbacklight doesn't work on asus
 	{ 0,			0x1008ff03,	spawn,		{.v = brightdown } },
-	{ 0,			0x1008ff11,	spawn,		{.v = volup } },
-	{ 0,			0x1008ff13,	spawn,		{.v = voldown } },
+	{ 0,			0x1008ff11,	spawn,		{.v = voldown } },
+	{ 0,			0x1008ff13,	spawn,		{.v = volup } },
 	{ 0,			XK_Print,	spawn,		SHCMD("maim -s | xclip -selection clipboard -t image/png") },
 	{ ControlMask,		XK_Print,	spawn,		SHCMD("scrot -u /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
+	{ MODKEY,		XK_Delete,	spawn,		SHCMD("i3lock") },
 	{ MODKEY,		XK_Print,	spawn,		SHCMD("flameshot gui") },
 	{ MODKEY,		XK_a,		spawn,		SHCMD("localc") },
 	{ MODKEY,		XK_c,		spawn,		SHCMD("urxvt -e neomutt") },	// why does -Z always report no new mail?
 	{ MODKEY,		XK_d,		spawn,		{.v = dmenucmd } },
-	{ MODKEY,		XK_delete,	spawn,		SHCMD("i3lock") },	// testing
 	{ MODKEY,		XK_e,		spawn,		{.v = termcmd } },
 	{ MODKEY,		XK_m,		spawn,		SHCMD("urxvt -e ncmpcpp") },
 	{ MODKEY,		XK_minus,	spawn,		SHCMD("sh ~/scripts/nordtog --toggle") },	// doesn't work without terminal?
@@ -161,7 +161,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY,		XK_w,		spawn,		SHCMD("firefox") },
 	{ MODKEY,		XK_y,		spawn,		SHCMD("urxvt -e sh ~/scripts/mpvopen") },	// used to be nobrow
 	{ MODKEY|ShiftMask,	XK_d,		spawn,		SHCMD("discord-ptb") },
-	{ MODKEY|ShiftMask,	XK_e,		spawn,		SHCMD("kitty") },	// not working?
+	{ MODKEY|ShiftMask,	XK_e,		spawn,		SHCMD("kitty") },
 	{ MODKEY|ShiftMask,	XK_f,		spawn,		SHCMD("urxvt -e sh ~/scripts/ranga") },
 	{ MODKEY|ShiftMask,	XK_h,		spawn,		SHCMD("urxvt -e htop") },
 	{ MODKEY|ShiftMask,	XK_l,		spawn,		SHCMD("sh ~/scripts/lastscrob") },
@@ -172,10 +172,10 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ ShiftMask,		XK_Print,	spawn,		SHCMD("scrot /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
 //	{ MODKEY,		XK_p,		spawn,		SHCMD("mpc toggle") },		// may deprecate
 
-	{ MODKEY,		XK_comma,	spawn,		SHCMD("sh ~/scripts/rempv -b") },	// seek backward
-	{ MODKEY,		XK_period,	spawn,		SHCMD("sh ~/scripts/rempv -t") },	// toggle
-	{ MODKEY,		XK_slash,	spawn,		SHCMD("sh ~/scripts/rempv -f") },	// seek forward
-	{ MODKEY,		XK_x,		spawn,		SHCMD("sh ~/scripts/rempv -q") },	// quit
+	{ MODKEY,		XK_comma,	spawn,		SHCMD("bash ~/scripts/rempv -b") },	// seek backward
+	{ MODKEY,		XK_period,	spawn,		SHCMD("bash ~/scripts/rempv -t") },	// toggle
+	{ MODKEY,		XK_slash,	spawn,		SHCMD("bash ~/scripts/rempv -f") },	// seek forward
+	{ MODKEY,		XK_x,		spawn,		SHCMD("bash ~/scripts/rempv -q") },	// quit
 
 //	https://dwm.suckless.org/patches/keypressrelease/
 //	https://gitlab.com/rafa_99/dwm/blob/master/config.h#L152
@@ -249,6 +249,7 @@ static Button buttons[] = {
 
 static const char *const autostart[] = {	// cool_autostart
 
+	"sh", "-c", "setxkbmap -layout us", NULL,		// TESTING
 	"./.fehbg", NULL,	// TESTING
 	"dunst", NULL,		// any command longer than 1 word needs the long syntax, apparently
 	"mpd", NULL,		// can be pretty slow on cold boot; e.g. "Cannot assign requested address"
@@ -256,12 +257,11 @@ static const char *const autostart[] = {	// cool_autostart
 	"sh", "-c", "pkill mpdscribble; mpdscribble",	NULL,	// pidof || method -> running, but inactive
 	"sh", "-c", "redshift -x; redshift -b 1",	NULL,		// pkill doesn't affect redshift!
 	"sh", "-c", "setxkbmap -option compose:rctrl",	NULL,
-	"sh", "-c", "setxkbmap -layout us", NULL,		// TESTING
 	"sh", "-c", "udisksctl mount -b /dev/sdb1",	NULL,	// takes a while, don't panic
 	"sh", "-c", "~/dwm/dwm_status_kai.sh",	NULL,	// unreliable; start manually, kill, then can autostart again
 	"sh", "-c", "~/scripts/mon",		NULL,
 	"udiskie", NULL,
-	//"sh", "-c", "notify-send \"dwm started\"", NULL,
+	//"sh", "-c", "notify-send 'dwm started'", NULL,
 	//"sh", "-c", "while :; do feh -r --randomize --bg-fill '/run/media/joseph/My Passport/files/wg/'; sleep 10m; done", NULL,	// 1st 10 min will fail; waiting to mount
 	//"sh", "-c", "~/scripts/mouse",		NULL,
 	NULL
