@@ -12,6 +12,8 @@
 
 // set up dwm for xdm (ubuntu)
 // https://medium.com/hacker-toolbelt/dwm-windows-manager-in-ubuntu-14958224a782
+// echo dwm > .xsession
+//
 // set up dwm for lightdm
 // https://forum.manjaro.org/t/dwm-not-showing-in-lightdm-log-in-screen/98220/4
 // /usr/share/xsessions/dwm.desktop
@@ -132,7 +134,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	/* modifier		key		function	argument */
 
 	// https://github.com/LukeSmithxyz/voidrice/blob/be9490155fae85a877d49c7342a8814a184c414d/.local/bin/maimpick
-	// still unbound: ru-=;':"{} zx (shiftview?); backspace (focus master), backslash, enter
+	// still unbound: pruz-=;':"{}; backspace (focus master), backslash, enter
 	// virtualbox "/home/joseph/VirtualBox VMs/7/7.vbox"
 	// virtualbox "/home/joseph/VirtualBox VMs/xp/xp.vbox" -- what keybind?
 	//{ 0,			XK_Print,	spawn,		SHCMD("sleep 0.2; scrot -s /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },	// selection is buggy
@@ -140,37 +142,41 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ 0,			0x1008ff03,	spawn,		{.v = brightdown } },
 	{ 0,			XK_Print,	spawn,		SHCMD("maim -s | xclip -selection clipboard -t image/png") },
 	{ ControlMask,		XK_Print,	spawn,		SHCMD("scrot -u /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
+	{ MODKEY,		0x1008ff2d,	spawn,		SHCMD("i3lock -c 000000") },	// try some other screen lockers
+	{ MODKEY,		XK_Delete,	spawn,		SHCMD("i3lock -c 000000") },
 	{ MODKEY,		XK_Print,	spawn,		SHCMD("flameshot gui") },
 	{ MODKEY,		XK_a,		spawn,		SHCMD("localc") },
 	{ MODKEY,		XK_c,		spawn,		SHCMD("urxvt -e neomutt") },	// why does -Z always report no new mail?
 	{ MODKEY,		XK_d,		spawn,		{.v = dmenucmd } },
-	{ MODKEY,		XK_delete,	spawn,		SHCMD("i3lock") },	// testing
 	{ MODKEY,		XK_e,		spawn,		{.v = termcmd } },
 	{ MODKEY,		XK_m,		spawn,		SHCMD("urxvt -e ncmpcpp") },
-	{ MODKEY,		XK_minus,	spawn,		SHCMD("sh ~/scripts/nordtog --toggle") },	// doesn't work without terminal?
+	{ MODKEY,		XK_minus,	spawn,		SHCMD("sh ~/scripts/nordtog --toggle") },
 	{ MODKEY,		XK_n,		spawn,		SHCMD("urxvt -e newsboat") },
 	{ MODKEY,		XK_o,		spawn,		SHCMD("sh ~/scripts/nordtog --on; transmission-gtk") },
+	{ MODKEY,		XK_p,		spawn,		SHCMD("sh ~/scripts/mpcrym") },
 	{ MODKEY,		XK_q,		spawn,		SHCMD("soulseekqt") },
 	{ MODKEY,		XK_s,		spawn,		SHCMD("sh ~/scripts/menu-surfraw") },	// add more functionality
 	{ MODKEY,		XK_t,		spawn,		SHCMD("telegram-desktop") },
 	{ MODKEY,		XK_w,		spawn,		SHCMD("firefox") },
-	{ MODKEY,		XK_y,		spawn,		SHCMD("urxvt -e sh ~/scripts/mpvopen") },	// used to be nobrow
+	{ MODKEY,		XK_y,		spawn,		SHCMD("urxvt -e sh ~/scripts/mpvopen") },	// uncommonly used
 	{ MODKEY|ShiftMask,	XK_d,		spawn,		SHCMD("discord-ptb") },
-	{ MODKEY|ShiftMask,	XK_e,		spawn,		SHCMD("kitty") },	// not working?
+	{ MODKEY|ShiftMask,	XK_e,		spawn,		SHCMD("kitty") },
 	{ MODKEY|ShiftMask,	XK_f,		spawn,		SHCMD("urxvt -e sh ~/scripts/ranga") },
 	{ MODKEY|ShiftMask,	XK_h,		spawn,		SHCMD("urxvt -e htop") },
 	{ MODKEY|ShiftMask,	XK_l,		spawn,		SHCMD("sh ~/scripts/lastscrob") },
-	{ MODKEY|ShiftMask,	XK_p,		spawn,		SHCMD("sh ~/scripts/mpcrym") },
 	{ MODKEY|ShiftMask,	XK_v,		spawn,		SHCMD("virtualbox") },
 	{ MODKEY|ShiftMask,	XK_w,		spawn,		SHCMD("sh ~/scripts/wttr") },
 	{ Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,	SHCMD("urxvt -e bash ~/scripts/deeznuts") },
 	{ ShiftMask,		XK_Print,	spawn,		SHCMD("scrot /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
-//	{ MODKEY,		XK_p,		spawn,		SHCMD("mpc toggle") },		// may deprecate
 
+	{ MODKEY,		0x1008ff14,	spawn,		SHCMD("sh ~/scripts/rempv -t") },	// not working
+	{ MODKEY,		0x1008ff16,	spawn,		SHCMD("sh ~/scripts/rempv -b") },
+	{ MODKEY,		0x1008ff17,	spawn,		SHCMD("sh ~/scripts/rempv -f") },
 	{ MODKEY,		XK_comma,	spawn,		SHCMD("sh ~/scripts/rempv -b") },	// seek backward
 	{ MODKEY,		XK_period,	spawn,		SHCMD("sh ~/scripts/rempv -t") },	// toggle
 	{ MODKEY,		XK_slash,	spawn,		SHCMD("sh ~/scripts/rempv -f") },	// seek forward
 	{ MODKEY,		XK_x,		spawn,		SHCMD("sh ~/scripts/rempv -q") },	// quit
+//	{ MODKEY,		XK_p,		spawn,		SHCMD("mpc toggle") },		// may deprecate
 
 //	https://dwm.suckless.org/patches/keypressrelease/
 //	https://gitlab.com/rafa_99/dwm/blob/master/config.h#L152
@@ -198,7 +204,7 @@ static Key keys[] = {		/* {0} just means no arg */
 
 	{ MODKEY,		XK_g,		setlayout,	{.v = &layouts[0]} },	// default
 	{ MODKEY,		XK_f,		setlayout,	{.v = &layouts[1]} },	// fullscreen
-	{ MODKEY,		XK_v,		setlayout,	{.v = &layouts[2]} },	// deck -- v? weird but neat...
+	{ MODKEY,		XK_v,		setlayout,	{.v = &layouts[2]} },	// deck
 	{ MODKEY,		XK_b,		setlayout,	{.v = &layouts[3]} },	// bstack
 
 	TAGKEYS(		XK_1,				0)
@@ -210,17 +216,13 @@ static Key keys[] = {		/* {0} just means no arg */
 	TAGKEYS(		XK_7,				6)
 	TAGKEYS(		XK_8,				7)
 	TAGKEYS(		XK_9,				8)
-	{ MODKEY,		XK_0,		spawn,		SHCMD("sh ~/scripts/mon") },	// toggle 2nd mon
+	{ MODKEY,		XK_0,		spawn,		SHCMD("sh ~/scripts/mon") },
 
-	{ MODKEY,		XK_i,		focusmon,	{.i = +1 } },
+	{ MODKEY,		XK_i,		focusmon,	{.i = +1 } },	// switch mon
 	{ MODKEY|ControlMask|ShiftMask,	XK_q,	quit,		{1} },
 	{ MODKEY|ShiftMask,	XK_i,		tagmon,		{.i = +1 } },	// send to mon
 	{ MODKEY|ShiftMask,	XK_q,		quit,		{0} },
 	{ MODKEY|ShiftMask,	XK_space,	tagmon,		{.i = +1 } },
-//	{ MODKEY,		XK_comma,	focusmon,	{.i = +1 } },	// send to mon
-//	{ MODKEY,		XK_period,	focusmon,	{.i = +1 } },	// change focus (cursor unaffected); this is ok because i only use 2 mons anyway; i use period because it's more ergonomic
-//	{ MODKEY|ShiftMask,	XK_comma,	tagmon,		{.i = -1 } },
-//	{ MODKEY|ShiftMask,	XK_period,	tagmon,		{.i = +1 } },
 };
 
 /* click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin */
@@ -244,20 +246,20 @@ static Button buttons[] = {
 
 static const char *const autostart[] = {	// cool_autostart
 
-	"./.fehbg", NULL,	// TESTING
 	"dunst", NULL,		// any command longer than 1 word needs the long syntax, apparently
 	"mpd", NULL,		// can be pretty slow on cold boot; e.g. "Cannot assign requested address"
 	"sh", "-c", "picom -b --config .picom.conf",	NULL,
 	"sh", "-c", "pkill mpdscribble; mpdscribble",	NULL,	// pidof || method -> running, but inactive
 	"sh", "-c", "redshift -x; redshift -b 1",	NULL,		// pkill doesn't affect redshift!
+	"sh", "-c", "setxkbmap -layout us", NULL,		// might need to have "high priority"
 	"sh", "-c", "setxkbmap -option compose:rctrl",	NULL,
-	"sh", "-c", "setxkbmap -layout us", NULL,		// TESTING
 	"sh", "-c", "udisksctl mount -b /dev/sdb1",	NULL,	// takes a while, don't panic
+	"sh", "-c", "while :; do feh -r --randomize --bg-fill ~/wallpaper; sleep 10m; done", NULL,	// 1st 10 min will fail; waiting to mount
 	"sh", "-c", "~/dwm/dwm_status_kai.sh",	NULL,	// unreliable; start manually, kill, then can autostart again
 	"sh", "-c", "~/scripts/mon",		NULL,
 	"udiskie", NULL,
+	//"./.fehbg", NULL,	// TESTING
 	//"sh", "-c", "notify-send \"dwm started\"", NULL,
-	//"sh", "-c", "while :; do feh -r --randomize --bg-fill '/run/media/joseph/My Passport/files/wg/'; sleep 10m; done", NULL,	// 1st 10 min will fail; waiting to mount
 	//"sh", "-c", "~/scripts/mouse",		NULL,
 	NULL
 
