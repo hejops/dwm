@@ -125,9 +125,12 @@ static const Layout layouts[] = {
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "rofi", "-show", "run", NULL };
 /* static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", white, "-sb", col_cyan, "-sf", col_gray4, NULL }; to change to rofi */
-static const char *termcmd[]  = { "urxvt", NULL };
-static const char *brightup[]	    = { "xbacklight", "-inc", "10", NULL};	// acpilight needs root
-static const char *brightdown[]     = { "xbacklight", "-dec", "10", NULL};
+static const char *termcmd[]	= { "urxvt", NULL };
+static const char *brightup[]	= { "xbacklight", "-inc", "10", NULL};	// acpilight needs root
+static const char *brightdown[]	= { "xbacklight", "-dec", "10", NULL};
+static const char *volup[]	= { "pactl", "set-sink-volume", "0", "+10%", NULL};
+static const char *voldown[]	= { "pactl", "set-sink-volume", "0", "-10%", NULL};
+// https://github.com/TaylanTatli/dwm/blob/master/config.h#L15
 // static const char *musiccmd[] = { "urxvt", "-title", "ncmpcpp", "-e", "ncmpcpp", NULL };	// testing; ncmpcpp always sets its own (long) title
 
 static Key keys[] = {		/* {0} just means no arg */
@@ -138,8 +141,10 @@ static Key keys[] = {		/* {0} just means no arg */
 	// virtualbox "/home/joseph/VirtualBox VMs/7/7.vbox"
 	// virtualbox "/home/joseph/VirtualBox VMs/xp/xp.vbox" -- what keybind?
 	//{ 0,			XK_Print,	spawn,		SHCMD("sleep 0.2; scrot -s /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },	// selection is buggy
-	{ 0,			0x1008ff02,	spawn,		{.v = brightup } },
+	{ 0,			0x1008ff02,	spawn,		{.v = brightup } },	// xbacklight doesn't work on asus
 	{ 0,			0x1008ff03,	spawn,		{.v = brightdown } },
+	{ 0,			0x1008ff11,	spawn,		{.v = voldown } },
+	{ 0,			0x1008ff13,	spawn,		{.v = volup } },
 	{ 0,			XK_Print,	spawn,		SHCMD("maim -s | xclip -selection clipboard -t image/png") },
 	{ ControlMask,		XK_Print,	spawn,		SHCMD("scrot -u /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
 	{ MODKEY,		0x1008ff2d,	spawn,		SHCMD("i3lock -c 000000") },	// try some other screen lockers
@@ -169,13 +174,13 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,	SHCMD("urxvt -e bash ~/scripts/deeznuts") },
 	{ ShiftMask,		XK_Print,	spawn,		SHCMD("scrot /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
 
-	{ MODKEY,		0x1008ff14,	spawn,		SHCMD("sh ~/scripts/rempv -t") },	// not working
-	{ MODKEY,		0x1008ff16,	spawn,		SHCMD("sh ~/scripts/rempv -b") },
-	{ MODKEY,		0x1008ff17,	spawn,		SHCMD("sh ~/scripts/rempv -f") },
-	{ MODKEY,		XK_comma,	spawn,		SHCMD("sh ~/scripts/rempv -b") },	// seek backward
-	{ MODKEY,		XK_period,	spawn,		SHCMD("sh ~/scripts/rempv -t") },	// toggle
-	{ MODKEY,		XK_slash,	spawn,		SHCMD("sh ~/scripts/rempv -f") },	// seek forward
-	{ MODKEY,		XK_x,		spawn,		SHCMD("sh ~/scripts/rempv -q") },	// quit
+	{ MODKEY,		0x1008ff14,	spawn,		SHCMD("bash ~/scripts/rempv -t") },	// not working
+	{ MODKEY,		0x1008ff16,	spawn,		SHCMD("bash ~/scripts/rempv -b") },
+	{ MODKEY,		0x1008ff17,	spawn,		SHCMD("bash ~/scripts/rempv -f") },
+	{ MODKEY,		XK_comma,	spawn,		SHCMD("bash ~/scripts/rempv -b") },	// seek backward
+	{ MODKEY,		XK_period,	spawn,		SHCMD("bash ~/scripts/rempv -t") },	// toggle
+	{ MODKEY,		XK_slash,	spawn,		SHCMD("bash ~/scripts/rempv -f") },	// seek forward
+	{ MODKEY,		XK_x,		spawn,		SHCMD("bash ~/scripts/rempv -q") },	// quit
 //	{ MODKEY,		XK_p,		spawn,		SHCMD("mpc toggle") },		// may deprecate
 
 //	https://dwm.suckless.org/patches/keypressrelease/
@@ -246,12 +251,12 @@ static Button buttons[] = {
 
 static const char *const autostart[] = {	// cool_autostart
 
+	"sh", "-c", "setxkbmap -layout us", NULL,		// TESTING
 	"dunst", NULL,		// any command longer than 1 word needs the long syntax, apparently
 	"mpd", NULL,		// can be pretty slow on cold boot; e.g. "Cannot assign requested address"
 	"sh", "-c", "picom -b --config .picom.conf",	NULL,
 	"sh", "-c", "pkill mpdscribble; mpdscribble",	NULL,	// pidof || method -> running, but inactive
 	"sh", "-c", "redshift -x; redshift -b 1",	NULL,		// pkill doesn't affect redshift!
-	"sh", "-c", "setxkbmap -layout us", NULL,		// might need to have "high priority"
 	"sh", "-c", "setxkbmap -option compose:rctrl",	NULL,
 	"sh", "-c", "udisksctl mount -b /dev/sdb1",	NULL,	// takes a while, don't panic
 	"sh", "-c", "while :; do feh -r --randomize --bg-fill ~/wallpaper; sleep 10m; done", NULL,	// 1st 10 min will fail; waiting to mount
@@ -259,7 +264,8 @@ static const char *const autostart[] = {	// cool_autostart
 	"sh", "-c", "~/scripts/mon",		NULL,
 	"udiskie", NULL,
 	//"./.fehbg", NULL,	// TESTING
-	//"sh", "-c", "notify-send \"dwm started\"", NULL,
+	//"sh", "-c", "notify-send 'dwm started'", NULL,
+	//"sh", "-c", "while :; do feh -r --randomize --bg-fill '/run/media/joseph/My Passport/files/wg/'; sleep 10m; done", NULL,	// 1st 10 min will fail; waiting to mount
 	//"sh", "-c", "~/scripts/mouse",		NULL,
 	NULL
 
