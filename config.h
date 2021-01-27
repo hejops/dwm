@@ -221,7 +221,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	TAGKEYS(		XK_7,				6)
 	TAGKEYS(		XK_8,				7)
 	TAGKEYS(		XK_9,				8)
-	{ MODKEY,		XK_0,		spawn,		SHCMD("sh ~/scripts/mon") },
+	{ MODKEY,		XK_0,		spawn,		SHCMD("bash ~/scripts/mon") },	// toggle 2nd mon
 
 	{ MODKEY,		XK_i,		focusmon,	{.i = +1 } },	// switch mon
 	{ MODKEY|ControlMask|ShiftMask,	XK_q,	quit,		{1} },
@@ -263,9 +263,7 @@ static const char *const autostart[] = {	// cool_autostart
 	"sh", "-c", "~/dwm/dwm_status_kai.sh",	NULL,	// unreliable; start manually, kill, then can autostart again
 	"sh", "-c", "~/scripts/mon",		NULL,
 	"udiskie", NULL,
-	//"./.fehbg", NULL,	// TESTING
 	//"sh", "-c", "notify-send 'dwm started'", NULL,
-	//"sh", "-c", "while :; do feh -r --randomize --bg-fill '/run/media/joseph/My Passport/files/wg/'; sleep 10m; done", NULL,	// 1st 10 min will fail; waiting to mount
 	//"sh", "-c", "~/scripts/mouse",		NULL,
 	NULL
 
