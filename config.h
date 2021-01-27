@@ -158,7 +158,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY,		XK_minus,	spawn,		SHCMD("sh ~/scripts/nordtog --toggle") },
 	{ MODKEY,		XK_n,		spawn,		SHCMD("urxvt -e newsboat") },
 	{ MODKEY,		XK_o,		spawn,		SHCMD("sh ~/scripts/nordtog --on; transmission-gtk") },
-	{ MODKEY,		XK_p,		spawn,		SHCMD("sh ~/scripts/mpcrym") },
+	{ MODKEY,		XK_p,		spawn,		SHCMD("bash -i ~/scripts/mpcrym") },	// testing interactive (to source bashrc)
 	{ MODKEY,		XK_q,		spawn,		SHCMD("soulseekqt") },
 	{ MODKEY,		XK_s,		spawn,		SHCMD("sh ~/scripts/menu-surfraw") },	// add more functionality
 	{ MODKEY,		XK_t,		spawn,		SHCMD("telegram-desktop") },
@@ -196,8 +196,11 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY,		XK_k,		focusstack,	{.i = -1 } },
 	{ MODKEY,		XK_l,		pushdown,       {0} },
 	{ MODKEY,		XK_space,	zoom,		{0} },		// switch master/stack, focus master
+	{ MODKEY,		XK_u,		view,		{0} },
+	{ MODKEY|ControlMask|ShiftMask,	XK_q,	quit,		{1} },		// restart
 	{ MODKEY|ShiftMask,	XK_0,		tag,		{.ui = ~0 } },	// "sticky"
 	{ MODKEY|ShiftMask,	XK_Tab,		setlayout,	{0} },		// toggle between last 2 layouts
+	{ MODKEY|ShiftMask,	XK_q,		quit,		{0} },
 //	{ MODKEY,		XK_0,		view,		{.ui = ~0 } },	// merge all workspaces; i almost never use this
 //	{ MODKEY,		XK_b,		togglebar,	{0} },
 
@@ -221,13 +224,12 @@ static Key keys[] = {		/* {0} just means no arg */
 	TAGKEYS(		XK_7,				6)
 	TAGKEYS(		XK_8,				7)
 	TAGKEYS(		XK_9,				8)
-	{ MODKEY,		XK_0,		spawn,		SHCMD("bash ~/scripts/mon") },	// toggle 2nd mon
 
+	{ MODKEY,		XK_0,		spawn,		SHCMD("sleep 1; sh ~/scripts/mon --on") },
 	{ MODKEY,		XK_i,		focusmon,	{.i = +1 } },	// switch mon
-	{ MODKEY|ControlMask|ShiftMask,	XK_q,	quit,		{1} },
 	{ MODKEY|ShiftMask,	XK_i,		tagmon,		{.i = +1 } },	// send to mon
-	{ MODKEY|ShiftMask,	XK_q,		quit,		{0} },
 	{ MODKEY|ShiftMask,	XK_space,	tagmon,		{.i = +1 } },
+//	{ MODKEY,		XK_0,		spawn,		SHCMD("bash ~/scripts/mon") },	// toggle 2nd mon
 };
 
 /* click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin */
