@@ -82,7 +82,6 @@ static const Rule rules[] = {
 	{ "Transmission-gtk",	NULL,	NULL,		1 << 2,		1,	0,	1 },
 	{ NULL,		NULL,		"deeznuts",	1 << 2,		0,	0,	1 },	// why doesn't this work like ncmpcpp?
 
-
 	{ "App.py",	NULL,		NULL,		1 << 3,		1,	1,	1 },	// playitslowly
 	{ "TuxGuitar",	NULL,		NULL,		1 << 3,		1,	0,	1 },
 	{ "VirtualBox Machine",	NULL,	NULL,		1 << 3,		1,	0,	1 },	// not triggered when run from terminal
@@ -136,8 +135,10 @@ static const char *voldown[]	= { "pactl", "set-sink-volume", "0", "-10%", NULL};
 static Key keys[] = {		/* {0} just means no arg */
 	/* modifier		key		function	argument */
 
+	// https://dwm.suckless.org/patches/keypressrelease/
 	// https://github.com/LukeSmithxyz/voidrice/blob/be9490155fae85a877d49c7342a8814a184c414d/.local/bin/maimpick
-	// still unbound: pruz-=;':"{}; backspace (focus master), backslash, enter
+	// https://gitlab.com/rafa_99/dwm/blob/master/config.h#L152
+	// still unbound: z-=;':"{}; backspace (focus master), backslash, enter
 	// virtualbox "/home/joseph/VirtualBox VMs/7/7.vbox"
 	// virtualbox "/home/joseph/VirtualBox VMs/xp/xp.vbox" -- what keybind?
 	//{ 0,			XK_Print,	spawn,		SHCMD("sleep 0.2; scrot -s /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },	// selection is buggy
@@ -158,9 +159,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY,		XK_minus,	spawn,		SHCMD("sh ~/scripts/nordtog --toggle") },
 	{ MODKEY,		XK_n,		spawn,		SHCMD("urxvt -e newsboat") },
 	{ MODKEY,		XK_o,		spawn,		SHCMD("sh ~/scripts/nordtog --on; transmission-gtk") },
-	{ MODKEY,		XK_p,		spawn,		SHCMD("bash -i ~/scripts/mpcrym") },	// testing interactive (to source bashrc)
 	{ MODKEY,		XK_q,		spawn,		SHCMD("soulseekqt") },
-	{ MODKEY,		XK_s,		spawn,		SHCMD("sh ~/scripts/menu-surfraw") },	// add more functionality
 	{ MODKEY,		XK_t,		spawn,		SHCMD("telegram-desktop") },
 	{ MODKEY,		XK_w,		spawn,		SHCMD("firefox") },
 	{ MODKEY,		XK_y,		spawn,		SHCMD("urxvt -e sh ~/scripts/mpvopen") },	// uncommonly used
@@ -171,9 +170,18 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY|ShiftMask,	XK_l,		spawn,		SHCMD("sh ~/scripts/lastscrob") },
 	{ MODKEY|ShiftMask,	XK_v,		spawn,		SHCMD("virtualbox") },
 	{ MODKEY|ShiftMask,	XK_w,		spawn,		SHCMD("sh ~/scripts/wttr") },
-	{ Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,	SHCMD("urxvt -e bash ~/scripts/deeznuts") },
+	{ Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,	SHCMD("urxvt -e sh ~/scripts/deeznuts") },
 	{ ShiftMask,		XK_Print,	spawn,		SHCMD("scrot /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
 
+	// rofi
+	// fasd: reverse, files only, no ranks -- idk how fasd -e works
+	{ MODKEY,		XK_p,		spawn,		SHCMD("bash -i ~/scripts/mpcrofi") },
+	{ MODKEY,		XK_r,		spawn,		SHCMD("f=$(fasd -Rfl | rofi -dmenu) && urxvt -e vim \"$f\"") },
+	{ MODKEY,		XK_s,		spawn,		SHCMD("sh ~/scripts/menu-surfraw") },	// TODO: unify relevant elvis into single script
+	{ MODKEY|ShiftMask,	XK_a,		spawn,		SHCMD("sh ~/scripts/vex") },	// maybe shift-a
+	{ MODKEY|ShiftMask,	XK_p,		spawn,		SHCMD("bash -i ~/scripts/mpcrym") },	// bash -i respects $PATH!
+
+	// media control
 	{ MODKEY,		0x1008ff14,	spawn,		SHCMD("bash ~/scripts/rempv -t") },	// not working
 	{ MODKEY,		0x1008ff16,	spawn,		SHCMD("bash ~/scripts/rempv -b") },
 	{ MODKEY,		0x1008ff17,	spawn,		SHCMD("bash ~/scripts/rempv -f") },
@@ -181,40 +189,25 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY,		XK_period,	spawn,		SHCMD("bash ~/scripts/rempv -t") },	// toggle
 	{ MODKEY,		XK_slash,	spawn,		SHCMD("bash ~/scripts/rempv -f") },	// seek forward
 	{ MODKEY,		XK_x,		spawn,		SHCMD("bash ~/scripts/rempv -q") },	// quit
-//	{ MODKEY,		XK_p,		spawn,		SHCMD("mpc toggle") },		// may deprecate
 
-//	https://dwm.suckless.org/patches/keypressrelease/
-//	https://gitlab.com/rafa_99/dwm/blob/master/config.h#L152
+	// layout
+	{ MODKEY,		XK_g,		setlayout,	{.v = &layouts[0]} },	// default
+	{ MODKEY,		XK_f,		setlayout,	{.v = &layouts[1]} },	// fullscreen
+	{ MODKEY,		XK_v,		setlayout,	{.v = &layouts[2]} },	// deck
+	{ MODKEY,		XK_b,		setlayout,	{.v = &layouts[3]} },	// bstack
 
+	// window
 	{ ControlMask,		XK_q,		killclient,	{0} },	// close window
-	{ MODKEY,		XK_Tab,		view,		{0} },	// back and forth workspace
-	{ MODKEY,		XK_bracketleft, shiftviewclients,	{ .i = -1 } },
-	{ MODKEY,		XK_bracketright,shiftviewclients,	{ .i = +1 } },	// cycle tag focus
 	{ MODKEY,		XK_grave,	togglefloating,	{0} },
 	{ MODKEY,		XK_h,		pushup,         {0} },
 	{ MODKEY,		XK_j,		focusstack,	{.i = +1 } },	// cycle window focus
 	{ MODKEY,		XK_k,		focusstack,	{.i = -1 } },
 	{ MODKEY,		XK_l,		pushdown,       {0} },
 	{ MODKEY,		XK_space,	zoom,		{0} },		// switch master/stack, focus master
-	{ MODKEY,		XK_u,		view,		{0} },
 	{ MODKEY|ControlMask|ShiftMask,	XK_q,	quit,		{1} },		// restart
-	{ MODKEY|ShiftMask,	XK_0,		tag,		{.ui = ~0 } },	// "sticky"
-	{ MODKEY|ShiftMask,	XK_Tab,		setlayout,	{0} },		// toggle between last 2 layouts
 	{ MODKEY|ShiftMask,	XK_q,		quit,		{0} },
-//	{ MODKEY,		XK_0,		view,		{.ui = ~0 } },	// merge all workspaces; i almost never use this
-//	{ MODKEY,		XK_b,		togglebar,	{0} },
 
-	{ MODKEY,		XK_Left,	setmfact,	{.f = -0.05} }, // widen master
-	{ MODKEY,		XK_Right,	setmfact,	{.f = +0.05} },	// since i rarely use this, might use shiftviewclients instead
-	{ MODKEY|ShiftMask,	XK_Down,	incnmaster,	{.i = -1 } },	// +1 horiz in master
-	{ MODKEY|ShiftMask,	XK_Up,		incnmaster,	{.i = +1 } },
-//	rarely used
-
-	{ MODKEY,		XK_g,		setlayout,	{.v = &layouts[0]} },	// default
-	{ MODKEY,		XK_f,		setlayout,	{.v = &layouts[1]} },	// fullscreen
-	{ MODKEY,		XK_v,		setlayout,	{.v = &layouts[2]} },	// deck
-	{ MODKEY,		XK_b,		setlayout,	{.v = &layouts[3]} },	// bstack
-
+	// workspace
 	TAGKEYS(		XK_1,				0)
 	TAGKEYS(		XK_2,				1)
 	TAGKEYS(		XK_3,				2)
@@ -224,12 +217,27 @@ static Key keys[] = {		/* {0} just means no arg */
 	TAGKEYS(		XK_7,				6)
 	TAGKEYS(		XK_8,				7)
 	TAGKEYS(		XK_9,				8)
+	{ MODKEY,		XK_Tab,		view,		{0} },	// back and forth workspace
+	{ MODKEY,		XK_bracketleft, shiftviewclients,	{ .i = -1 } },
+	{ MODKEY,		XK_bracketright,shiftviewclients,	{ .i = +1 } },	// cycle tag focus
+	{ MODKEY,		XK_u,		view,		{0} },	// nicer than mod+tab, pairs well with mod+i
 
+	// monitor
 	{ MODKEY,		XK_0,		spawn,		SHCMD("sleep 1; sh ~/scripts/mon --on") },
 	{ MODKEY,		XK_i,		focusmon,	{.i = +1 } },	// switch mon
 	{ MODKEY|ShiftMask,	XK_i,		tagmon,		{.i = +1 } },	// send to mon
 	{ MODKEY|ShiftMask,	XK_space,	tagmon,		{.i = +1 } },
-//	{ MODKEY,		XK_0,		spawn,		SHCMD("bash ~/scripts/mon") },	// toggle 2nd mon
+
+	// rarely used, may deprecate
+	{ MODKEY,		XK_Left,	setmfact,	{.f = -0.05} }, // widen master
+	{ MODKEY,		XK_Right,	setmfact,	{.f = +0.05} },	// since i rarely use this, might use shiftviewclients instead
+	{ MODKEY|ShiftMask,	XK_Down,	incnmaster,	{.i = -1 } },	// +1 horiz in master
+	{ MODKEY|ShiftMask,	XK_Tab,		setlayout,	{0} },		// toggle between last 2 layouts
+	{ MODKEY|ShiftMask,	XK_Up,		incnmaster,	{.i = +1 } },
+//	{ MODKEY,		XK_0,		view,		{.ui = ~0 } },	// merge all workspaces; i almost never use this
+//	{ MODKEY,		XK_b,		togglebar,	{0} },
+//	{ MODKEY|ShiftMask,	XK_0,		tag,		{.ui = ~0 } },	// "sticky", not used
+
 };
 
 /* click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin */
@@ -243,32 +251,29 @@ static Button buttons[] = {
 	{ ClkLtSymbol,		0,		Button3,	setlayout,	{.v = &layouts[1]} },
 	{ ClkStatusText,	0,		Button2,	spawn,		{.v = termcmd } },
 	{ ClkTagBar,		0,		Button1,	view,		{0} },
-	/* { ClkTagBar,		MODKEY,		Button1,	tag,		{0} }, */
 	{ ClkTagBar,		MODKEY,		Button3,	toggletag,	{0} },	// move to tag
 	{ ClkWinTitle,		0,		Button1,	focusstack,	{.i = +1 }},	// might seem useless but good for vbox
 	{ ClkWinTitle,		0,		Button2,	zoom,		{0} },	// togglefloating?
 	{ ClkWinTitle,		0,		Button3,	focusstack,	{.i = -1 }},
 //	{ ClkTagBar,		0,		Button3,	toggleview,	{0} },	very strange
+//	{ ClkTagBar,		MODKEY,		Button1,	tag,		{0} },
 };
 
 static const char *const autostart[] = {	// cool_autostart
 
-	"sh", "-c", "setxkbmap -layout us", NULL,		// TESTING
+	"sh", "-c", "setxkbmap -layout us", NULL,		// still not reliable
 	"dunst", NULL,		// any command longer than 1 word needs the long syntax, apparently
 	"mpd", NULL,		// can be pretty slow on cold boot; e.g. "Cannot assign requested address"
 	"sh", "-c", "picom -b --config .picom.conf",	NULL,
 	"sh", "-c", "pkill mpdscribble; mpdscribble",	NULL,	// pidof || method -> running, but inactive
-	"sh", "-c", "redshift -x; redshift -b 1",	NULL,		// pkill doesn't affect redshift!
+	"sh", "-c", "redshift -x; redshift -b 1",	NULL,	// pkill doesn't affect redshift!
 	"sh", "-c", "setxkbmap -option compose:rctrl",	NULL,
 	"sh", "-c", "udisksctl mount -b /dev/sdb1",	NULL,	// takes a while, don't panic
-	"sh", "-c", "while :; do feh -r --randomize --bg-fill ~/wallpaper; sleep 10m; done", NULL,	// 1st 10 min will fail; waiting to mount
-	"sh", "-c", "~/dwm/dwm_status_kai.sh",	NULL,	// unreliable; start manually, kill, then can autostart again
+	"sh", "-c", "while :; do feh -r --randomize --bg-fill ~/wallpaper; sleep 10m; done", NULL,
+	"sh", "-c", "~/dwm/dwm_status_kai.sh",	NULL,
 	"sh", "-c", "~/scripts/mon",		NULL,
 	"udiskie", NULL,
 	//"sh", "-c", "notify-send 'dwm started'", NULL,
 	//"sh", "-c", "~/scripts/mouse",		NULL,
 	NULL
-
-//	"hsetroot", "-center", "/usr/home/bit6tream/pic/wallapper.png", NULL,
-//	pkill remind; remind -z10 '-kdunstify %s &' /home/joseph/.reminders/.reminders.rem
 };
