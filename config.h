@@ -106,7 +106,7 @@ static const Layout layouts[] = {
 	{ "DEF",	tile },
 	{ "FUL",	monocle },
 	{ "DEC",	deck },
-	{ "BST",	bstack },
+//	{ "BST",	bstack },
 //	{ "><>",	  NULL },
 };
 
