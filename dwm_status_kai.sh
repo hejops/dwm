@@ -37,13 +37,16 @@ print_weather() {	# needs testing
 }
 
 print_mpc() {		# requires unicode font, e.g. symbola
-	title=$(mpc current)
-	if [[ -z "$title" ]]; then
-		title="Stopped"	# nothing playing
-	elif [[ $(mpc | sed -n '2p') =~ paused ]]; then
-		title=" $title" 
-	else
-		title=" $title"
+	# try mpv first; fallback to mpc
+	if ! title=$(echo '{ "command": ["expand-text", "${media-title}"] }' | socat - /tmp/mp_pipe | jq -r .data); then
+		title=$(mpc current)
+		if [[ -z "$title" ]]; then
+			title="Stopped"	# nothing playing
+		elif [[ $(mpc | sed -n '2p') =~ paused ]]; then
+			title=" $title" 
+		else
+			title=" $title"
+		fi
 	fi
 	printf "%s" "$title"
 }
@@ -94,7 +97,7 @@ print_bat(){
 }
 
 print_cpu() {
-	cpu=$(mpstat "$int" 1 | awk 'NR==4 {print $3"%\n"$4"%\n"$5"%"}' | sort | tail -1)
+	cpu=$(mpstat "$int" 1 | tail -1 | awk '{print $3"%\n"$4"%\n"$5"%"}' | sort | tail -1)
 	printf "%s" "$cpu"
 	# top | sed -n 3p
 	# sar
@@ -103,14 +106,15 @@ print_cpu() {
 print_mem(){ free -h | awk 'NR==2 {print $3}' | tr -d i; }	# line 3, field 3
 
 print_disk() {		# if hdd not (yet) mounted, shows ~ instead
-	# TODO: use awk
-	# TODO: use name instead, designation depends on port!
+	# TODO: use name instead of sdb, designation depends on port!
 	df_output=$(df -h)
 	if [[ $df_output = *sdb* ]]; then 
 		device=$(grep sdb <<< "$df_output")
-	else device=$(grep -P '/$')
+	else
+		device=$(grep '/$')
 	fi
-	tr -s ' ' <<< "$device" | cut -d' ' -f4 
+	disk=$(<<< "$device" awk '{print $4}')
+	printf "%s" "$disk"
 }
 
 print_date(){ date '+%a %d/%m %H:%M' ; }
@@ -122,4 +126,3 @@ while true; do
 	sleep "$int"
 done
 # & puts the process into the background, where it cannot be killed by dwm
-
