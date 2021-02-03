@@ -86,6 +86,7 @@ static const Rule rules[] = {
 	{ "TuxGuitar",	NULL,		NULL,		1 << 3,		1,	0,	1 },
 	{ "VirtualBox Machine",	NULL,	NULL,		1 << 3,		1,	0,	1 },	// not triggered when run from terminal
 	{ "VirtualBox Manager",	NULL,	NULL,		1 << 3,		1,	1,	1 },
+	{ "virtualbox",	NULL,		NULL,		1 << 3,		1,	1,	1 },	// idk
 
 	{ "Gimp",	NULL,		NULL,		0,		0,	1,	-1 },
 	{ "Gpick",	"gpick",	NULL,		0,		0,	1,	-1 },
@@ -105,7 +106,7 @@ static const Layout layouts[] = {
 	{ "DEF",	tile },
 	{ "FUL",	monocle },
 	{ "DEC",	deck },
-	{ "BST",	bstack },
+//	{ "BST",	bstack },
 //	{ "><>",	  NULL },
 };
 
@@ -139,8 +140,6 @@ static Key keys[] = {		/* {0} just means no arg */
 	// https://github.com/LukeSmithxyz/voidrice/blob/be9490155fae85a877d49c7342a8814a184c414d/.local/bin/maimpick
 	// https://gitlab.com/rafa_99/dwm/blob/master/config.h#L152
 	// still unbound: z-=;':"{}; backspace (focus master), backslash, enter
-	// virtualbox "/home/joseph/VirtualBox VMs/7/7.vbox"
-	// virtualbox "/home/joseph/VirtualBox VMs/xp/xp.vbox" -- what keybind?
 	//{ 0,			XK_Print,	spawn,		SHCMD("sleep 0.2; scrot -s /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },	// selection is buggy
 	{ 0,			0x1008ff02,	spawn,		{.v = brightup } },	// xbacklight doesn't work on asus
 	{ 0,			0x1008ff03,	spawn,		{.v = brightdown } },
@@ -173,13 +172,17 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,	SHCMD("urxvt -e sh ~/scripts/deeznuts") },
 	{ ShiftMask,		XK_Print,	spawn,		SHCMD("scrot /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
 
-	// rofi
 	// fasd: reverse, files only, no ranks -- idk how fasd -e works
-	{ MODKEY,		XK_p,		spawn,		SHCMD("bash -i ~/scripts/mpcrofi") },
+	// rofi
+	// virtualbox "/home/joseph/VirtualBox VMs/7/7.vbox"
+	// virtualbox "/home/joseph/VirtualBox VMs/xp/xp.vbox"
+	{ MODKEY,		XK_p,		spawn,		SHCMD("bash -i ~/scripts/mpcrofi") },	// now playing
 	{ MODKEY,		XK_r,		spawn,		SHCMD("f=$(fasd -Rfl | rofi -dmenu) && urxvt -e vim \"$f\"") },
 	{ MODKEY,		XK_s,		spawn,		SHCMD("sh ~/scripts/menu-surfraw") },	// TODO: unify relevant elvis into single script
-	{ MODKEY|ShiftMask,	XK_a,		spawn,		SHCMD("sh ~/scripts/vex") },	// maybe shift-a
+	{ MODKEY|ShiftMask,	XK_m,		spawn,		SHCMD("bash -i ~/scripts/mpcrofi -s") },	// search artist/album
+	// { MODKEY|ShiftMask,	XK_m,		spawn,		SHCMD("bash -i ~/scripts/mpcrofi -l") },	// browse playlist
 	{ MODKEY|ShiftMask,	XK_p,		spawn,		SHCMD("bash -i ~/scripts/mpcrym") },	// bash -i respects $PATH!
+	{ MODKEY|ShiftMask,	XK_r,		spawn,		SHCMD("sh ~/scripts/vex") },
 
 	// media control
 	{ MODKEY,		0x1008ff14,	spawn,		SHCMD("bash ~/scripts/rempv -t") },	// not working
@@ -194,17 +197,17 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY,		XK_g,		setlayout,	{.v = &layouts[0]} },	// default
 	{ MODKEY,		XK_f,		setlayout,	{.v = &layouts[1]} },	// fullscreen
 	{ MODKEY,		XK_v,		setlayout,	{.v = &layouts[2]} },	// deck
-	{ MODKEY,		XK_b,		setlayout,	{.v = &layouts[3]} },	// bstack
+	{ MODKEY,		XK_b,		setlayout,	{.v = &layouts[3]} },	// bstack -- almost never used
 
 	// window
-	{ ControlMask,		XK_q,		killclient,	{0} },	// close window
+	{ ControlMask,		XK_q,		killclient,	{0} },
 	{ MODKEY,		XK_grave,	togglefloating,	{0} },
 	{ MODKEY,		XK_h,		pushup,         {0} },
-	{ MODKEY,		XK_j,		focusstack,	{.i = +1 } },	// cycle window focus
+	{ MODKEY,		XK_j,		focusstack,	{.i = +1 } },
 	{ MODKEY,		XK_k,		focusstack,	{.i = -1 } },
 	{ MODKEY,		XK_l,		pushdown,       {0} },
-	{ MODKEY,		XK_space,	zoom,		{0} },		// switch master/stack, focus master
-	{ MODKEY|ControlMask|ShiftMask,	XK_q,	quit,		{1} },		// restart
+	{ MODKEY,		XK_space,	zoom,		{0} },	// switch master/stack, focus master
+	{ MODKEY|ControlMask|ShiftMask,	XK_q,	quit,		{1} },	// restart
 	{ MODKEY|ShiftMask,	XK_q,		quit,		{0} },
 
 	// workspace
