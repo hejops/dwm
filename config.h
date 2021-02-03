@@ -261,17 +261,16 @@ static Button buttons[] = {
 
 static const char *const autostart[] = {	// cool_autostart
 
-	"sh", "-c", "setxkbmap -layout us", NULL,		// still not reliable
+	"sh", "-c", "setxkbmap -layout us -option compose:rctrl", NULL,		// all setxkbmap options must be declared at once
 	"dunst", NULL,		// any command longer than 1 word needs the long syntax, apparently
 	"mpd", NULL,		// can be pretty slow on cold boot; e.g. "Cannot assign requested address"
 	"sh", "-c", "picom -b --config .picom.conf",	NULL,
 	"sh", "-c", "pkill mpdscribble; mpdscribble",	NULL,	// pidof || method -> running, but inactive
 	"sh", "-c", "redshift -x; redshift -b 1",	NULL,	// pkill doesn't affect redshift!
-	"sh", "-c", "setxkbmap -option compose:rctrl",	NULL,
 	"sh", "-c", "udisksctl mount -b /dev/sdb1",	NULL,	// takes a while, don't panic
 	"sh", "-c", "while :; do feh -r --randomize --bg-fill ~/wallpaper; sleep 10m; done", NULL,
 	"sh", "-c", "~/dwm/dwm_status_kai.sh",	NULL,
-	"sh", "-c", "~/scripts/mon",		NULL,
+	"bash", "-c", "~/scripts/mon",		NULL,
 	"udiskie", NULL,
 	//"sh", "-c", "notify-send 'dwm started'", NULL,
 	//"sh", "-c", "~/scripts/mouse",		NULL,
