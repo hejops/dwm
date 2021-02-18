@@ -87,6 +87,8 @@ static const Rule rules[] = {
 	{ "VirtualBox Machine",	NULL,	NULL,		1 << 3,		1,	0,	1 },	// not triggered when run from terminal
 	{ "VirtualBox Manager",	NULL,	NULL,		1 << 3,		1,	1,	1 },
 	{ "virtualbox",	NULL,		NULL,		1 << 3,		1,	1,	1 },	// idk
+	{ "Virtualbox",	NULL,		NULL,		1 << 3,		1,	1,	1 },	// this better work gdi
+	// https://github.com/laur89/dwm-setup/blob/603f8b26d5bba806c195e6f82a2370fd51c6faf7/.dwm/w0ngBuild/source6.0/config.h
 
 	{ "Gimp",	NULL,		NULL,		0,		0,	1,	-1 },
 	{ "Gpick",	"gpick",	NULL,		0,		0,	1,	-1 },
@@ -157,30 +159,33 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY,		XK_m,		spawn,		SHCMD("urxvt -e ncmpcpp") },
 	{ MODKEY,		XK_minus,	spawn,		SHCMD("sh ~/scripts/nordtog --toggle") },
 	{ MODKEY,		XK_n,		spawn,		SHCMD("urxvt -e newsboat") },
-	{ MODKEY,		XK_o,		spawn,		SHCMD("sh ~/scripts/nordtog --on; transmission-gtk") },
 	{ MODKEY,		XK_q,		spawn,		SHCMD("soulseekqt") },
 	{ MODKEY,		XK_t,		spawn,		SHCMD("telegram-desktop") },
 	{ MODKEY,		XK_w,		spawn,		SHCMD("firefox") },
-	{ MODKEY,		XK_y,		spawn,		SHCMD("urxvt -e sh ~/scripts/mpvopen") },	// uncommonly used
 	{ MODKEY|ShiftMask,	XK_d,		spawn,		SHCMD("discord-ptb") },
 	{ MODKEY|ShiftMask,	XK_e,		spawn,		SHCMD("kitty") },
-	{ MODKEY|ShiftMask,	XK_f,		spawn,		SHCMD("urxvt -e sh ~/scripts/ranga") },
+	{ MODKEY|ShiftMask,	XK_f,		spawn,		SHCMD("urxvt -e bash ~/scripts/ranga") },
 	{ MODKEY|ShiftMask,	XK_h,		spawn,		SHCMD("urxvt -e htop") },
 	{ MODKEY|ShiftMask,	XK_l,		spawn,		SHCMD("sh ~/scripts/lastscrob") },
+	{ MODKEY|ShiftMask,	XK_t,		spawn,		SHCMD("sh ~/scripts/nordtog --on; transmission-gtk") },
 	{ MODKEY|ShiftMask,	XK_v,		spawn,		SHCMD("virtualbox") },
 	{ MODKEY|ShiftMask,	XK_w,		spawn,		SHCMD("sh ~/scripts/wttr") },
+	{ Mod1Mask|ControlMask,	XK_Delete,	spawn,		SHCMD("sh rofi -show power-menu -modi power-menu:rofi-power-menu -lines 6") },
 	{ Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,	SHCMD("urxvt -e sh ~/scripts/deeznuts") },
 	{ ShiftMask,		XK_Print,	spawn,		SHCMD("scrot /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
+//	{ MODKEY,		XK_y,		spawn,		SHCMD("urxvt -e sh ~/scripts/mpvopen") },	// uncommonly used
 
-	// fasd: reverse, files only, no ranks -- idk how fasd -e works
 	// rofi
+	// 4chan boards
+	// fasd: reverse, files only, no ranks -- idk how fasd -e works
+	// firefox tabs
 	// virtualbox "/home/joseph/VirtualBox VMs/7/7.vbox"
 	// virtualbox "/home/joseph/VirtualBox VMs/xp/xp.vbox"
-	{ MODKEY,		XK_p,		spawn,		SHCMD("bash -i ~/scripts/mpcrofi") },	// now playing
+	{ MODKEY,		XK_p,		spawn,		SHCMD("bash -i ~/scripts/mpcrofi -n") },	// now playing
 	{ MODKEY,		XK_r,		spawn,		SHCMD("f=$(fasd -Rfl | rofi -dmenu) && urxvt -e vim \"$f\"") },
 	{ MODKEY,		XK_s,		spawn,		SHCMD("sh ~/scripts/menu-surfraw") },	// TODO: unify relevant elvis into single script
-	{ MODKEY|ShiftMask,	XK_m,		spawn,		SHCMD("bash -i ~/scripts/mpcrofi -s") },	// search artist/album
-	// { MODKEY|ShiftMask,	XK_m,		spawn,		SHCMD("bash -i ~/scripts/mpcrofi -l") },	// browse playlist
+	{ MODKEY,		XK_semicolon,	spawn,		SHCMD("bash -i ~/scripts/mpcrofi") },	// prompt
+	{ MODKEY,		XK_apostrophe,	spawn,		SHCMD("bash -i ~/scripts/mpcrofi -s") },	// search artist/album
 	{ MODKEY|ShiftMask,	XK_p,		spawn,		SHCMD("bash -i ~/scripts/mpcrym") },	// bash -i respects $PATH!
 	{ MODKEY|ShiftMask,	XK_r,		spawn,		SHCMD("sh ~/scripts/vex") },
 
@@ -197,7 +202,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY,		XK_g,		setlayout,	{.v = &layouts[0]} },	// default
 	{ MODKEY,		XK_f,		setlayout,	{.v = &layouts[1]} },	// fullscreen
 	{ MODKEY,		XK_v,		setlayout,	{.v = &layouts[2]} },	// deck
-	{ MODKEY,		XK_b,		setlayout,	{.v = &layouts[3]} },	// bstack -- almost never used
+	// { MODKEY,		XK_b,		setlayout,	{.v = &layouts[3]} },	// bstack -- deprecated
 
 	// window
 	{ ControlMask,		XK_q,		killclient,	{0} },
@@ -221,6 +226,8 @@ static Key keys[] = {		/* {0} just means no arg */
 	TAGKEYS(		XK_8,				7)
 	TAGKEYS(		XK_9,				8)
 	{ MODKEY,		XK_Tab,		view,		{0} },	// back and forth workspace
+	{ MODKEY,		XK_y,		shiftviewclients,	{ .i = -1 } },
+	{ MODKEY,		XK_o,		shiftviewclients,	{ .i = +1 } },	// cycle tag focus
 	{ MODKEY,		XK_bracketleft, shiftviewclients,	{ .i = -1 } },
 	{ MODKEY,		XK_bracketright,shiftviewclients,	{ .i = +1 } },	// cycle tag focus
 	{ MODKEY,		XK_u,		view,		{0} },	// nicer than mod+tab, pairs well with mod+i
@@ -264,18 +271,21 @@ static Button buttons[] = {
 
 static const char *const autostart[] = {	// cool_autostart
 
-	"sh", "-c", "setxkbmap -layout us -option compose:rctrl", NULL,		// all setxkbmap options must be declared at once
 	"dunst", NULL,		// any command longer than 1 word needs the long syntax, apparently
 	"mpd", NULL,		// can be pretty slow on cold boot; e.g. "Cannot assign requested address"
 	"sh", "-c", "picom -b --config .picom.conf",	NULL,
 	"sh", "-c", "pkill mpdscribble; mpdscribble",	NULL,	// pidof || method -> running, but inactive
 	"sh", "-c", "redshift -x; redshift -b 1",	NULL,	// pkill doesn't affect redshift!
+	"sh", "-c", "setxkbmap -layout us -option compose:rctrl", NULL,		// all setxkbmap options must be declared at once
 	"sh", "-c", "udisksctl mount -b /dev/sdb1",	NULL,	// takes a while, don't panic
 	"sh", "-c", "while :; do feh -r --randomize --bg-fill ~/wallpaper; sleep 10m; done", NULL,
 	"sh", "-c", "~/dwm/dwm_status_kai.sh",	NULL,
-	"bash", "-c", "~/scripts/mon",		NULL,
+	"sh", "-c", "~/scripts/cup",		NULL,
+	"sh", "-c", "~/scripts/mon --on",	NULL,
+	"sh", "-c", "~/scripts/rymgrep -d",	NULL,
 	"udiskie", NULL,
-	//"sh", "-c", "notify-send 'dwm started'", NULL,
-	//"sh", "-c", "~/scripts/mouse",		NULL,
+	// "bash", "-c", "~/scripts/mon",		NULL,
+	// "sh", "-c", "notify-send 'dwm started'", NULL,
+	// "sh", "-c", "~/scripts/mouse",		NULL,
 	NULL
 };
