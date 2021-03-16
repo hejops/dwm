@@ -1,8 +1,3 @@
-// http://ratfactor.com/dwm
-// https://github.com/LukeSmithxyz/dwm/blob/master/config.h
-// https://www.youtube.com/watch?v=UEmPboaTDpQ
-// https://www.youtube.com/watch?v=fBrc_xgwQE8
-
 // patches to try: regex rules, focusadjacenttag, focusonnetactive, swapfocus, switchtotag, zoomswap
 // diff -u [old] [new] > [diff]
 // patch < [diff]		overwrites the file specified in [diff]
@@ -27,9 +22,9 @@
 static const unsigned int borderpx	= 1;	// border pixel of windows
 static const unsigned int snap		= 32;	// snap pixel
 static const int showbar		= 1;	// 0 means no bar
-static const int topbar			= 0;	// 0 means bottom bar
-static const char *fonts[]		= { "monaco:size=8", "symbola:size=8" };	// requires font-awesome, apparently
-static const char dmenufont[]		= "monaco:size=8";
+static const int topbar			= 1;	// 0 means bottom bar -- testing
+static const char *fonts[]		= { "ia writer mono s:size=8", "monaco:size=8", "symbola:size=8" };	// may require font-awesome
+// static const char dmenufont[]		= "monaco:size=8";
 
 // https://camo.githubusercontent.com/cdb2f2e986c564b515c0c698e6c45b4ab5d725a9/687474703a2f2f692e696d6775722e636f6d2f776136363678672e706e67
 static const char blue[]		= "#458688";
@@ -41,9 +36,9 @@ static const char white2[]		= "#ebdbb2";
 static const char white[]		= "#bbbbbb";
 
 static const char *colors[][3]		= {
-//			fg	bg	 border
-	[SchemeNorm] = { white2, gray, gray },
-	[SchemeSel]  = { blue, gray, blue },
+//			fg	bg	border
+	[SchemeNorm] = { white2,gray,	gray },
+	[SchemeSel]  = { blue,	gray,	blue },
 };
 
 // tag names -- testing
@@ -54,8 +49,7 @@ static const Rule rules[] = {
 	// xprop(1):
 	// WM_CLASS(STRING) = instance, class;	reversed!
 	// WM_NAME(STRING) = title
-	// try to make do without regex first
-	// https://github.com/ericpruitt/edge/blob/master/patches/dwm-00-regex-rules.diff
+	// regex is hardly needed: https://github.com/ericpruitt/edge/blob/master/patches/dwm-00-regex-rules.diff
 	// https://www.tutorialspoint.com/c_standard_library/c_function_strstr.htm
 	// switch = switchtotag (not switchtag), float = isfloating
 
@@ -69,6 +63,7 @@ static const Rule rules[] = {
 	{ "libreoffice-writer",	NULL,	NULL,		0,		0,	0,	1 },
 	{ "mednafen",	NULL,		NULL,		0,		0,	1,	1 },
 	{ "mpv",	NULL,		NULL,		1 << 0,		1,	0,	1 },
+	{ NULL,		"libreoffice",	NULL,		0,		0,	0,	1 },
 	{ NULL,		NULL,		"LibreOffice",	0,		0,	0,	1 },	// this doesn't work
 	{ NULL,		NULL,		"ncmpcpp",	1 << 0,		0,	0,	1 },	// yes, this works
 
@@ -84,7 +79,7 @@ static const Rule rules[] = {
 
 	{ "App.py",	NULL,		NULL,		1 << 3,		1,	1,	1 },	// playitslowly
 	{ "TuxGuitar",	NULL,		NULL,		1 << 3,		1,	0,	1 },
-	{ "VirtualBox Machine",	NULL,	NULL,		1 << 3,		1,	0,	1 },	// not triggered when run from terminal
+	{ "VirtualBox Machine",	NULL,	NULL,		1 << 3,		1,	0,	1 },	// rule not triggered; WM_CLASS:  not found
 	{ "VirtualBox Manager",	NULL,	NULL,		1 << 3,		1,	1,	1 },
 	{ "virtualbox",	NULL,		NULL,		1 << 3,		1,	1,	1 },	// idk
 	{ "Virtualbox",	NULL,		NULL,		1 << 3,		1,	1,	1 },	// this better work gdi
@@ -112,91 +107,89 @@ static const Layout layouts[] = {
 //	{ "><>",	  NULL },
 };
 
-/* key definitions */
 #define MODKEY Mod4Mask
 #define TAGKEYS(KEY,TAG) \
 	{ MODKEY,			KEY,	  view,		{.ui = 1 << TAG} }, \
-	{ MODKEY|ControlMask,		KEY,	  toggleview,	{.ui = 1 << TAG} }, \
+	{ Mod1Mask,			KEY,	  toggleview,	{.ui = 1 << TAG} }, \
 	{ MODKEY|ShiftMask,		KEY,	  tag,		{.ui = 1 << TAG} }, \
 	{ MODKEY|ControlMask|ShiftMask, KEY,	  toggletag,	{.ui = 1 << TAG} },
+// toggleview = activate (in addition), tag = send to, toggletag = duplicate to
+// these combinations are all unwieldy
+// alt+\d might cause conflicts with some programs, but i haven't noticed any yet
 
-/* helper for spawning shell commands in the pre dwm-5.0 fashion */
+#include <X11/XF86keysym.h>	// https://cgit.freedesktop.org/xorg/proto/x11proto/tree/XF86keysym.h
+
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
-
-/* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "rofi", "-show", "run", NULL };
-/* static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", white, "-sb", col_cyan, "-sf", col_gray4, NULL }; to change to rofi */
 static const char *termcmd[]	= { "urxvt", NULL };
 static const char *brightup[]	= { "xbacklight", "-inc", "10", NULL};	// acpilight needs root
 static const char *brightdown[]	= { "xbacklight", "-dec", "10", NULL};
 static const char *volup[]	= { "pactl", "set-sink-volume", "0", "+10%", NULL};
 static const char *voldown[]	= { "pactl", "set-sink-volume", "0", "-10%", NULL};
 // https://github.com/TaylanTatli/dwm/blob/master/config.h#L15
-// static const char *musiccmd[] = { "urxvt", "-title", "ncmpcpp", "-e", "ncmpcpp", NULL };	// testing; ncmpcpp always sets its own (long) title
 
 static Key keys[] = {		/* {0} just means no arg */
 	/* modifier		key		function	argument */
 
-	// https://dwm.suckless.org/patches/keypressrelease/
-	// https://github.com/LukeSmithxyz/voidrice/blob/be9490155fae85a877d49c7342a8814a184c414d/.local/bin/maimpick
-	// https://gitlab.com/rafa_99/dwm/blob/master/config.h#L152
-	// still unbound: z-=;':"{}; backspace (focus master), backslash, enter
-	//{ 0,			XK_Print,	spawn,		SHCMD("sleep 0.2; scrot -s /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },	// selection is buggy
-	{ 0,			0x1008ff02,	spawn,		{.v = brightup } },	// xbacklight doesn't work on asus
-	{ 0,			0x1008ff03,	spawn,		{.v = brightdown } },
-	{ 0,			0x1008ff11,	spawn,		{.v = voldown } },
-	{ 0,			0x1008ff13,	spawn,		{.v = volup } },
-	{ 0,			XK_Print,	spawn,		SHCMD("maim -s | xclip -selection clipboard -t image/png") },
-	{ ControlMask,		XK_Print,	spawn,		SHCMD("scrot -u /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
-	{ MODKEY,		0x1008ff2d,	spawn,		SHCMD("i3lock -c 000000") },	// try some other screen lockers
+	// still unbound: b=:"{}; backspace (reserved: focus master), backslash
+	// { MODKEY,		XK_y,		spawn,		SHCMD("urxvt -e bash -i ~/scripts/mpvopen") },	// uncommonly used
+	{ 0,			0x1008ff2d,	spawn,		SHCMD("i3lock -c 000000") },	// try some other screen lockers
+	{ 0,			XF86XK_AudioLowerVolume,	spawn,		{.v = voldown } },
+	{ 0,			XF86XK_AudioRaiseVolume,	spawn,		{.v = volup } },
+	{ 0,			XF86XK_MonBrightnessDown,	spawn,		{.v = brightdown } },
+	{ 0,			XF86XK_MonBrightnessUp,		spawn,		{.v = brightup } },	// xbacklight doesn't work on asus
+	{ 0,			XK_Print,	spawn,		SHCMD("maim -m 10 -s | xclip -selection clipboard -t image/png") }, // scrot syntax is garbage since it doesn't support true piping
+	{ ControlMask,		XK_Print,	spawn,		SHCMD("maim -m 10 -i $(xdotool getactivewindow) | xclip -selection clipboard -t image/png") },
 	{ MODKEY,		XK_Delete,	spawn,		SHCMD("i3lock -c 000000") },
 	{ MODKEY,		XK_Print,	spawn,		SHCMD("flameshot gui") },
+	{ MODKEY,		XK_Return,	spawn,		SHCMD("urxvt -e bash -i ~/scripts/deeznuts") },
 	{ MODKEY,		XK_a,		spawn,		SHCMD("localc") },
 	{ MODKEY,		XK_c,		spawn,		SHCMD("urxvt -e neomutt") },	// why does -Z always report no new mail?
 	{ MODKEY,		XK_d,		spawn,		{.v = dmenucmd } },
 	{ MODKEY,		XK_e,		spawn,		{.v = termcmd } },
-	{ MODKEY,		XK_m,		spawn,		SHCMD("urxvt -e ncmpcpp") },
-	{ MODKEY,		XK_minus,	spawn,		SHCMD("sh ~/scripts/nordtog --toggle") },
-	{ MODKEY,		XK_n,		spawn,		SHCMD("urxvt -e newsboat") },
+	{ MODKEY,		XK_minus,	spawn,		SHCMD("bash -i ~/scripts/nordtog --toggle") },	// bash -i respects $PATH
+	{ MODKEY,		XK_n,		spawn,		SHCMD("urxvt -e newsboat") },	// printf '\e]710;%s\007' "xft:monaco:pixelsize=16"
 	{ MODKEY,		XK_q,		spawn,		SHCMD("soulseekqt") },
 	{ MODKEY,		XK_t,		spawn,		SHCMD("telegram-desktop") },
 	{ MODKEY,		XK_w,		spawn,		SHCMD("firefox") },
 	{ MODKEY|ShiftMask,	XK_d,		spawn,		SHCMD("discord-ptb") },
 	{ MODKEY|ShiftMask,	XK_e,		spawn,		SHCMD("kitty") },
-	{ MODKEY|ShiftMask,	XK_f,		spawn,		SHCMD("urxvt -e bash ~/scripts/ranga") },
+	{ MODKEY|ShiftMask,	XK_f,		spawn,		SHCMD("urxvt -e bash -i ~/scripts/ranga") },
 	{ MODKEY|ShiftMask,	XK_h,		spawn,		SHCMD("urxvt -e htop") },
-	{ MODKEY|ShiftMask,	XK_l,		spawn,		SHCMD("sh ~/scripts/lastscrob") },
-	{ MODKEY|ShiftMask,	XK_t,		spawn,		SHCMD("sh ~/scripts/nordtog --on; transmission-gtk") },
-	{ MODKEY|ShiftMask,	XK_v,		spawn,		SHCMD("virtualbox") },
-	{ MODKEY|ShiftMask,	XK_w,		spawn,		SHCMD("sh ~/scripts/wttr") },
-	{ Mod1Mask|ControlMask,	XK_Delete,	spawn,		SHCMD("sh rofi -show power-menu -modi power-menu:rofi-power-menu -lines 6") },
-	{ Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,	SHCMD("urxvt -e sh ~/scripts/deeznuts") },
-	{ ShiftMask,		XK_Print,	spawn,		SHCMD("scrot /tmp/screenshot-$(date +%F_%T).png -e 'xclip -selection c -t image/png < $f'") },
-//	{ MODKEY,		XK_y,		spawn,		SHCMD("urxvt -e sh ~/scripts/mpvopen") },	// uncommonly used
+	{ MODKEY|ShiftMask,	XK_l,		spawn,		SHCMD("bash -i ~/scripts/lastgrep") },
+	{ MODKEY|ShiftMask,	XK_m,		spawn,		SHCMD("urxvt -e ncmpcpp") },	// dropped priority
+	{ MODKEY|ShiftMask,	XK_t,		spawn,		SHCMD("bash -i ~/scripts/nordtog --on; transmission-gtk") },
+	{ MODKEY|ShiftMask,	XK_v,		spawn,		SHCMD("bash -i ~/scripts/vb") },	// hacky
+	{ MODKEY|ShiftMask,	XK_w,		spawn,		SHCMD("bash -i ~/scripts/wttr") },
+	{ Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,	SHCMD("urxvt -e bash -i ~/scripts/deeznuts") },	// unwieldy, might deprecate
+	{ ShiftMask,		XK_Print,	spawn,		SHCMD("maim -m 10 | xclip -selection clipboard -t image/png") },
 
 	// rofi
+	// $HOME/.SoulseekQt/wishlist
 	// 4chan boards
-	// fasd: reverse, files only, no ranks -- idk how fasd -e works
+	// fasd: reverse, files only, no scores, match by recent access -- idk what fasd -e does
 	// firefox tabs
-	// virtualbox "/home/joseph/VirtualBox VMs/7/7.vbox"
-	// virtualbox "/home/joseph/VirtualBox VMs/xp/xp.vbox"
-	{ MODKEY,		XK_p,		spawn,		SHCMD("bash -i ~/scripts/mpcrofi -n") },	// now playing
-	{ MODKEY,		XK_r,		spawn,		SHCMD("f=$(fasd -Rfl | rofi -dmenu) && urxvt -e vim \"$f\"") },
-	{ MODKEY,		XK_s,		spawn,		SHCMD("sh ~/scripts/menu-surfraw") },	// TODO: unify relevant elvis into single script
-	{ MODKEY,		XK_semicolon,	spawn,		SHCMD("bash -i ~/scripts/mpcrofi") },	// prompt
+	// notmuch search date:today | awk '{print substr($0, index($0, $5))}' | rofi -dmenu -> open in neomutt?
+	// { Mod1Mask|ControlMask,	XK_Delete,	spawn,		SHCMD("sh rofi -show power-menu -modi power-menu:rofi-power-menu -lines 6") },
 	{ MODKEY,		XK_apostrophe,	spawn,		SHCMD("bash -i ~/scripts/mpcrofi -s") },	// search artist/album
-	{ MODKEY|ShiftMask,	XK_p,		spawn,		SHCMD("bash -i ~/scripts/mpcrym") },	// bash -i respects $PATH!
-	{ MODKEY|ShiftMask,	XK_r,		spawn,		SHCMD("sh ~/scripts/vex") },
+	{ MODKEY,		XK_m,		spawn,		SHCMD("bash -i ~/scripts/mpcrofi -s") },
+	{ MODKEY,		XK_p,		spawn,		SHCMD("bash -i ~/scripts/mpcrofi -n") },	// now playing
+	{ MODKEY,		XK_r,		spawn,		SHCMD("f=$(fasd -Rflt | rofi -dmenu -i) && urxvt -e vim \"$f\"") },
+	{ MODKEY,		XK_s,		spawn,		SHCMD("bash -i ~/scripts/search") },
+	{ MODKEY,		XK_semicolon,	spawn,		SHCMD("bash -i ~/scripts/mpcrofi") },	// prompt
+	{ MODKEY|ShiftMask,	XK_p,		spawn,		SHCMD("bash -i ~/scripts/mpcrym") },
+	{ MODKEY|ShiftMask,	XK_r,		spawn,		SHCMD("bash -i ~/scripts/vex") },
 
 	// media control
-	{ MODKEY,		0x1008ff14,	spawn,		SHCMD("bash ~/scripts/rempv -t") },	// not working
-	{ MODKEY,		0x1008ff16,	spawn,		SHCMD("bash ~/scripts/rempv -b") },
-	{ MODKEY,		0x1008ff17,	spawn,		SHCMD("bash ~/scripts/rempv -f") },
-	{ MODKEY,		XK_comma,	spawn,		SHCMD("bash ~/scripts/rempv -b") },	// seek backward
-	{ MODKEY,		XK_period,	spawn,		SHCMD("bash ~/scripts/rempv -t") },	// toggle
-	{ MODKEY,		XK_slash,	spawn,		SHCMD("bash ~/scripts/rempv -f") },	// seek forward
-	{ MODKEY,		XK_x,		spawn,		SHCMD("bash ~/scripts/rempv -q") },	// quit
+	{ 0,			XF86XK_AudioNext,	spawn,	SHCMD("bash -i ~/scripts/rempv -f") },
+	{ 0,			XF86XK_AudioPlay,	spawn,	SHCMD("bash -i ~/scripts/rempv -t") },
+	{ 0,			XF86XK_AudioPrev,	spawn,	SHCMD("bash -i ~/scripts/rempv -b") },
+	{ MODKEY,		XK_comma,	spawn,		SHCMD("bash -i ~/scripts/rempv -b") },	// seek backward
+	{ MODKEY,		XK_period,	spawn,		SHCMD("bash -i ~/scripts/rempv -t") },	// toggle
+	{ MODKEY,		XK_slash,	spawn,		SHCMD("bash -i ~/scripts/rempv -f") },	// seek forward
+	{ MODKEY,		XK_x,		spawn,		SHCMD("bash -i ~/scripts/rempv -q") },	// quit
+	{ MODKEY,		XK_z,		spawn,		SHCMD("bash -i ~/scripts/rempv -d") },	// search deezer
 
 	// layout
 	{ MODKEY,		XK_g,		setlayout,	{.v = &layouts[0]} },	// default
@@ -216,6 +209,8 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY|ShiftMask,	XK_q,		quit,		{0} },
 
 	// workspace
+	// { MODKEY,		XK_bracketleft, shiftviewclients,	{ .i = -1 } },
+	// { MODKEY,		XK_bracketright,shiftviewclients,	{ .i = +1 } },	// cycle tag focus
 	TAGKEYS(		XK_1,				0)
 	TAGKEYS(		XK_2,				1)
 	TAGKEYS(		XK_3,				2)
@@ -225,67 +220,78 @@ static Key keys[] = {		/* {0} just means no arg */
 	TAGKEYS(		XK_7,				6)
 	TAGKEYS(		XK_8,				7)
 	TAGKEYS(		XK_9,				8)
-	{ MODKEY,		XK_Tab,		view,		{0} },	// back and forth workspace
-	{ MODKEY,		XK_y,		shiftviewclients,	{ .i = -1 } },
+	{ MODKEY,		XK_Tab,		view,		{0} },	// i often use this one-handed
 	{ MODKEY,		XK_o,		shiftviewclients,	{ .i = +1 } },	// cycle tag focus
-	{ MODKEY,		XK_bracketleft, shiftviewclients,	{ .i = -1 } },
-	{ MODKEY,		XK_bracketright,shiftviewclients,	{ .i = +1 } },	// cycle tag focus
-	{ MODKEY,		XK_u,		view,		{0} },	// nicer than mod+tab, pairs well with mod+i
+	{ MODKEY,		XK_u,		view,		{0} },	// intuitive with mod+i
+	{ MODKEY,		XK_y,		shiftviewclients,	{ .i = -1 } },
 
 	// monitor
-	{ MODKEY,		XK_0,		spawn,		SHCMD("sleep 1; sh ~/scripts/mon --on") },
+	// { MODKEY,		XK_BackSpace,	spawn,		SHCMD("pkill picom; picom -b --config .picom.conf; notify-send 'Restarted picom'") },	// it's just a phase mom
+	// { MODKEY|ShiftMask,	XK_space,	tagmon,		{.i = +1 } },
+	{ MODKEY,		XK_0,		spawn,		SHCMD("bash -i ~/scripts/mon --on") },
 	{ MODKEY,		XK_i,		focusmon,	{.i = +1 } },	// switch mon
 	{ MODKEY|ShiftMask,	XK_i,		tagmon,		{.i = +1 } },	// send to mon
-	{ MODKEY|ShiftMask,	XK_space,	tagmon,		{.i = +1 } },
 
-	// rarely used, may deprecate
-	{ MODKEY,		XK_Left,	setmfact,	{.f = -0.05} }, // widen master
-	{ MODKEY,		XK_Right,	setmfact,	{.f = +0.05} },	// since i rarely use this, might use shiftviewclients instead
-	{ MODKEY|ShiftMask,	XK_Down,	incnmaster,	{.i = -1 } },	// +1 horiz in master
-	{ MODKEY|ShiftMask,	XK_Tab,		setlayout,	{0} },		// toggle between last 2 layouts
-	{ MODKEY|ShiftMask,	XK_Up,		incnmaster,	{.i = +1 } },
-//	{ MODKEY,		XK_0,		view,		{.ui = ~0 } },	// merge all workspaces; i almost never use this
-//	{ MODKEY,		XK_b,		togglebar,	{0} },
-//	{ MODKEY|ShiftMask,	XK_0,		tag,		{.ui = ~0 } },	// "sticky", not used
+	// gimmicks that i don't use
+	// { MODKEY,		XK_0,		view,		{.ui = ~0 } },	// merge all workspaces
+	// { MODKEY,		XK_Left,	setmfact,	{.f = -0.05} }, // widen master
+	// { MODKEY,		XK_Right,	setmfact,	{.f = +0.05} },
+	// { MODKEY,		XK_b,		togglebar,	{0} },
+	// { MODKEY|ShiftMask,	XK_0,		tag,		{.ui = ~0 } },	// "sticky"
+	// { MODKEY|ShiftMask,	XK_Down,	incnmaster,	{.i = -1 } },	// +1 horiz in master
+	// { MODKEY|ShiftMask,	XK_Tab,		setlayout,	{0} },		// toggle between last 2 layouts
+	// { MODKEY|ShiftMask,	XK_Up,		incnmaster,	{.i = +1 } },
 
 };
 
 /* click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin */
 static Button buttons[] = {
 
-	//click			event mask	button		function	argument
+	// click		event mask	button		function	argument
+	// { ClkTagBar,		0,		Button3,	toggleview,	{0} },
+	// { ClkTagBar,		0,		Button4,	shiftviewclients,	{ .i = -1 } },
+	// { ClkTagBar,		0,		Button5,	shiftviewclients,	{ .i = +1 } },
+	// { ClkTagBar,		MODKEY,		Button3,	toggletag,	{0} },	// duplicate to
+	// { ClkWinTitle,	0,		Button2,	zoom,		{0} },	// togglefloating?
+	// { ClkWinTitle,	0,		Button4,	focusstack,	{.i = -1 }},
+	// { ClkWinTitle,	0,		Button5,	focusstack,	{.i = +1 }},	// might seem useless but good for vbox
+	{ ClkClientWin,		MODKEY,		8,		view,		{0}},
+	{ ClkClientWin,		MODKEY,		9,		tagmon,		{.i = +1 }},
 	{ ClkClientWin,		MODKEY,		Button1,	movemouse,	{0} },	// anywhere in window
 	{ ClkClientWin,		MODKEY,		Button2,	togglefloating, {0} },
 	{ ClkClientWin,		MODKEY,		Button3,	resizemouse,	{0} },
-	{ ClkLtSymbol,		0,		Button1,	setlayout,	{0} },	// layout symbol
-	{ ClkLtSymbol,		0,		Button3,	setlayout,	{.v = &layouts[1]} },
+	{ ClkClientWin,		MODKEY,		Button4,	focusstack,	{.i = -1 }},	// mostly for fullscreen
+	{ ClkClientWin,		MODKEY,		Button5,	focusstack,	{.i = +1 }},
+	{ ClkLtSymbol,		0,		Button1,	setlayout,	{0} },	// toggle layouts
+	{ ClkLtSymbol,		0,		Button3,	setlayout,	{.v = &layouts[1]} },	// fullscreen
 	{ ClkStatusText,	0,		Button2,	spawn,		{.v = termcmd } },
+	{ ClkStatusText,	0,		Button3,	toggleview,	{0} },	// TESTING
 	{ ClkTagBar,		0,		Button1,	view,		{0} },
-	{ ClkTagBar,		MODKEY,		Button3,	toggletag,	{0} },	// move to tag
-	{ ClkWinTitle,		0,		Button1,	focusstack,	{.i = +1 }},	// might seem useless but good for vbox
-	{ ClkWinTitle,		0,		Button2,	zoom,		{0} },	// togglefloating?
-	{ ClkWinTitle,		0,		Button3,	focusstack,	{.i = -1 }},
-//	{ ClkTagBar,		0,		Button3,	toggleview,	{0} },	very strange
-//	{ ClkTagBar,		MODKEY,		Button1,	tag,		{0} },
+	{ ClkTagBar,		0,		Button2,	toggleview,	{0} },	// activate
+	{ ClkTagBar,		MODKEY,		Button1,	tag,		{0} },	// send to
+	{ ClkWinTitle,		0,		Button2,	tagmon,		{.i = -1}},
+	{ ClkWinTitle,		0,		Button4,	shiftviewclients,	{.i = -1 }},
+	{ ClkWinTitle,		0,		Button5,	shiftviewclients,	{.i = +1 }},
 };
 
 static const char *const autostart[] = {	// cool_autostart
 
 	"dunst", NULL,		// any command longer than 1 word needs the long syntax, apparently
-	"mpd", NULL,		// can be pretty slow on cold boot; e.g. "Cannot assign requested address"
-	"sh", "-c", "picom -b --config .picom.conf",	NULL,
+	"mpd", NULL,		// can be pretty slow on cold boot -- "Cannot assign requested address"
+	"sh", "-c", "pkill picom; picom -b --config ~/.picom.conf",	NULL,	// -b is definitely needed
 	"sh", "-c", "pkill mpdscribble; mpdscribble",	NULL,	// pidof || method -> running, but inactive
 	"sh", "-c", "redshift -x; redshift -b 1",	NULL,	// pkill doesn't affect redshift!
 	"sh", "-c", "setxkbmap -layout us -option compose:rctrl", NULL,		// all setxkbmap options must be declared at once
+	"sh", "-c", "sleep 1; ~/scripts/mon --on",	NULL,	// need sleep because picom is slow to initialise
 	"sh", "-c", "udisksctl mount -b /dev/sdb1",	NULL,	// takes a while, don't panic
-	"sh", "-c", "while :; do feh -r --randomize --bg-fill ~/wallpaper; sleep 10m; done", NULL,
-	"sh", "-c", "~/dwm/dwm_status_kai.sh",	NULL,
 	"sh", "-c", "~/scripts/cup",		NULL,
-	"sh", "-c", "~/scripts/mon --on",	NULL,
-	"sh", "-c", "~/scripts/rymgrep -d",	NULL,
+	// "sh", "-c", "~/scripts/rymgrep -d",	NULL,
+	"sh", "-c", "~/scripts/wallset",		NULL,
 	"udiskie", NULL,
 	// "bash", "-c", "~/scripts/mon",		NULL,
 	// "sh", "-c", "notify-send 'dwm started'", NULL,
+	// "sh", "-c", "while :; do feh -r --randomize --bg-fill ~/wallpaper; sleep 10m; done", NULL,	// i use wallset now
+	// "sh", "-c", "~/dwm/dwm_status_kai.sh",	NULL,	// now handled by cron
 	// "sh", "-c", "~/scripts/mouse",		NULL,
 	NULL
 };
