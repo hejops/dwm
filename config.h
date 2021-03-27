@@ -23,7 +23,8 @@ static const unsigned int borderpx	= 1;	// border pixel of windows
 static const unsigned int snap		= 32;	// snap pixel
 static const int showbar		= 1;	// 0 means no bar
 static const int topbar			= 1;	// 0 means bottom bar -- testing
-static const char *fonts[]		= { "ia writer mono s:size=8", "monaco:size=8", "symbola:size=8" };	// may require font-awesome
+static const char *fonts[]		= { "fira mono:size=8", "ia writer mono s:size=8",
+					"monaco:size=8", "symbola:size=8" };	// may require font-awesome
 // static const char dmenufont[]		= "monaco:size=8";
 
 // https://camo.githubusercontent.com/cdb2f2e986c564b515c0c698e6c45b4ab5d725a9/687474703a2f2f692e696d6775722e636f6d2f776136363678672e706e67
@@ -166,30 +167,31 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ ShiftMask,		XK_Print,	spawn,		SHCMD("maim -m 10 | xclip -selection clipboard -t image/png") },
 
 	// rofi
+	// rofi -show calc -modi calc -no-show-match -no-sort
 	// $HOME/.SoulseekQt/wishlist
 	// 4chan boards
 	// fasd: reverse, files only, no scores, match by recent access -- idk what fasd -e does
 	// firefox tabs
 	// notmuch search date:today | awk '{print substr($0, index($0, $5))}' | rofi -dmenu -> open in neomutt?
 	// { Mod1Mask|ControlMask,	XK_Delete,	spawn,		SHCMD("sh rofi -show power-menu -modi power-menu:rofi-power-menu -lines 6") },
-	{ MODKEY,		XK_apostrophe,	spawn,		SHCMD("bash -i ~/scripts/mpcrofi -s") },	// search artist/album
-	{ MODKEY,		XK_m,		spawn,		SHCMD("bash -i ~/scripts/mpcrofi -s") },
-	{ MODKEY,		XK_p,		spawn,		SHCMD("bash -i ~/scripts/mpcrofi -n") },	// now playing
-	{ MODKEY,		XK_r,		spawn,		SHCMD("f=$(fasd -Rflt | rofi -dmenu -i) && urxvt -e vim \"$f\"") },
+	{ MODKEY,		XK_apostrophe,	spawn,		SHCMD("bash -i ~/scripts/rmpc -s") },	// search artist/album
+	{ MODKEY,		XK_m,		spawn,		SHCMD("bash -i ~/scripts/rmpc -s") },
+	{ MODKEY,		XK_p,		spawn,		SHCMD("bash -i ~/scripts/rmpc -n") },	// now playing
+	{ MODKEY,		XK_r,		spawn,		SHCMD("f=$(fasd -Rflt | rofi -dmenu -i) && urxvt -e vim \"$f\"") },	// to be replaced with o
 	{ MODKEY,		XK_s,		spawn,		SHCMD("bash -i ~/scripts/search") },
-	{ MODKEY,		XK_semicolon,	spawn,		SHCMD("bash -i ~/scripts/mpcrofi") },	// prompt
-	{ MODKEY|ShiftMask,	XK_p,		spawn,		SHCMD("bash -i ~/scripts/mpcrym") },
+	{ MODKEY,		XK_semicolon,	spawn,		SHCMD("bash -i ~/scripts/rmpc") },	// prompt
+	{ MODKEY|ShiftMask,	XK_p,		spawn,		SHCMD("bash -i ~/scripts/rmpc --rym") },
 	{ MODKEY|ShiftMask,	XK_r,		spawn,		SHCMD("bash -i ~/scripts/vex") },
 
 	// media control
-	{ 0,			XF86XK_AudioNext,	spawn,	SHCMD("bash -i ~/scripts/rempv -f") },
-	{ 0,			XF86XK_AudioPlay,	spawn,	SHCMD("bash -i ~/scripts/rempv -t") },
-	{ 0,			XF86XK_AudioPrev,	spawn,	SHCMD("bash -i ~/scripts/rempv -b") },
-	{ MODKEY,		XK_comma,	spawn,		SHCMD("bash -i ~/scripts/rempv -b") },	// seek backward
-	{ MODKEY,		XK_period,	spawn,		SHCMD("bash -i ~/scripts/rempv -t") },	// toggle
-	{ MODKEY,		XK_slash,	spawn,		SHCMD("bash -i ~/scripts/rempv -f") },	// seek forward
-	{ MODKEY,		XK_x,		spawn,		SHCMD("bash -i ~/scripts/rempv -q") },	// quit
-	{ MODKEY,		XK_z,		spawn,		SHCMD("bash -i ~/scripts/rempv -d") },	// search deezer
+	{ 0,			XF86XK_AudioNext,	spawn,	SHCMD("bash -i ~/scripts/rmpv -f") },
+	{ 0,			XF86XK_AudioPlay,	spawn,	SHCMD("bash -i ~/scripts/rmpv -t") },
+	{ 0,			XF86XK_AudioPrev,	spawn,	SHCMD("bash -i ~/scripts/rmpv -b") },
+	{ MODKEY,		XK_comma,	spawn,		SHCMD("bash -i ~/scripts/rmpv -b") },	// seek backward
+	{ MODKEY,		XK_period,	spawn,		SHCMD("bash -i ~/scripts/rmpv -t") },	// toggle
+	{ MODKEY,		XK_slash,	spawn,		SHCMD("bash -i ~/scripts/rmpv -f") },	// seek forward
+	{ MODKEY,		XK_x,		spawn,		SHCMD("bash -i ~/scripts/rmpv -q") },	// quit
+	{ MODKEY,		XK_z,		spawn,		SHCMD("bash -i ~/scripts/rmpv -d") },	// search deezer
 
 	// layout
 	{ MODKEY,		XK_g,		setlayout,	{.v = &layouts[0]} },	// default
@@ -266,6 +268,8 @@ static Button buttons[] = {
 	{ ClkLtSymbol,		0,		Button3,	setlayout,	{.v = &layouts[1]} },	// fullscreen
 	{ ClkStatusText,	0,		Button2,	spawn,		{.v = termcmd } },
 	{ ClkStatusText,	0,		Button3,	toggleview,	{0} },	// TESTING
+	{ ClkStatusText,	0,		Button4,	shiftviewclients,	{.i = -1 }},
+	{ ClkStatusText,	0,		Button5,	shiftviewclients,	{.i = +1 }},
 	{ ClkTagBar,		0,		Button1,	view,		{0} },
 	{ ClkTagBar,		0,		Button2,	toggleview,	{0} },	// activate
 	{ ClkTagBar,		MODKEY,		Button1,	tag,		{0} },	// send to
@@ -282,7 +286,7 @@ static const char *const autostart[] = {	// cool_autostart
 	"sh", "-c", "pkill mpdscribble; mpdscribble",	NULL,	// pidof || method -> running, but inactive
 	"sh", "-c", "redshift -x; redshift -b 1",	NULL,	// pkill doesn't affect redshift!
 	"sh", "-c", "setxkbmap -layout us -option compose:rctrl", NULL,		// all setxkbmap options must be declared at once
-	"sh", "-c", "sleep 1; ~/scripts/mon --on",	NULL,	// need sleep because picom is slow to initialise
+	"sh", "-c", "~/scripts/mon --on",	NULL,	// need sleep because picom is slow to initialise
 	"sh", "-c", "udisksctl mount -b /dev/sdb1",	NULL,	// takes a while, don't panic
 	"sh", "-c", "~/scripts/cup",		NULL,
 	// "sh", "-c", "~/scripts/rymgrep -d",	NULL,
