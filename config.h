@@ -23,8 +23,10 @@ static const unsigned int borderpx	= 1;	// border pixel of windows
 static const unsigned int snap		= 32;	// snap pixel
 static const int showbar		= 1;	// 0 means no bar
 static const int topbar			= 1;	// 0 means bottom bar -- testing
-static const char *fonts[]		= { "fira mono:size=8", "ia writer mono s:size=8",
-					"monaco:size=8", "symbola:size=8" };	// may require font-awesome
+static const char *fonts[]		= { "fira mono:size=8",
+	/* "ia writer mono s:size=8", */
+	/* "monaco:size=8", */
+	"symbola:size=8" };	// may require font-awesome
 // static const char dmenufont[]		= "monaco:size=8";
 
 // https://camo.githubusercontent.com/cdb2f2e986c564b515c0c698e6c45b4ab5d725a9/687474703a2f2f692e696d6775722e636f6d2f776136363678672e706e67
@@ -44,7 +46,7 @@ static const char *colors[][3]		= {
 
 // tag names -- testing
 // https://github.com/meinwald/DWM-config/blob/master/config.h#L16
-static const char *tags[] = { "main", "work", "down", "vbox", "5", "6", "7", "8", "9" };
+static const char *tags[] = { "main", "work", "down", "vbox", "tab", "6", "7", "8", "9" };
 
 static const Rule rules[] = {
 	// xprop(1):
@@ -79,12 +81,14 @@ static const Rule rules[] = {
 	{ NULL,		NULL,		"deeznuts",	1 << 2,		0,	0,	1 },	// why doesn't this work like ncmpcpp?
 
 	{ "App.py",	NULL,		NULL,		1 << 3,		1,	1,	1 },	// playitslowly
-	{ "TuxGuitar",	NULL,		NULL,		1 << 3,		1,	0,	1 },
 	{ "VirtualBox Machine",	NULL,	NULL,		1 << 3,		1,	0,	1 },	// rule not triggered; WM_CLASS:  not found
 	{ "VirtualBox Manager",	NULL,	NULL,		1 << 3,		1,	1,	1 },
 	{ "virtualbox",	NULL,		NULL,		1 << 3,		1,	1,	1 },	// idk
 	{ "Virtualbox",	NULL,		NULL,		1 << 3,		1,	1,	1 },	// this better work gdi
 	// https://github.com/laur89/dwm-setup/blob/603f8b26d5bba806c195e6f82a2370fd51c6faf7/.dwm/w0ngBuild/source6.0/config.h
+
+	{ "TuxGuitar",	NULL,		NULL,		1 << 4,		1,	0,	1 },
+	{ "MuseScore3",	NULL,		NULL,		1 << 4,		1,	0,	1 },
 
 	{ "Gimp",	NULL,		NULL,		0,		0,	1,	-1 },
 	{ "Gpick",	"gpick",	NULL,		0,		0,	1,	-1 },
@@ -162,26 +166,25 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY|ShiftMask,	XK_m,		spawn,		SHCMD("urxvt -e ncmpcpp") },	// dropped priority
 	{ MODKEY|ShiftMask,	XK_t,		spawn,		SHCMD("bash -i ~/scripts/nordtog --on; transmission-gtk") },
 	{ MODKEY|ShiftMask,	XK_v,		spawn,		SHCMD("bash -i ~/scripts/vb") },	// hacky
-	{ MODKEY|ShiftMask,	XK_w,		spawn,		SHCMD("bash -i ~/scripts/wttr") },
+	{ MODKEY|ShiftMask,	XK_w,		spawn,		SHCMD("bash ~/scripts/wttr") },
 	{ Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,	SHCMD("urxvt -e bash -i ~/scripts/deeznuts") },	// unwieldy, might deprecate
 	{ ShiftMask,		XK_Print,	spawn,		SHCMD("maim -m 10 | xclip -selection clipboard -t image/png") },
 
-	// rofi
-	// rofi -show calc -modi calc -no-show-match -no-sort
 	// $HOME/.SoulseekQt/wishlist
 	// 4chan boards
-	// fasd: reverse, files only, no scores, match by recent access -- idk what fasd -e does
 	// firefox tabs
 	// notmuch search date:today | awk '{print substr($0, index($0, $5))}' | rofi -dmenu -> open in neomutt?
+	// rofi
+	// rofi -show calc -modi calc -no-show-match -no-sort
 	// { Mod1Mask|ControlMask,	XK_Delete,	spawn,		SHCMD("sh rofi -show power-menu -modi power-menu:rofi-power-menu -lines 6") },
-	{ MODKEY,		XK_apostrophe,	spawn,		SHCMD("bash -i ~/scripts/rmpc -s") },	// search artist/album
+	// { MODKEY,		XK_apostrophe,	spawn,		SHCMD("bash -i ~/scripts/rmpc -s") },	// search artist/album
 	{ MODKEY,		XK_m,		spawn,		SHCMD("bash -i ~/scripts/rmpc -s") },
 	{ MODKEY,		XK_p,		spawn,		SHCMD("bash -i ~/scripts/rmpc -n") },	// now playing
-	{ MODKEY,		XK_r,		spawn,		SHCMD("f=$(fasd -Rflt | rofi -dmenu -i) && urxvt -e vim \"$f\"") },	// to be replaced with o
+	{ MODKEY,		XK_r,		spawn,		SHCMD("bash -i ~/scripts/o") },
 	{ MODKEY,		XK_s,		spawn,		SHCMD("bash -i ~/scripts/search") },
 	{ MODKEY,		XK_semicolon,	spawn,		SHCMD("bash -i ~/scripts/rmpc") },	// prompt
 	{ MODKEY|ShiftMask,	XK_p,		spawn,		SHCMD("bash -i ~/scripts/rmpc --rym") },
-	{ MODKEY|ShiftMask,	XK_r,		spawn,		SHCMD("bash -i ~/scripts/vex") },
+	{ MODKEY|ShiftMask,	XK_r,		spawn,		SHCMD("bash -i ~/scripts/vex") },	// will probably deprecate
 
 	// media control
 	{ 0,			XF86XK_AudioNext,	spawn,	SHCMD("bash -i ~/scripts/rmpv -f") },
@@ -230,7 +233,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	// monitor
 	// { MODKEY,		XK_BackSpace,	spawn,		SHCMD("pkill picom; picom -b --config .picom.conf; notify-send 'Restarted picom'") },	// it's just a phase mom
 	// { MODKEY|ShiftMask,	XK_space,	tagmon,		{.i = +1 } },
-	{ MODKEY,		XK_0,		spawn,		SHCMD("bash -i ~/scripts/mon --on") },
+	{ MODKEY,		XK_0,		spawn,		SHCMD("bash -ix ~/scripts/mon --on > mon.log") },
 	{ MODKEY,		XK_i,		focusmon,	{.i = +1 } },	// switch mon
 	{ MODKEY|ShiftMask,	XK_i,		tagmon,		{.i = +1 } },	// send to mon
 
@@ -281,21 +284,23 @@ static Button buttons[] = {
 static const char *const autostart[] = {	// cool_autostart
 
 	"dunst", NULL,		// any command longer than 1 word needs the long syntax, apparently
-	"mpd", NULL,		// can be pretty slow on cold boot -- "Cannot assign requested address"
-	"sh", "-c", "pkill picom; picom -b --config ~/.picom.conf",	NULL,	// -b is definitely needed
+	"mpd", NULL,		// very slow on cold boot -- "Cannot assign requested address"
+	"sh", "-c", "~/scripts/cup",		NULL,
+	"sh", "-c", "~/scripts/mon --on",	NULL,
 	"sh", "-c", "pkill mpdscribble; mpdscribble",	NULL,	// pidof || method -> running, but inactive
+	"sh", "-c", "pkill picom; picom -b",	NULL,	// -b = daemon
 	"sh", "-c", "redshift -x; redshift -b 1",	NULL,	// pkill doesn't affect redshift!
 	"sh", "-c", "setxkbmap -layout us -option compose:rctrl", NULL,		// all setxkbmap options must be declared at once
-	"sh", "-c", "~/scripts/mon --on",	NULL,	// need sleep because picom is slow to initialise
 	"sh", "-c", "udisksctl mount -b /dev/sdb1",	NULL,	// takes a while, don't panic
-	"sh", "-c", "~/scripts/cup",		NULL,
-	// "sh", "-c", "~/scripts/rymgrep -d",	NULL,
-	"sh", "-c", "~/scripts/wallset",		NULL,
 	"udiskie", NULL,
 	// "bash", "-c", "~/scripts/mon",		NULL,
-	// "sh", "-c", "notify-send 'dwm started'", NULL,
-	// "sh", "-c", "while :; do feh -r --randomize --bg-fill ~/wallpaper; sleep 10m; done", NULL,	// i use wallset now
 	// "sh", "-c", "~/dwm/dwm_status_kai.sh",	NULL,	// now handled by cron
 	// "sh", "-c", "~/scripts/mouse",		NULL,
+	// "sh", "-c", "~/scripts/rymgrep -d",	NULL,
+	// "sh", "-c", "~/scripts/wallset",		NULL,
+	// "sh", "-c", "mons -e top",	NULL,	// TESTING
+	// "sh", "-c", "notify-send 'dwm started'", NULL,
+	// "sh", "-c", "while :; do feh -r --randomize --bg-fill ~/wallpaper; sleep 10m; done", NULL,	// i use wallset now
+
 	NULL
 };
