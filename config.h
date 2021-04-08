@@ -59,6 +59,8 @@ static const Rule rules[] = {
 	// class	instance	title		tags mask	switch	float	monitor
 	// switchtag definitions: https://github.com/bakkeby/patches/wiki/switchtag
 	{ "Chromium",	NULL,		NULL,		1 << 0,		0,	0,	1 },
+	{ "Display",	NULL,		NULL,		0,		0,	1,	1 },	// PIL
+	{ "FLTK",	NULL,		NULL,		0,		0,	1,	1 },	// vmd
 	{ "PPSSPPQt",	NULL,		NULL,		0,		0,	1,	1 },
 	{ "discord",	NULL,		NULL,		0,		0,	1,	1 },
 	{ "firefox",	NULL,		NULL,		0,		3,	0,	1 },
@@ -150,7 +152,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY,		XK_Print,	spawn,		SHCMD("flameshot gui") },
 	{ MODKEY,		XK_Return,	spawn,		SHCMD("urxvt -e bash -i ~/scripts/deeznuts") },
 	{ MODKEY,		XK_a,		spawn,		SHCMD("localc") },
-	{ MODKEY,		XK_c,		spawn,		SHCMD("urxvt -e neomutt") },	// why does -Z always report no new mail?
+	{ MODKEY,		XK_c,		spawn,		SHCMD("NOTMUCH_CONFIG=$HOME/.config/notmuch/config urxvt -e neomutt") },	// why does -Z always report no new mail?
 	{ MODKEY,		XK_d,		spawn,		{.v = dmenucmd } },
 	{ MODKEY,		XK_e,		spawn,		{.v = termcmd } },
 	{ MODKEY,		XK_minus,	spawn,		SHCMD("bash -i ~/scripts/nordtog --toggle") },	// bash -i respects $PATH
@@ -283,24 +285,19 @@ static Button buttons[] = {
 
 static const char *const autostart[] = {	// cool_autostart
 
-	"dunst", NULL,		// any command longer than 1 word needs the long syntax, apparently
+	"dunst", NULL,		// anything that isn't an executable (i.e. longer than 1 word) needs the full sh syntax
 	"mpd", NULL,		// very slow on cold boot -- "Cannot assign requested address"
 	"sh", "-c", "~/scripts/cup",		NULL,
-	"sh", "-c", "~/scripts/mon --on",	NULL,
-	"sh", "-c", "pkill mpdscribble; mpdscribble",	NULL,	// pidof || method -> running, but inactive
-	"sh", "-c", "pkill picom; picom -b",	NULL,	// -b = daemon
-	"sh", "-c", "redshift -x; redshift -b 1",	NULL,	// pkill doesn't affect redshift!
+	"sh", "-c", "pkill mpdscribble; mpdscribble",	NULL,
+	"sh", "-c", "pkill picom; picom -b",	NULL,	// -b = daemon; run order (wrt mon) doesn't really matter
+	"sh", "-c", "redshift -x; redshift -b 1",	NULL,	// redshift cannot be pkilled!
 	"sh", "-c", "setxkbmap -layout us -option compose:rctrl", NULL,		// all setxkbmap options must be declared at once
+	"sh", "-c", "sleep 1; ~/scripts/mon --on",	NULL,	// not using sleep will produce a black or misconfigured screen
 	"sh", "-c", "udisksctl mount -b /dev/sdb1",	NULL,	// takes a while, don't panic
 	"udiskie", NULL,
-	// "bash", "-c", "~/scripts/mon",		NULL,
-	// "sh", "-c", "~/dwm/dwm_status_kai.sh",	NULL,	// now handled by cron
 	// "sh", "-c", "~/scripts/mouse",		NULL,
-	// "sh", "-c", "~/scripts/rymgrep -d",	NULL,
 	// "sh", "-c", "~/scripts/wallset",		NULL,
-	// "sh", "-c", "mons -e top",	NULL,	// TESTING
 	// "sh", "-c", "notify-send 'dwm started'", NULL,
-	// "sh", "-c", "while :; do feh -r --randomize --bg-fill ~/wallpaper; sleep 10m; done", NULL,	// i use wallset now
 
 	NULL
 };
