@@ -140,7 +140,8 @@ static Key keys[] = {		/* {0} just means no arg */
 	/* modifier		key		function	argument */
 
 	// still unbound: b=:"{}; backspace (reserved: focus master), backslash
-	// { MODKEY,		XK_y,		spawn,		SHCMD("urxvt -e bash -i ~/scripts/mpvopen") },	// uncommonly used
+	// { MODKEY,		XK_y,		spawn,		SHCMD("urxvt -e sh -i mpvopen") },	// uncommonly used
+	// { Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,	SHCMD("urxvt -e sh -i deeznuts") },	// unwieldy, might deprecate
 	{ 0,			0x1008ff2d,	spawn,		SHCMD("i3lock -c 000000") },	// try some other screen lockers
 	{ 0,			XF86XK_AudioLowerVolume,	spawn,		{.v = voldown } },
 	{ 0,			XF86XK_AudioRaiseVolume,	spawn,		{.v = volup } },
@@ -150,26 +151,25 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ ControlMask,		XK_Print,	spawn,		SHCMD("maim -m 10 -i $(xdotool getactivewindow) | xclip -selection clipboard -t image/png") },
 	{ MODKEY,		XK_Delete,	spawn,		SHCMD("i3lock -c 000000") },
 	{ MODKEY,		XK_Print,	spawn,		SHCMD("flameshot gui") },
-	{ MODKEY,		XK_Return,	spawn,		SHCMD("urxvt -e bash -i ~/scripts/deeznuts") },
+	{ MODKEY,		XK_Return,	spawn,		SHCMD("urxvt -e sh -i deeznuts") },
 	{ MODKEY,		XK_a,		spawn,		SHCMD("localc") },
-	{ MODKEY,		XK_c,		spawn,		SHCMD("NOTMUCH_CONFIG=$HOME/.config/notmuch/config urxvt -e neomutt") },	// why does -Z always report no new mail?
+	{ MODKEY,		XK_c,		spawn,		SHCMD("NOTMUCH_CONFIG=$HOME/.config/notmuch/config urxvt -e neomutt") },
 	{ MODKEY,		XK_d,		spawn,		{.v = dmenucmd } },
 	{ MODKEY,		XK_e,		spawn,		{.v = termcmd } },
-	{ MODKEY,		XK_minus,	spawn,		SHCMD("bash -i ~/scripts/nordtog --toggle") },	// bash -i respects $PATH
+	{ MODKEY,		XK_minus,	spawn,		SHCMD("sh -i nordtog --toggle") },	// sh -i respects $PATH
 	{ MODKEY,		XK_n,		spawn,		SHCMD("urxvt -e newsboat") },	// printf '\e]710;%s\007' "xft:monaco:pixelsize=16"
 	{ MODKEY,		XK_q,		spawn,		SHCMD("soulseekqt") },
 	{ MODKEY,		XK_t,		spawn,		SHCMD("telegram-desktop") },
 	{ MODKEY,		XK_w,		spawn,		SHCMD("firefox") },
 	{ MODKEY|ShiftMask,	XK_d,		spawn,		SHCMD("discord-ptb") },
 	{ MODKEY|ShiftMask,	XK_e,		spawn,		SHCMD("kitty") },
-	{ MODKEY|ShiftMask,	XK_f,		spawn,		SHCMD("urxvt -e bash -i ~/scripts/ranga") },
+	{ MODKEY|ShiftMask,	XK_f,		spawn,		SHCMD("urxvt -e sh -i ranga") },
 	{ MODKEY|ShiftMask,	XK_h,		spawn,		SHCMD("urxvt -e htop") },
-	{ MODKEY|ShiftMask,	XK_l,		spawn,		SHCMD("bash -i ~/scripts/lastgrep") },
+	{ MODKEY|ShiftMask,	XK_l,		spawn,		SHCMD("lastgrep") },
 	{ MODKEY|ShiftMask,	XK_m,		spawn,		SHCMD("urxvt -e ncmpcpp") },	// dropped priority
-	{ MODKEY|ShiftMask,	XK_t,		spawn,		SHCMD("bash -i ~/scripts/nordtog --on; transmission-gtk") },
-	{ MODKEY|ShiftMask,	XK_v,		spawn,		SHCMD("bash -i ~/scripts/vb") },	// hacky
-	{ MODKEY|ShiftMask,	XK_w,		spawn,		SHCMD("bash ~/scripts/wttr") },
-	{ Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,	SHCMD("urxvt -e bash -i ~/scripts/deeznuts") },	// unwieldy, might deprecate
+	{ MODKEY|ShiftMask,	XK_t,		spawn,		SHCMD("sh -i nordtog --on; transmission-gtk") },
+	{ MODKEY|ShiftMask,	XK_v,		spawn,		SHCMD("sh -i vb") },	// hacky
+	{ MODKEY|ShiftMask,	XK_w,		spawn,		SHCMD("wttr") },
 	{ ShiftMask,		XK_Print,	spawn,		SHCMD("maim -m 10 | xclip -selection clipboard -t image/png") },
 
 	// $HOME/.SoulseekQt/wishlist
@@ -178,25 +178,26 @@ static Key keys[] = {		/* {0} just means no arg */
 	// notmuch search date:today | awk '{print substr($0, index($0, $5))}' | rofi -dmenu -> open in neomutt?
 	// rofi
 	// rofi -show calc -modi calc -no-show-match -no-sort
+	// { MODKEY,		XK_apostrophe,	spawn,		SHCMD("sh -i rmpc -s") },	// search artist/album
+	// { MODKEY|ShiftMask,	XK_r,		spawn,		SHCMD("sh -i vex") },	// will probably deprecate
 	// { Mod1Mask|ControlMask,	XK_Delete,	spawn,		SHCMD("sh rofi -show power-menu -modi power-menu:rofi-power-menu -lines 6") },
-	// { MODKEY,		XK_apostrophe,	spawn,		SHCMD("bash -i ~/scripts/rmpc -s") },	// search artist/album
-	{ MODKEY,		XK_m,		spawn,		SHCMD("bash -i ~/scripts/rmpc -s") },
-	{ MODKEY,		XK_p,		spawn,		SHCMD("bash -i ~/scripts/rmpc -n") },	// now playing
-	{ MODKEY,		XK_r,		spawn,		SHCMD("bash -i ~/scripts/o") },
-	{ MODKEY,		XK_s,		spawn,		SHCMD("bash -i ~/scripts/search") },
-	{ MODKEY,		XK_semicolon,	spawn,		SHCMD("bash -i ~/scripts/rmpc") },	// prompt
-	{ MODKEY|ShiftMask,	XK_p,		spawn,		SHCMD("bash -i ~/scripts/rmpc --rym") },
-	{ MODKEY|ShiftMask,	XK_r,		spawn,		SHCMD("bash -i ~/scripts/vex") },	// will probably deprecate
+	{ MODKEY,		XK_m,		spawn,		SHCMD("sh -i rmpc -s") },
+	{ MODKEY,		XK_p,		spawn,		SHCMD("sh -i rmpc -n") },	// now playing
+	{ MODKEY,		XK_r,		spawn,		SHCMD("sh o") },
+	{ MODKEY,		XK_s,		spawn,		SHCMD("sh -i search") },
+	{ MODKEY,		XK_semicolon,	spawn,		SHCMD("sh -i rmpc") },	// prompt
+	{ MODKEY|ShiftMask,	XK_p,		spawn,		SHCMD("sh -i rmpc --rym") },
+	{ MODKEY|ShiftMask,	XK_r,		spawn,		SHCMD("sh o -s") },		// show dirs first
 
 	// media control
-	{ 0,			XF86XK_AudioNext,	spawn,	SHCMD("bash -i ~/scripts/rmpv -f") },
-	{ 0,			XF86XK_AudioPlay,	spawn,	SHCMD("bash -i ~/scripts/rmpv -t") },
-	{ 0,			XF86XK_AudioPrev,	spawn,	SHCMD("bash -i ~/scripts/rmpv -b") },
-	{ MODKEY,		XK_comma,	spawn,		SHCMD("bash -i ~/scripts/rmpv -b") },	// seek backward
-	{ MODKEY,		XK_period,	spawn,		SHCMD("bash -i ~/scripts/rmpv -t") },	// toggle
-	{ MODKEY,		XK_slash,	spawn,		SHCMD("bash -i ~/scripts/rmpv -f") },	// seek forward
-	{ MODKEY,		XK_x,		spawn,		SHCMD("bash -i ~/scripts/rmpv -q") },	// quit
-	{ MODKEY,		XK_z,		spawn,		SHCMD("bash -i ~/scripts/rmpv -d") },	// search deezer
+	{ 0,			XF86XK_AudioNext,	spawn,	SHCMD("sh -i rmpv -f") },
+	{ 0,			XF86XK_AudioPlay,	spawn,	SHCMD("sh -i rmpv -t") },
+	{ 0,			XF86XK_AudioPrev,	spawn,	SHCMD("sh -i rmpv -b") },
+	{ MODKEY,		XK_comma,	spawn,		SHCMD("sh -i rmpv -b") },	// seek backward
+	{ MODKEY,		XK_period,	spawn,		SHCMD("sh -i rmpv -t") },	// toggle
+	{ MODKEY,		XK_slash,	spawn,		SHCMD("sh -i rmpv -f") },	// seek forward
+	{ MODKEY,		XK_x,		spawn,		SHCMD("sh -i rmpv -q") },	// quit
+	{ MODKEY,		XK_z,		spawn,		SHCMD("sh -i rmpv -d") },	// search deezer
 
 	// layout
 	{ MODKEY,		XK_g,		setlayout,	{.v = &layouts[0]} },	// default
@@ -235,7 +236,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	// monitor
 	// { MODKEY,		XK_BackSpace,	spawn,		SHCMD("pkill picom; picom -b --config .picom.conf; notify-send 'Restarted picom'") },	// it's just a phase mom
 	// { MODKEY|ShiftMask,	XK_space,	tagmon,		{.i = +1 } },
-	{ MODKEY,		XK_0,		spawn,		SHCMD("bash -ix ~/scripts/mon --on > mon.log") },
+	{ MODKEY,		XK_0,		spawn,		SHCMD("sh -ix mon --on > mon.log") },
 	{ MODKEY,		XK_i,		focusmon,	{.i = +1 } },	// switch mon
 	{ MODKEY|ShiftMask,	XK_i,		tagmon,		{.i = +1 } },	// send to mon
 
@@ -287,16 +288,16 @@ static const char *const autostart[] = {	// cool_autostart
 
 	"dunst", NULL,		// anything that isn't an executable (i.e. longer than 1 word) needs the full sh syntax
 	"mpd", NULL,		// very slow on cold boot -- "Cannot assign requested address"
-	"sh", "-c", "~/scripts/cup",		NULL,
+	"sh", "-c", "cup",		NULL,
 	"sh", "-c", "pkill mpdscribble; mpdscribble",	NULL,
 	"sh", "-c", "pkill picom; picom -b",	NULL,	// -b = daemon; run order (wrt mon) doesn't really matter
 	"sh", "-c", "redshift -x; redshift -b 1",	NULL,	// redshift cannot be pkilled!
 	"sh", "-c", "setxkbmap -layout us -option compose:rctrl", NULL,		// all setxkbmap options must be declared at once
-	"sh", "-c", "sleep 1; ~/scripts/mon --on",	NULL,	// not using sleep will produce a black or misconfigured screen
+	"sh", "-c", "sleep 1; mon --on",	NULL,	// not using sleep will produce a black or misconfigured screen
 	"sh", "-c", "udisksctl mount -b /dev/sdb1",	NULL,	// takes a while, don't panic
 	"udiskie", NULL,
-	// "sh", "-c", "~/scripts/mouse",		NULL,
-	// "sh", "-c", "~/scripts/wallset",		NULL,
+	// "sh", "-c", "mouse",		NULL,
+	// "sh", "-c", "wallset",		NULL,
 	// "sh", "-c", "notify-send 'dwm started'", NULL,
 
 	NULL
