@@ -140,35 +140,35 @@ static Key keys[] = {		/* {0} just means no arg */
 	/* modifier		key		function	argument */
 
 	// still unbound: b=:"{}; backspace (reserved: focus master), backslash
-	// { MODKEY,		XK_y,		spawn,		SHCMD("urxvt -e sh -i mpvopen") },	// uncommonly used
-	// { Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,	SHCMD("urxvt -e sh -i deeznuts") },	// unwieldy, might deprecate
+	// { MODKEY,		XK_y,		spawn,		SHCMD("urxvt -e sh mpvopen") },	// uncommonly used
+	// { Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,	SHCMD("urxvt -e sh deeznuts") },	// unwieldy, might deprecate
 	{ 0,			0x1008ff2d,	spawn,		SHCMD("i3lock -c 000000") },	// try some other screen lockers
 	{ 0,			XF86XK_AudioLowerVolume,	spawn,		{.v = voldown } },
 	{ 0,			XF86XK_AudioRaiseVolume,	spawn,		{.v = volup } },
 	{ 0,			XF86XK_MonBrightnessDown,	spawn,		{.v = brightdown } },
 	{ 0,			XF86XK_MonBrightnessUp,		spawn,		{.v = brightup } },	// xbacklight doesn't work on asus
 	{ 0,			XK_Print,	spawn,		SHCMD("maim -m 10 -s | xclip -selection clipboard -t image/png") }, // scrot syntax is garbage since it doesn't support true piping
-	{ ControlMask,		XK_Print,	spawn,		SHCMD("maim -m 10 -i $(xdotool getactivewindow) | xclip -selection clipboard -t image/png") },
+	{ ControlMask,		XK_Print,	spawn,		SHCMD("maim -m 10 $(xdotool getactivewindow) | xclip -selection clipboard -t image/png") },
 	{ MODKEY,		XK_Delete,	spawn,		SHCMD("i3lock -c 000000") },
 	{ MODKEY,		XK_Print,	spawn,		SHCMD("flameshot gui") },
-	{ MODKEY,		XK_Return,	spawn,		SHCMD("urxvt -e sh -i deeznuts") },
+	{ MODKEY,		XK_Return,	spawn,		SHCMD("urxvt -e sh deeznuts") },
 	{ MODKEY,		XK_a,		spawn,		SHCMD("localc") },
 	{ MODKEY,		XK_c,		spawn,		SHCMD("NOTMUCH_CONFIG=$HOME/.config/notmuch/config urxvt -e neomutt") },
 	{ MODKEY,		XK_d,		spawn,		{.v = dmenucmd } },
 	{ MODKEY,		XK_e,		spawn,		{.v = termcmd } },
-	{ MODKEY,		XK_minus,	spawn,		SHCMD("sh -i nordtog --toggle") },	// sh -i respects $PATH
+	{ MODKEY,		XK_minus,	spawn,		SHCMD("nordtog --toggle") },	// is still needed; eventually will find a way to use from the script itself
 	{ MODKEY,		XK_n,		spawn,		SHCMD("urxvt -e newsboat") },	// printf '\e]710;%s\007' "xft:monaco:pixelsize=16"
 	{ MODKEY,		XK_q,		spawn,		SHCMD("soulseekqt") },
 	{ MODKEY,		XK_t,		spawn,		SHCMD("telegram-desktop") },
 	{ MODKEY,		XK_w,		spawn,		SHCMD("firefox") },
 	{ MODKEY|ShiftMask,	XK_d,		spawn,		SHCMD("discord-ptb") },
 	{ MODKEY|ShiftMask,	XK_e,		spawn,		SHCMD("kitty") },
-	{ MODKEY|ShiftMask,	XK_f,		spawn,		SHCMD("urxvt -e sh -i ranga") },
+	{ MODKEY|ShiftMask,	XK_f,		spawn,		SHCMD("urxvt -e ranga") },
 	{ MODKEY|ShiftMask,	XK_h,		spawn,		SHCMD("urxvt -e htop") },
 	{ MODKEY|ShiftMask,	XK_l,		spawn,		SHCMD("lastgrep") },
 	{ MODKEY|ShiftMask,	XK_m,		spawn,		SHCMD("urxvt -e ncmpcpp") },	// dropped priority
-	{ MODKEY|ShiftMask,	XK_t,		spawn,		SHCMD("sh -i nordtog --on; transmission-gtk") },
-	{ MODKEY|ShiftMask,	XK_v,		spawn,		SHCMD("sh -i vb") },	// hacky
+	{ MODKEY|ShiftMask,	XK_t,		spawn,		SHCMD("nordtog --on; transmission-gtk") },
+	{ MODKEY|ShiftMask,	XK_v,		spawn,		SHCMD("vb") },	// hacky
 	{ MODKEY|ShiftMask,	XK_w,		spawn,		SHCMD("wttr") },
 	{ ShiftMask,		XK_Print,	spawn,		SHCMD("maim -m 10 | xclip -selection clipboard -t image/png") },
 
@@ -178,26 +178,26 @@ static Key keys[] = {		/* {0} just means no arg */
 	// notmuch search date:today | awk '{print substr($0, index($0, $5))}' | rofi -dmenu -> open in neomutt?
 	// rofi
 	// rofi -show calc -modi calc -no-show-match -no-sort
-	// { MODKEY,		XK_apostrophe,	spawn,		SHCMD("sh -i rmpc -s") },	// search artist/album
-	// { MODKEY|ShiftMask,	XK_r,		spawn,		SHCMD("sh -i vex") },	// will probably deprecate
-	// { Mod1Mask|ControlMask,	XK_Delete,	spawn,		SHCMD("sh rofi -show power-menu -modi power-menu:rofi-power-menu -lines 6") },
-	{ MODKEY,		XK_m,		spawn,		SHCMD("sh -i rmpc -s") },
-	{ MODKEY,		XK_p,		spawn,		SHCMD("sh -i rmpc -n") },	// now playing
-	{ MODKEY,		XK_r,		spawn,		SHCMD("sh o") },
-	{ MODKEY,		XK_s,		spawn,		SHCMD("sh -i search") },
-	{ MODKEY,		XK_semicolon,	spawn,		SHCMD("sh -i rmpc") },	// prompt
-	{ MODKEY|ShiftMask,	XK_p,		spawn,		SHCMD("sh -i rmpc --rym") },
-	{ MODKEY|ShiftMask,	XK_r,		spawn,		SHCMD("sh o -s") },		// show dirs first
+	// { MODKEY,		XK_apostrophe,	spawn,		SHCMD("rmpc -s") },	// search artist/album
+	// { MODKEY|ShiftMask,	XK_r,		spawn,		SHCMD("vex") },	// will probably deprecate
+	// { Mod1Mask|ControlMask,	XK_Delete,	spawn,		SHCMD("rofi -show power-menu -modi power-menu:rofi-power-menu -lines 6") },
+	{ MODKEY,		XK_m,		spawn,		SHCMD("rmpc -s") },
+	{ MODKEY,		XK_p,		spawn,		SHCMD("rmpc -n") },	// now playing
+	{ MODKEY,		XK_r,		spawn,		SHCMD("o") },
+	{ MODKEY,		XK_s,		spawn,		SHCMD("search") },
+	{ MODKEY,		XK_semicolon,	spawn,		SHCMD("rmpc") },	// prompt
+	{ MODKEY|ShiftMask,	XK_p,		spawn,		SHCMD("rmpc --rym") },
+	{ MODKEY|ShiftMask,	XK_r,		spawn,		SHCMD("o -s") },		// show dirs first
 
 	// media control
-	{ 0,			XF86XK_AudioNext,	spawn,	SHCMD("sh -i rmpv -f") },
-	{ 0,			XF86XK_AudioPlay,	spawn,	SHCMD("sh -i rmpv -t") },
-	{ 0,			XF86XK_AudioPrev,	spawn,	SHCMD("sh -i rmpv -b") },
-	{ MODKEY,		XK_comma,	spawn,		SHCMD("sh -i rmpv -b") },	// seek backward
-	{ MODKEY,		XK_period,	spawn,		SHCMD("sh -i rmpv -t") },	// toggle
-	{ MODKEY,		XK_slash,	spawn,		SHCMD("sh -i rmpv -f") },	// seek forward
-	{ MODKEY,		XK_x,		spawn,		SHCMD("sh -i rmpv -q") },	// quit
-	{ MODKEY,		XK_z,		spawn,		SHCMD("sh -i rmpv -d") },	// search deezer
+	{ 0,			XF86XK_AudioNext,	spawn,	SHCMD("rmpv -f") },
+	{ 0,			XF86XK_AudioPlay,	spawn,	SHCMD("rmpv -t") },
+	{ 0,			XF86XK_AudioPrev,	spawn,	SHCMD("rmpv -b") },
+	{ MODKEY,		XK_comma,	spawn,		SHCMD("rmpv -b") },	// seek backward
+	{ MODKEY,		XK_period,	spawn,		SHCMD("rmpv -t") },	// toggle
+	{ MODKEY,		XK_slash,	spawn,		SHCMD("rmpv -f") },	// seek forward
+	{ MODKEY,		XK_x,		spawn,		SHCMD("rmpv -q") },	// quit
+	{ MODKEY,		XK_z,		spawn,		SHCMD("rmpv -d") },	// search deezer
 
 	// layout
 	{ MODKEY,		XK_g,		setlayout,	{.v = &layouts[0]} },	// default
@@ -236,7 +236,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	// monitor
 	// { MODKEY,		XK_BackSpace,	spawn,		SHCMD("pkill picom; picom -b --config .picom.conf; notify-send 'Restarted picom'") },	// it's just a phase mom
 	// { MODKEY|ShiftMask,	XK_space,	tagmon,		{.i = +1 } },
-	{ MODKEY,		XK_0,		spawn,		SHCMD("sh -ix mon --on > mon.log") },
+	{ MODKEY,		XK_0,		spawn,		SHCMD("mon --on > mon.log") },
 	{ MODKEY,		XK_i,		focusmon,	{.i = +1 } },	// switch mon
 	{ MODKEY|ShiftMask,	XK_i,		tagmon,		{.i = +1 } },	// send to mon
 
@@ -286,7 +286,7 @@ static Button buttons[] = {
 
 static const char *const autostart[] = {	// cool_autostart
 
-	"dunst", NULL,		// anything that isn't an executable (i.e. longer than 1 word) needs the full sh syntax
+	"dunst", NULL,		// anything that isn't an executable (i.e. longer than 1 word) needs the full syntax
 	"mpd", NULL,		// very slow on cold boot -- "Cannot assign requested address"
 	"sh", "-c", "cup",		NULL,
 	"sh", "-c", "pkill mpdscribble; mpdscribble",	NULL,
