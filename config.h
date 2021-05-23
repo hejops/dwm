@@ -59,7 +59,7 @@ static const Rule rules[] = {
 	// class	instance	title		tags mask	switch	float	monitor
 	// switchtag definitions: https://github.com/bakkeby/patches/wiki/switchtag
 	{ "Chromium",	NULL,		NULL,		1 << 0,		0,	0,	1 },
-	{ "Display",	NULL,		NULL,		0,		0,	1,	1 },	// PIL
+	{ "Display",	NULL,		NULL,		0,		0,	1,	0 },	// PIL
 	{ "FLTK",	NULL,		NULL,		0,		0,	1,	1 },	// vmd
 	{ "PPSSPPQt",	NULL,		NULL,		0,		0,	1,	1 },
 	{ "discord",	NULL,		NULL,		0,		0,	1,	1 },
@@ -75,29 +75,28 @@ static const Rule rules[] = {
 	{ "Com.github.xournalpp.xournalpp",	NULL,	NULL,	1 << 1,	1,	0,	1 },
 	{ "Evince",	NULL,		NULL,		1 << 1,		3,	0,	1 },
 	{ "MestReNova",	NULL,		NULL,		1 << 1,		1,	0,	1 },
-	{ "Zathura",	NULL,		NULL,		1 << 1,		3,	0,	1 },
+	{ "Zathura",	NULL,		NULL,		1 << 1,		3,	0,	1 },	// testing 4
 	{ "zoom",	NULL,		NULL,		1 << 1,		1,	0,	-1 },
 
-	{ "SoulseekQt",	NULL,		NULL,		1 << 2,		1,	1,	1 },	// not sure which mon these should go to
+	{ "SoulseekQt",	NULL,		NULL,		1 << 2,		1,	1,	1 },
 	{ "Transmission-gtk",	NULL,	NULL,		1 << 2,		1,	0,	1 },
-	{ NULL,		NULL,		"deeznuts",	1 << 2,		0,	0,	1 },	// why doesn't this work like ncmpcpp?
 
 	{ "App.py",	NULL,		NULL,		1 << 3,		1,	1,	1 },	// playitslowly
-	{ "VirtualBox Machine",	NULL,	NULL,		1 << 3,		1,	0,	1 },	// rule not triggered; WM_CLASS:  not found
+	{ "VirtualBox Machine",	NULL,	NULL,		1 << 3,		1,	0,	1 },
 	{ "VirtualBox Manager",	NULL,	NULL,		1 << 3,		1,	1,	1 },
 	{ "virtualbox",	NULL,		NULL,		1 << 3,		1,	1,	1 },	// idk
 	{ "Virtualbox",	NULL,		NULL,		1 << 3,		1,	1,	1 },	// this better work gdi
 	// https://github.com/laur89/dwm-setup/blob/603f8b26d5bba806c195e6f82a2370fd51c6faf7/.dwm/w0ngBuild/source6.0/config.h
 
-	{ "TuxGuitar",	NULL,		NULL,		1 << 4,		1,	0,	1 },
 	{ "MuseScore3",	NULL,		NULL,		1 << 4,		1,	0,	1 },
+	{ "TuxGuitar",	NULL,		NULL,		1 << 4,		1,	0,	1 },
 
 	{ "Gimp",	NULL,		NULL,		0,		0,	1,	-1 },
 	{ "Gpick",	"gpick",	NULL,		0,		0,	1,	-1 },
-	{ "matplotlib",	NULL,		NULL,		0,		0,	1,	-1 },
 	{ "Pavucontrol",	NULL,	NULL,		0,		0,	1,	-1 },
 	{ "TelegramDesktop",	NULL,	NULL,		0,		0,	1,	-1 },
 	{ "Thunar",	NULL,		NULL,		0,		0,	1,	-1 },
+	{ "matplotlib",	NULL,		NULL,		0,		0,	1,	-1 },
 
 };
 
@@ -117,12 +116,12 @@ static const Layout layouts[] = {
 #define MODKEY Mod4Mask
 #define TAGKEYS(KEY,TAG) \
 	{ MODKEY,			KEY,	  view,		{.ui = 1 << TAG} }, \
-	{ Mod1Mask,			KEY,	  toggleview,	{.ui = 1 << TAG} }, \
+	{ Mod1Mask,		KEY,	  toggletag,	{.ui = 1 << TAG} }, \
 	{ MODKEY|ShiftMask,		KEY,	  tag,		{.ui = 1 << TAG} }, \
-	{ MODKEY|ControlMask|ShiftMask, KEY,	  toggletag,	{.ui = 1 << TAG} },
+	{ MODKEY|ControlMask|ShiftMask, KEY,	  toggleview,	{.ui = 1 << TAG} },
 // toggleview = activate (in addition), tag = send to, toggletag = duplicate to
 // these combinations are all unwieldy
-// alt+\d might cause conflicts with some programs, but i haven't noticed any yet
+// alt+\d is unreliable
 
 #include <X11/XF86keysym.h>	// https://cgit.freedesktop.org/xorg/proto/x11proto/tree/XF86keysym.h
 
@@ -140,33 +139,31 @@ static Key keys[] = {		/* {0} just means no arg */
 	/* modifier		key		function	argument */
 
 	// still unbound: b=:"{}; backspace (reserved: focus master), backslash
-	// { MODKEY,		XK_y,		spawn,		SHCMD("urxvt -e sh mpvopen") },	// uncommonly used
-	// { Mod1Mask|ControlMask|ShiftMask,	XK_d,	spawn,	SHCMD("urxvt -e sh deeznuts") },	// unwieldy, might deprecate
 	{ 0,			0x1008ff2d,	spawn,		SHCMD("i3lock -c 000000") },	// try some other screen lockers
 	{ 0,			XF86XK_AudioLowerVolume,	spawn,		{.v = voldown } },
 	{ 0,			XF86XK_AudioRaiseVolume,	spawn,		{.v = volup } },
 	{ 0,			XF86XK_MonBrightnessDown,	spawn,		{.v = brightdown } },
 	{ 0,			XF86XK_MonBrightnessUp,		spawn,		{.v = brightup } },	// xbacklight doesn't work on asus
 	{ 0,			XK_Print,	spawn,		SHCMD("maim -m 10 -s | xclip -selection clipboard -t image/png") }, // scrot syntax is garbage since it doesn't support true piping
-	{ ControlMask,		XK_Print,	spawn,		SHCMD("maim -m 10 $(xdotool getactivewindow) | xclip -selection clipboard -t image/png") },
+	{ ControlMask,		XK_Print,	spawn,		SHCMD("maim -m 10 -i $(xdotool getactivewindow) | xclip -selection clipboard -t image/png") },
 	{ MODKEY,		XK_Delete,	spawn,		SHCMD("i3lock -c 000000") },
 	{ MODKEY,		XK_Print,	spawn,		SHCMD("flameshot gui") },
-	{ MODKEY,		XK_Return,	spawn,		SHCMD("urxvt -e sh deeznuts") },
+	{ MODKEY,		XK_Return,	spawn,		SHCMD("kitty -e sh deeznuts") },
 	{ MODKEY,		XK_a,		spawn,		SHCMD("localc") },
-	{ MODKEY,		XK_c,		spawn,		SHCMD("NOTMUCH_CONFIG=$HOME/.config/notmuch/config urxvt -e neomutt") },
+	{ MODKEY,		XK_c,		spawn,		SHCMD("NOTMUCH_CONFIG=$HOME/.config/notmuch/config kitty -e neomutt") },
 	{ MODKEY,		XK_d,		spawn,		{.v = dmenucmd } },
 	{ MODKEY,		XK_e,		spawn,		{.v = termcmd } },
 	{ MODKEY,		XK_minus,	spawn,		SHCMD("nordtog --toggle") },	// is still needed; eventually will find a way to use from the script itself
-	{ MODKEY,		XK_n,		spawn,		SHCMD("urxvt -e newsboat") },	// printf '\e]710;%s\007' "xft:monaco:pixelsize=16"
+	{ MODKEY,		XK_n,		spawn,		SHCMD("kitty -e newsboat") },	// printf '\e]710;%s\007' "xft:monaco:pixelsize=16"
 	{ MODKEY,		XK_q,		spawn,		SHCMD("soulseekqt") },
 	{ MODKEY,		XK_t,		spawn,		SHCMD("telegram-desktop") },
 	{ MODKEY,		XK_w,		spawn,		SHCMD("firefox") },
 	{ MODKEY|ShiftMask,	XK_d,		spawn,		SHCMD("discord-ptb") },
 	{ MODKEY|ShiftMask,	XK_e,		spawn,		SHCMD("kitty") },
-	{ MODKEY|ShiftMask,	XK_f,		spawn,		SHCMD("urxvt -e ranga") },
-	{ MODKEY|ShiftMask,	XK_h,		spawn,		SHCMD("urxvt -e htop") },
+	{ MODKEY|ShiftMask,	XK_f,		spawn,		SHCMD("kitty -e ranga") },
+	{ MODKEY|ShiftMask,	XK_h,		spawn,		SHCMD("kitty -e htop") },
 	{ MODKEY|ShiftMask,	XK_l,		spawn,		SHCMD("lastgrep") },
-	{ MODKEY|ShiftMask,	XK_m,		spawn,		SHCMD("urxvt -e ncmpcpp") },	// dropped priority
+	{ MODKEY|ShiftMask,	XK_m,		spawn,		SHCMD("kitty -e ncmpcpp") },	// dropped priority
 	{ MODKEY|ShiftMask,	XK_t,		spawn,		SHCMD("nordtog --on; transmission-gtk") },
 	{ MODKEY|ShiftMask,	XK_v,		spawn,		SHCMD("vb") },	// hacky
 	{ MODKEY|ShiftMask,	XK_w,		spawn,		SHCMD("wttr") },
