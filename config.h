@@ -284,9 +284,8 @@ static Button buttons[] = {
 static const char *const autostart[] = {	// cool_autostart
 
 	"dunst", NULL,		// anything that isn't an executable (i.e. longer than 1 word) needs the full syntax
-	"mpd", NULL,		// very slow on cold boot -- "Cannot assign requested address"
-	"sh", "-c", "cup",		NULL,
-	"sh", "-c", "pkill mpdscribble; mpdscribble",	NULL,
+	"sh", "-c", "pgrep mpd || mpd",	NULL,	// must be killed, since multiple instances may now be spawned
+	"sh", "-c", "pgrep mpdscribble || mpdscribble",	NULL,
 	"sh", "-c", "pkill picom; picom -b",	NULL,	// -b = daemon; run order (wrt mon) doesn't really matter
 	"sh", "-c", "redshift -x; redshift -b 1",	NULL,	// redshift cannot be pkilled!
 	"sh", "-c", "setxkbmap -layout us -option compose:rctrl", NULL,		// all setxkbmap options must be declared at once
