@@ -89,7 +89,7 @@ static const Rule rules[] = {
 	{ "Evince",	NULL,		NULL,		1 << 1,		3,	0,	1 },
 	{ "MestReNova",	NULL,		NULL,		1 << 1,		1,	0,	1 },
 	{ "Zathura",	NULL,		NULL,		1 << 1,		4,	0,	1 },	// testing 4
-	{ "teams-for-linux",	NULL,	NULL,		1 << 1,		1,	0,	-1 },
+	{ "teams-for-linux",	NULL,	NULL,		1 << 1,		1,	0,	0 },
 	{ "zoom",	NULL,		NULL,		1 << 1,		1,	0,	-1 },
 
 	{ NULL,		NULL,		"artemis",	1 << 2,		3,	0,	1 },
@@ -167,12 +167,13 @@ static Key keys[] = {		/* {0} just means no arg */
 	// still unbound: ab=:"{}; backspace (reserved: focus master), backslash
 	// { MODKEY,		XK_a,		spawn,		SHCMD("kitty --title calcurse -e calcurse") },
 	// { MODKEY,		XK_a,		spawn,		SHCMD("localc") },
+	// { MODKEY,		XK_a,		spawn,		SHCMD("urxvt -title shux -e shux") },	// kitty has poor compatibility
 	// { MODKEY,		XK_b,		spawn,		SHCMD("jacka") },	// starts qjackctl, then qsynth
 	// { MODKEY|ShiftMask,	XK_m,		spawn,		SHCMD("kitty -e ncmpcpp") },	// dropped priority
 	{ 0,			0x1008ff2d,	spawn,		SHCMD("i3lock -c 000000") },	// try some other screen lockers
 	{ MODKEY,		XK_Delete,	spawn,		SHCMD("i3lock -c 000000") },
 	{ MODKEY,		XK_Print,	spawn,		SHCMD("flameshot gui") },
-	{ MODKEY,		XK_a,		spawn,		SHCMD("urxvt -title shux -e shux") },	// kitty has poor compatibility
+	{ MODKEY,		XK_a,		spawn,		SHCMD("musescore") },
 	{ MODKEY,		XK_c,		spawn,		SHCMD("NOTMUCH_CONFIG=$HOME/.config/notmuch/config kitty -e neomutt") },
 	{ MODKEY,		XK_n,		spawn,		SHCMD("kitty -e newsboat") },	// printf '\e]710;%s\007' "xft:monaco:pixelsize=16"
 	{ MODKEY,		XK_q,		spawn,		SHCMD("nicotine") },
@@ -191,33 +192,27 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ 0,			XF86XK_MonBrightnessDown,	spawn,		{.v = brightdown } },
 	{ 0,			XF86XK_MonBrightnessUp,		spawn,		{.v = brightup } },	// xbacklight doesn't work on asus
 
+	// simulate middle click (etc), in conjunction with -option caps:menu
+	// the ideal case would be to simply continue registering Caps_Lock keypresses, while disabling the actual caps lock function
+	// however, this does not appear to be possible -- you either get both the keybind + caps lock as side effect, or nothing at all
+	// my solution is to replace caps lock with menu
+	// the original menu key is somehow unaffected (even that isn't that useful), and caps lock acts as a "dummy" key for middle click
+	{ 0,			XK_Menu,	spawn,		SHCMD("caps") },
+
 	// screenshot
 	{ 0,			XK_Print,	spawn,		SHCMD("maim --hidecursor --quality=10 --select | xclip -selection clipboard -t image/png") }, // scrot syntax is garbage since it doesn't support true piping
 	{ ControlMask,		XK_Print,	spawn,		SHCMD("maim --hidecursor --quality=10 --window=$(xdotool getactivewindow) | xclip -selection clipboard -t image/png") },
 	{ ShiftMask,		XK_Print,	spawn,		SHCMD("maim --hidecursor --quality=10 | tee ~/$(date -Iseconds).png | xclip -selection clipboard -t image/png") },
 
-	// $HOME/.SoulseekQt/wishlist
-	// 4chan boards
-	// TODO: these binds are not very intuititve, but i can't think of a better solution...
-	// firefox tabs
-	// notmuch search date:today | awk '{print substr($0, index($0, $5))}' | rofi -dmenu -> open in neomutt?
 	// rofi
-	// rofi -show calc -modi calc -no-show-match -no-sort
-	// { MODKEY,		XK_apostrophe,	spawn,		SHCMD("rmpc -s") },	// search artist/album
-	// { MODKEY|ShiftMask,	XK_r,		spawn,		SHCMD("o -s") },		// show dirs first
-	// { MODKEY|ShiftMask,	XK_r,		spawn,		SHCMD("vex") },	// will probably deprecate
-	// { Mod1Mask|ControlMask,	XK_Delete,	spawn,		SHCMD("rofi -show power-menu -modi power-menu:rofi-power-menu -lines 6") },
-
-	// rofi
-	{ MODKEY,		XK_m,		spawn,		SHCMD("rmpc -s") },
 	// { MODKEY,		XK_p,		spawn,		SHCMD("rmpc -n") },	// now playing
+	{ MODKEY,		XK_m,		spawn,		SHCMD("rmpc -s") },
 	{ MODKEY,		XK_r,		spawn,		SHCMD("o") },
 	{ MODKEY,		XK_s,		spawn,		SHCMD("search") },
 	{ MODKEY,		XK_semicolon,	spawn,		SHCMD("rmpc") },	// prompt
 	{ MODKEY|ShiftMask,	XK_p,		spawn,		SHCMD("rmpc --rym") },
 
 	// media control
-	// { MODKEY,		XK_z,		spawn,		SHCMD("rmpv -d") },	// search deezer
 	{ 0,			XF86XK_AudioNext,	spawn,	SHCMD("rmpv -f") },
 	{ 0,			XF86XK_AudioPlay,	spawn,	SHCMD("rmpv -t") },
 	{ 0,			XF86XK_AudioPrev,	spawn,	SHCMD("rmpv -b") },
@@ -316,9 +311,10 @@ static const char *const autostart[] = {	// cool_autostart
 
 	"dash", "-c", "dwmstatus",	NULL,
 	"dunst", NULL,		// anything that isn't an executable (i.e. longer than 1 word) needs the full syntax
+	"sh", "-c", "find loona | shuf | xargs -d '\n' nsxiv -S 300", NULL,
 	"sh", "-c", "pkill picom; picom -b",	NULL,	// -b = daemon; run order (wrt mon) doesn't really matter
-	"sh", "-c", "redshift -x; redshift -b 1",	NULL,	// redshift cannot be pkilled!
-	"sh", "-c", "setxkbmap -layout us -option compose:rctrl", NULL,		// all setxkbmap options must be declared at once
+	"sh", "-c", "reds",	NULL,
+	"sh", "-c", "setxkbmap -layout us -option -option compose:ralt,caps:menu", NULL,		// all setxkbmap options must be declared at once -- https://gist.github.com/illucent/beaf4a8c6a68bd4f5670f1c6f0c8d67e, https://gist.github.com/jatcwang/ae3b7019f219b8cdc6798329108c9aee
 	"sh", "-c", "sleep 1; mon --on",	NULL,	// not using sleep will produce a black or misconfigured screen
 	"sh", "-c", "udisksctl mount -b /dev/sdb1",	NULL,	// takes a while, don't panic
 	"sh", "-c", "wallset",		NULL,
@@ -329,6 +325,7 @@ static const char *const autostart[] = {	// cool_autostart
 	// "sh", "-c", "notify-send 'dwm started'", NULL,
 	// "sh", "-c", "pgrep mpd || mpd",	NULL,	// must be killed, since multiple instances may now be spawned
 	// "sh", "-c", "pgrep mpdscribble || mpdscribble",	NULL,
+	// "sh", "-c", "redshift -x; redshift -b 1",	NULL,	// redshift cannot be pkilled!
 	// "sh", "-c", "wallset",		NULL,
 
 	NULL
