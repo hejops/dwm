@@ -162,7 +162,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY,		XK_d,		spawn,		{.v = dmenucmd } },
 	{ MODKEY,		XK_e,		spawn,		{.v = termcmd } },
 
-	// < dwm/config.h grep -P '       \{ MODKEY,\s+XK_[a-z],' | sort | cut -f4-
+	// < ~/dwm/config.h grep -P '^\s+\{ MODKEY,\s+XK_[a-z],' | sort | cut -f4-
 	// programs
 	// still unbound: ab=:"{}; backspace (reserved: focus master), backslash
 	// { MODKEY,		XK_a,		spawn,		SHCMD("kitty --title calcurse -e calcurse") },
@@ -309,24 +309,20 @@ static Button buttons[] = {
 
 static const char *const autostart[] = {	// cool_autostart
 
-	"dash", "-c", "dwmstatus",	NULL,
 	"dunst", NULL,		// anything that isn't an executable (i.e. longer than 1 word) needs the full syntax
-	"sh", "-c", "find loona | shuf | xargs -d '\n' nsxiv -S 300", NULL,
+	"dwmstatus", NULL,	// this seems to work, with PATH set properly
 	"sh", "-c", "pkill picom; picom -b",	NULL,	// -b = daemon; run order (wrt mon) doesn't really matter
 	"sh", "-c", "reds",	NULL,
 	"sh", "-c", "setxkbmap -layout us -option -option compose:ralt,caps:menu", NULL,		// all setxkbmap options must be declared at once -- https://gist.github.com/illucent/beaf4a8c6a68bd4f5670f1c6f0c8d67e, https://gist.github.com/jatcwang/ae3b7019f219b8cdc6798329108c9aee
 	"sh", "-c", "sleep 1; mon --on",	NULL,	// not using sleep will produce a black or misconfigured screen
-	"sh", "-c", "udisksctl mount -b /dev/sdb1",	NULL,	// takes a while, don't panic
 	"sh", "-c", "wallset",		NULL,
 	"udiskie", NULL,
-	// "mpd", NULL,
 	// "sh", "-c", "cup",		NULL,
-	// "sh", "-c", "mouse",		NULL,
+	// "sh", "-c", "dwmstatus",	NULL,
+	// "sh", "-c", "find loona | shuf | xargs -d '\n' nsxiv -S 300", NULL,
+	// "sh", "-c", "lsblk | grep Passport && udisksctl mount -b /dev/sdb1",	NULL,	// takes a while, don't panic -- will be made into a script
 	// "sh", "-c", "notify-send 'dwm started'", NULL,
-	// "sh", "-c", "pgrep mpd || mpd",	NULL,	// must be killed, since multiple instances may now be spawned
-	// "sh", "-c", "pgrep mpdscribble || mpdscribble",	NULL,
-	// "sh", "-c", "redshift -x; redshift -b 1",	NULL,	// redshift cannot be pkilled!
-	// "sh", "-c", "wallset",		NULL,
+	// "sh", "-c", "notify-send \"$PATH\"", NULL,
 
 	NULL
 };
