@@ -228,8 +228,8 @@ static Key keys[] = {		/* {0} just means no arg */
 	{ MODKEY,		XK_v,		setlayout,	{.v = &layouts[2]} },	// deck
 
 	// window
+	// { MODKEY,		XK_grave,	togglefloating,	{0} },
 	{ ControlMask,		XK_q,		killclient,	{0} },
-	{ MODKEY,		XK_grave,	togglefloating,	{0} },
 	{ MODKEY,		XK_h,		pushup,         {0} },
 	{ MODKEY,		XK_j,		focusstack,	{.i = +1 } },
 	{ MODKEY,		XK_k,		focusstack,	{.i = -1 } },
@@ -259,6 +259,8 @@ static Key keys[] = {		/* {0} just means no arg */
 	// { MODKEY,		XK_BackSpace,	spawn,		SHCMD("pkill picom; picom -b --config .picom.conf; notify-send 'Restarted picom'") },	// it's just a phase mom
 	// { MODKEY|ShiftMask,	XK_space,	tagmon,		{.i = +1 } },
 	{ MODKEY,		XK_0,		spawn,		SHCMD("mon --on > mon.log") },
+	{ MODKEY,		XK_Escape,	spawn,		SHCMD("mond --on") },
+	{ MODKEY,		XK_grave,	spawn,		SHCMD("mond --toggle") },
 	{ MODKEY,		XK_i,		focusmon,	{.i = +1 } },	// switch mon
 	{ MODKEY|ShiftMask,	XK_i,		tagmon,		{.i = +1 } },	// send to mon
 
@@ -319,14 +321,10 @@ static const char *const autostart[] = {	// cool_autostart
 	"sh", "-c", "udisksctl mount -b /dev/sdb1",	NULL,	// takes a while, don't panic
 	"sh", "-c", "wallset",		NULL,
 	"udiskie", NULL,
-	// "mpd", NULL,
 	// "sh", "-c", "cup",		NULL,
-	// "sh", "-c", "mouse",		NULL,
-	// "sh", "-c", "notify-send 'dwm started'", NULL,
-	// "sh", "-c", "pgrep mpd || mpd",	NULL,	// must be killed, since multiple instances may now be spawned
-	// "sh", "-c", "pgrep mpdscribble || mpdscribble",	NULL,
+	// "sh", "-c", "echo \"$PATH\" > /tmp/foopath", NULL,
+	// "sh", "-c", "notify-send \"$PATH\"", NULL,
 	// "sh", "-c", "redshift -x; redshift -b 1",	NULL,	// redshift cannot be pkilled!
-	// "sh", "-c", "wallset",		NULL,
 
 	NULL
 };
