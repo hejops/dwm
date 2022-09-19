@@ -259,7 +259,7 @@ static Key keys[] = {		/* {0} just means no arg */
 	// { MODKEY,		XK_BackSpace,	spawn,		SHCMD("pkill picom; picom -b --config .picom.conf; notify-send 'Restarted picom'") },	// it's just a phase mom
 	// { MODKEY|ShiftMask,	XK_space,	tagmon,		{.i = +1 } },
 	{ MODKEY,		XK_0,		spawn,		SHCMD("mon --on > mon.log") },
-	{ MODKEY,		XK_Escape,	spawn,		SHCMD("mond --on") },
+	{ MODKEY,		XK_b,	spawn,		SHCMD("mond --on") },
 	{ MODKEY,		XK_grave,	spawn,		SHCMD("mond --toggle") },
 	{ MODKEY,		XK_i,		focusmon,	{.i = +1 } },	// switch mon
 	{ MODKEY|ShiftMask,	XK_i,		tagmon,		{.i = +1 } },	// send to mon
