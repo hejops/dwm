@@ -148,7 +148,8 @@ static const Layout layouts[] = {
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "rofi", "-show", "run", NULL };
-static const char *termcmd[]	= { "urxvt", NULL };
+// static const char *termcmd[]	= { "urxvt", NULL };
+static const char *termcmd[]	= { "kitty", NULL };
 // https://wiki.archlinux.org/title/backlight#xbacklight
 static const char *brightup[]	= { "xbacklight", "-inc", "10", NULL};	// acpilight needs root
 static const char *brightdown[]	= { "xbacklight", "-dec", "10", NULL};
@@ -314,7 +315,6 @@ static const char *const autostart[] = {	// cool_autostart
 	"dunst", NULL,		// anything that isn't an executable (i.e. longer than 1 word) needs the full syntax
 	"dwmstatus", NULL,	// this seems to work, with PATH set properly
 	"sh", "-c", "cup",		NULL,
-	"sh", "-c", "lsblk | grep sdb1 && udisksctl mount -b /dev/sdb1",	NULL,	// takes a while, don't panic -- will be made into a script
 	"sh", "-c", "pkill picom; picom -b",	NULL,	// -b = daemon; run order (wrt mon) doesn't really matter
 	"sh", "-c", "reds",	NULL,
 	"sh", "-c", "setxkbmap -layout us -option -option compose:ralt,caps:menu", NULL,		// all setxkbmap options must be declared at once -- https://gist.github.com/illucent/beaf4a8c6a68bd4f5670f1c6f0c8d67e, https://gist.github.com/jatcwang/ae3b7019f219b8cdc6798329108c9aee
@@ -323,9 +323,9 @@ static const char *const autostart[] = {	// cool_autostart
 	"udiskie", NULL,
 	// "sh", "-c", "dwmstatus",	NULL,
 	// "sh", "-c", "find loona | shuf | xargs -d '\n' nsxiv -S 300", NULL,
+	// "sh", "-c", "lsblk | grep sdb1 && udisksctl mount -b /dev/sdb1",	NULL,	// takes a while, don't panic -- will be made into a script -- TODO: is this actually necessary?
 	// "sh", "-c", "notify-send 'dwm started'", NULL,
 	// "sh", "-c", "notify-send \"$PATH\"", NULL,
-	// "sh", "-c", "redshift -x; redshift -b 1",	NULL,	// redshift cannot be pkilled!
 
 	NULL
 };
