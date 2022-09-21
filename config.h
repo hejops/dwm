@@ -148,7 +148,8 @@ static const Layout layouts[] = {
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "rofi", "-show", "run", NULL };
-static const char *termcmd[]	= { "urxvt", NULL };
+// static const char *termcmd[]	= { "urxvt", NULL };
+static const char *termcmd[]	= { "kitty", NULL };
 // https://wiki.archlinux.org/title/backlight#xbacklight
 static const char *brightup[]	= { "xbacklight", "-inc", "10", NULL};	// acpilight needs root
 static const char *brightdown[]	= { "xbacklight", "-dec", "10", NULL};
@@ -322,7 +323,7 @@ static const char *const autostart[] = {	// cool_autostart
 	"udiskie", NULL,
 	// "sh", "-c", "dwmstatus",	NULL,
 	// "sh", "-c", "find loona | shuf | xargs -d '\n' nsxiv -S 300", NULL,
-	// "sh", "-c", "lsblk | grep sdb1 && udisksctl mount -b /dev/sdb1",	NULL,	// takes a while, don't panic -- will be made into a script
+	// "sh", "-c", "lsblk | grep sdb1 && udisksctl mount -b /dev/sdb1",	NULL,	// takes a while, don't panic -- will be made into a script -- TODO: is this actually necessary?
 	// "sh", "-c", "notify-send 'dwm started'", NULL,
 	// "sh", "-c", "notify-send \"$PATH\"", NULL,
 
