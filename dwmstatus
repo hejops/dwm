@@ -1,0 +1,371 @@
+#!/usr/bin/env dash
+set -eu #-o pipefail
+
+# 0.45 s (dash, warm)
+
+# TODO: is there any way to avoid spamming pids? doubt it; not a huge issue
+# though, since old pids do get recycled
+# max pid is 4194304 -- cat /proc/sys/kernel/pid_max
+# https://stackoverflow.com/a/11323428
+
+# http://linuxclues.blogspot.sg/2009/11/shell-script-show-network-speed.html
+# https://github.com/Cornu/dwmstatus/blob/master/status.c
+# https://github.com/jiji606/dwm-status/blob/master/dwm-status.sh	ok i guess
+# https://github.com/joestandring/dwm-bar	bloat
+# https://raw.githubusercontent.com/kaihendry/dotfiles/master/bin/dwm_status
+
+# alternatives: polybar, lemonbar, succade
+
+# printf is allegedly faster than echo
+# https://unix.stackexchange.com/a/77564
+
+# pgrep zoom && exit
+
+usage() {
+	# https://stackoverflow.com/a/59718683
+	# https://serverfault.com/a/586332
+	# TODO: command >> $cronfile
+	cat << EOF
+Usage: $(basename "$0") [options]
+	Set dwm status with xsetroot
+EOF
+	exit
+}
+
+[ "${1-}" = --help ] && usage
+
+# generic() {
+# 	# 3 args: file to check / fail action / msg to print
+# 	[ -f "$1" ] || "$2"
+# 	lines="$(wc < "$1" -l)"
+# 	if [ "$lines" -ne 0 ]; then
+# 		msg="$lines $3 $SEP"
+# 		printf "%s" "$msg"
+# 	fi
+# }
+
+mail() {
+	# TODO: use better search terms
+	# interval: 60 min
+	# TODO IMAP possible?
+	# TODO: minsec check can be generalised
+	# [ "$minsec" != 000* ] ||
+	# [ -x notmuch ] || return
+	# [ $(systemctl status --user mbsync.service) = *Finished* ] || { echo "Could not fetch mail"; return; }
+
+	if [ ! -d "$HOME/.mail" ]; then
+		printf "No mail dir"
+
+	elif systemctl status --user mbsync.service | grep -q failed; then
+		printf "Mail error"
+
+	else
+
+		# XDG_CONFIG_HOME is not supported
+		local n
+		n=$(NOTMUCH_CONFIG="$HOME/.config/notmuch/config" notmuch count tag:inbox and tag:unread and date:today)
+		[ "$n" -eq 0 ] && return 1
+		printf "%s" "$n unread mail"
+	fi
+}
+
+updates() {
+	# interval: 60 min
+	# checkupdates is handled by the external script: cup
+	[ -f /tmp/updates ] || return 0
+	printf "%s" "$(cat /tmp/updates)"
+}
+
+weather() {
+	# automatic geolocation requires large database file (4 GB)
+	# https://db-ip.com/db/
+	# geoiplookup -f FILE $(curl -s ipinfo.io/ip)
+
+	# interval: 60 min
+	# https://github.com/chubin/wttr.in#one-line-output
+	# TODO: max temp for the day (not implemented yet)
+	# see https://github.com/chubin/wttr.in/issues/329, and refer to v2 to get forecast
+
+	# text description, temp (sunset)
+	# time: 0.065s (real)
+	# not very accurate (within 300 km), but good enough i guess
+
+	# # i suspect OEBB blocks repeated requests
+	# if nmcli | grep -q OEBB; then
+	# 	echo "Weather not supported on this network"
+	# 	return
+	# fi
+
+	if [ -s /tmp/location ]; then
+		location=$(cat /tmp/location)
+
+	elif
+		# note: ip-based location is not always reliable, e.g. on trains (OEBB = Vienna by default)
+		location=$(curl -sL ipinfo.io) && echo "$location" | grep -Fq '<'
+	then
+		echo "Location unavailable"
+		rm -f /tmp/location
+		return
+
+	else
+
+		location=$(echo "$location" | jq -r .city | tr ' ' +)
+		echo "$location" > /tmp/location
+
+	fi
+
+	# slow outside Europe? (>0.35 s)
+	weather=$(curl --max-time 1 --fail -sL "wttr.in/$location?format=%C,+%t+(%s)") || return
+	echo "$weather" | grep -Fq \
+		-e requests \
+		-e queries \
+		-e Gateway \
+		-e Unknown \
+		-e Error && return 1
+	printf "%s" "$weather"
+
+}
+
+nowplaying() {
+
+	local title
+
+	if
+		! pactl list sink-inputs | grep -q 'Corked: no'
+	then
+		title=''
+	else
+		title=$(
+			# # pactl -f json: Invalid non-ASCII character
+			# pactl -f json list sink-inputs |
+			# 	jq -r '.[] | select(.corked == false) | .properties."media.name"' |
+
+			# grep -v 'Audio Stream' |
+			# tail -n1 |
+			pactl list sink-inputs |
+				sed -n '/Corked: no/,+9p' |
+				grep 'media.name' |
+				cut -d'"' -f2 |
+				grep -v Playback |
+				sed 's/ - YouTube Music$//'
+		)
+	fi
+
+	printf "%s" "$title"
+}
+
+network() {
+
+	# TODO: in rare cases of buggy kernel (?), ip will freeze, even with timeout
+	case $(ip link show | grep -F 'state UP') in
+	*enp*)
+		ssid=ethernet
+		;;
+	*)
+		ssid=$(iwgetid -r)
+		;;
+	esac
+
+	printf "%s" "$ssid"
+
+}
+
+bat() {
+
+	# laptop only: acpi -V
+	# https://forums.gentoo.org/viewtopic-t-379939-start-0.html
+
+	if [ ! -f /sys/class/power_supply/BAT0/capacity ]; then
+		charge="🔌"
+		return
+	fi
+
+	charge="$(cat /sys/class/power_supply/BAT*/capacity)%"
+
+	batstat="$(cat /sys/class/power_supply/BAT*/status)"
+	if [ "$batstat" = "Discharging" ]; then
+		battime=$(acpi -V | head -n1 | cut -d' ' -f5) # get rid of seconds
+		charge="$charge ($battime)"
+
+		# if expr "$battime" : "^\d:\d{2}$" >/dev/null; then
+		# 	# https://github.com/koalaman/shellcheck/wiki/SC3015
+		# 	notify-send -u critical "Critical battery" "$battime"
+		# fi
+
+		charge="🔋 $charge"
+
+	else
+		# connected usually = "Unknown"
+		# charge="⚡ $charge"
+		charge="🔌 $charge"
+	fi
+	# suspend when we close the lid
+	#systemctl --user stop inhibit-lid-sleep-on-battery.service
+	# On mains! no need to suspend
+	#systemctl --user start inhibit-lid-sleep-on-battery.service
+	printf "%s" "$charge"
+}
+
+cpu() {
+	local CPU mem degree
+
+	# top is preferred over mpstat because it is not limited to 1 second intervals
+	# CPU=$(mpstat -P ALL 1 1 | grep "Average:     all" | awk 'END { print 100 - $NF"%" }')
+	CPU=$(top -b -n1 | grep %Cpu | awk '{print $2}')%
+
+	# line 2, field 3
+	# speed: NR==2 > /Mem/ > grep + awk
+	mem=$(free -h | awk 'NR==2 {print $3}' | tr -d i)
+
+	if [ "$(echo "$mem" | cut -d. -f1 | tr -d G)" -gt 11 ]; then
+		# kill memory hogging processes during emergency
+		notify-send 'high memory'
+		killall streamlit
+		killall pylint
+	fi
+
+	# laptop only
+	if [ -d /sys/class/thermal/thermal_zone0 ]; then
+		# last 3 digits are always 000, i think
+		# lower bound is around 60
+		degree=$(sed < /sys/class/thermal/thermal_zone0/temp 's|000||')
+	else
+		degree=$(sensors -u | grep temp1_input | sort | tail -n1 | cut -d' ' -f4 | cut -d. -f1)
+	fi
+
+	# thermal_zone0 and thermal_zone1 are generally always the same
+	# sensors | grep -Pom1 '\+\d+' | tr -d +
+	# degree=$(echo "$milli / 1000 / 1" | bc)
+	printf "%s" "$CPU, $mem, ${degree}°C"
+}
+
+disk() {
+	# if hdd not (yet) mounted, ~ is shown instead
+	# TODO: identify by name instead of sdb, designation depends on port!
+	# TODO: if phone not unmounted properly, this hangs!
+	df_output=$(df -h)
+	disk=$(
+		echo "$df_output" |
+			grep -e '/dev/sd' -e '/$' |
+			awk '{print $4}' |
+			sort -V |
+			tr '\n' ' ' |
+			xargs
+	)
+	printf "%s" "$disk"
+}
+
+Date() {
+	# you are still expected to set tz yourself
+	# sudo timedatectl set-timezone $(timedatectl list-timezones | grep / | fzf)
+	uk_time=$(TZ=":Europe/London" date '+%H:%M')
+	local_time=$(date '+%H:%M')
+	if [ "$uk_time" = "$local_time" ]; then
+		echo "$(date '+%a %d/%m') $local_time"
+	else
+		echo "$(date '+%a %d/%m') $local_time [$uk_time]"
+	fi
+}
+
+RUN() {
+	# TODO: get first line only -- then again, functions should be written properly anyway
+	# TODO: instead of using file, save in memory?
+	# RUN FUNC 60 FILE
+	FUNC=$1
+	INT=${2:-$SLEEP}     # seconds
+	INT=$((INT / SLEEP)) # e.g. 1h = 3600 s -> 720
+	FILE=${3-}
+
+	# no FILE provided -> always eval
+	if [ -z "$FILE" ]; then
+		# OUT=$(eval "$FUNC")
+		# additional line containing 524857
+		OUT=$(eval "$FUNC" | tail -n1)
+
+	# if FILE is empty, or reached 1h
+	# eval, and output to file for reuse
+	elif
+		! [ -s "$FILE" ] ||
+			# [ $((i % INT)) -eq 0 ]
+			[ "$CURR_MINUTE" -eq "$START_MINUTE" ]
+	then
+		OUT=$(eval "$FUNC") || OUT=""
+		echo "$OUT" > "$FILE"
+
+	# fallback to FILE
+	else
+		OUT=$(cat "$FILE")
+	fi
+
+	if [ -n "$OUT" ]; then
+		printf "%s" "$OUT$SEP"
+	fi
+}
+
+# remember: retrieving subshell output is not trivial!
+# https://unix.stackexchange.com/a/140049
+
+# concatenation (+=) and "all at once" are basically equivalent in speed (~ 130
+# ms), but concatenation is easier to read/maintain/rearrange
+
+# TODO: if unplugged, set all polling frequencies to 1x/min
+
+main() {
+
+	STR="$MACHINE: "
+
+	if nmcli | grep -q '0: connected'; then
+		# only this function actively uses network
+		# TODO: 'wlan0: connected' does not always mean have network
+		STR=${STR}$(RUN weather 60 /tmp/weather)
+	fi
+
+	[ -f /tmp/alert ] && STR=${STR}ALERT
+
+	STR=${STR}$(RUN mail)
+	STR=${STR}$(RUN updates)
+
+	STR=${STR}$(RUN nowplaying)
+	STR=${STR}$(RUN network)
+	STR=${STR}$(RUN bat)
+	STR=${STR}$(RUN cpu)
+	STR=${STR}$(RUN disk)
+	STR=${STR}$(Date)
+
+	# TODO: not always 0
+	# env DISPLAY=:0 xsetroot -name "$STR"
+	xsetroot -name "$STR"
+}
+
+MACHINE="$(cat /sys/devices/virtual/dmi/id/product_name)"
+SEP=" | "
+START_MINUTE=$(date +%M%S)
+
+# for debugging, add any arg
+if [ $# -gt 0 ]; then
+	SLEEP=1
+	CURR_MINUTE=$(date +%M%S)
+	main
+	exit
+fi
+
+while true; do
+
+	CURR_MINUTE=$(date +%M%S)
+	SLEEP=5
+
+	# my system is always connected to power
+	# if
+	# 	# the &&s are necessary here
+	# 	[ -d /sys/class/power_supply/BAT0 ] &&
+	# 		BAT=$(cat /sys/class/power_supply/BAT*/status) &&
+	# 		[ "$BAT" = Discharging ]
+	# then
+	# 	SLEEP=60
+	# else
+	# 	SLEEP=5
+	# fi
+
+	main
+	sleep $SLEEP
+done
