@@ -373,16 +373,14 @@ static const char *const autostart[] = {
     // anything that isn't an executable (i.e. longer than 1 word) needs the
     // full syntax
 
+    "sh", "-c", "sleep 1; ~/scripts/wallset", NULL,
+    "sh", "-c", "~/dwm/dwmstatus", NULL,
+    "sh", "-c", "~/scripts/mon.py", NULL,
+    "sh", "-c", "~/scripts/reds", NULL,
+
     "dunst", NULL,
-    "mon.py", NULL,
     "sh", "-c", "pkill picom; picom -b", NULL, // -b = daemon; run order (wrt mon) doesn't really matter
-    "sh", "-c", "sleep 1; wallset", NULL,
-    "udiskie", NULL, // automount all devices
-    "~/scripts/dwmstatus", NULL,
-    "~/scripts/reds", NULL,
-    // "dwmstatus", NULL,
-    // "reds", NULL,
-    // "sh", "-c", "~/dwm/dwmstatus", NULL,
+    "udiskie", NULL, // automount all devices -- should be run last?
 
     // "pulseaudio", NULL,
     // "python3", "~/scripts/4chan.py", ">", "/tmp/loona",	NULL,
