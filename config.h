@@ -272,14 +272,16 @@ static Key keys[] = {
 
     // window
     // { MODKEY,		XK_grave,	togglefloating,	{0} },
+    // {MODKEY, XK_h, pushup, {0}},
+    // {MODKEY, XK_l, pushdown, {0}},
+    { MODKEY|ControlMask,           XK_h,  focusmaster,    {0} },
+    { MODKEY|ControlMask,           XK_l,  focusmaster,    {0} },
     {ControlMask, XK_q, killclient, {0}},
-    {MODKEY, XK_h, pushup, {0}},
+    {MODKEY | ControlMask | ShiftMask, XK_q, quit, {1}}, // restart, rarely used
+    {MODKEY | ShiftMask, XK_q, quit, {0}},
     {MODKEY, XK_j, focusstack, {.i = +1}},
     {MODKEY, XK_k, focusstack, {.i = -1}},
-    {MODKEY, XK_l, pushdown, {0}},
     {MODKEY, XK_space, zoom, {0}}, // switch master/stack, focus master
-    {MODKEY | ControlMask | ShiftMask, XK_q, quit, {1}}, // restart
-    {MODKEY | ShiftMask, XK_q, quit, {0}},
 
     // workspace
     // { MODKEY,		XK_bracketleft, shiftviewclients,	{ .i = -1 } },
