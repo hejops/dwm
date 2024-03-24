@@ -173,34 +173,84 @@ static const Layout layouts[] = {
 
 #include <X11/XF86keysym.h> // https://cgit.freedesktop.org/xorg/proto/x11proto/tree/XF86keysym.h
 
-#define SHCMD(cmd)                                                             \
-  {                                                                            \
-    .v = (const char *[]) { "/bin/sh", "-c", cmd, NULL }                       \
-  }
-static char dmenumon[2] =
-    "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = {"rofi", "-show", "run", NULL};
-// static const char *termcmd[]	= { "urxvt", NULL };
-static const char *termcmd[] = {"kitty", NULL};
+#define SHCMD(cmd) { .v = (const char *[]) { "/bin/sh", "-c", cmd, NULL } }
+// https://github.com/TaylanTatli/dwm/blob/master/config.h#L15
+// https://wiki.archlinux.org/title/backlight#External_monitors
 // https://wiki.archlinux.org/title/backlight#xbacklight
 // note: xbacklight/light may not work for all displays; ddcutil may be needed
-// https://wiki.archlinux.org/title/backlight#External_monitors
-static const char *brightup[] = {"xbacklight", "-inc", "10",
-                                 NULL
-                                }; // acpilight needs root
+static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *brightdown[] = {"xbacklight", "-dec", "10", NULL};
-static const char *volup[] = {"vol", "+5", NULL};
+static const char *brightup[] = {"xbacklight", "-inc", "10", NULL }; // acpilight needs root
+static const char *dmenucmd[] = {"rofi", "-show", "run", NULL};
+static const char *termcmd[] = {"kitty", NULL};
 static const char *voldown[] = {"vol", "-5", NULL};
-// https://github.com/TaylanTatli/dwm/blob/master/config.h#L15
+static const char *volup[] = {"vol", "+5", NULL};
 
 static Key keys[] = {
     /* {0} just means no arg */
     /* modifier		key		function	argument */
 
-    {MODKEY, XK_d, spawn, {.v = dmenucmd}},
-    {MODKEY, XK_e, spawn, {.v = termcmd}},
+    // {MODKEY, XK_d, spawn, {.v = dmenucmd}},
 
-    // unbound: ahinopuxyz
+    // home row, 1 adjacent (up/down): asdfjkl; weruio xcvm,.
+    // 2 down: -([])=
+    // index, pinky: ghtybn z/`'qp
+
+    // windowing
+    {MODKEY, XK_i, zoom, {0}}, // switch master/stack, focus master
+    {MODKEY, XK_j, focusstack, {.i = +1}},
+    {MODKEY, XK_k, focusstack, {.i = -1}},
+    {MODKEY, XK_l, focusmaster,    {0} },
+
+    // terminal
+    {MODKEY, XK_d, spawn, SHCMD("o")},
+    {MODKEY, XK_e, spawn, {.v = termcmd}},
+    {MODKEY, XK_f, spawn, SHCMD("kitty -e pmp")}, // prompt
+    {MODKEY, XK_s, spawn, SHCMD("kitty --hold search")}, // --hold is necessary for rust
+
+    {MODKEY, XK_a, spawn, SHCMD("kitty -e neomutt")},
+    {MODKEY, XK_r, spawn, SHCMD("nicotine")},
+    {MODKEY, XK_w, spawn, SHCMD("firefox")},
+
+    // uo;
+    {MODKEY, XK_o, spawn, SHCMD("kitty -e pmp --queue")},
+    {MODKEY, XK_u, spawn, SHCMD("rmpv -t")}, // toggle
+
+    {MODKEY, XK_c, setlayout, {.v = &layouts[0]}}, // default
+    {MODKEY, XK_v, setlayout, {.v = &layouts[2]}}, // deck
+    {MODKEY, XK_x, setlayout, {.v = &layouts[1]}}, // fullscreen
+
+    // m,.
+    {MODKEY, XK_comma, spawn, SHCMD("book")},
+    {MODKEY, XK_m, spawn, SHCMD("telegram-desktop")},
+
+    // ghtybn z/`'qp
+
+    // media control
+    {0, XF86XK_AudioNext, spawn, SHCMD("rmpv -f")},
+    {0, XF86XK_AudioPlay, spawn, SHCMD("rmpv -t")},
+    {0, XF86XK_AudioPrev, spawn, SHCMD("rmpv -b")},
+
+    // note: dwm 6.3 has a new 'lockfullscreen' const, which i have not added yet
+    // https://git.suckless.org/dwm/commit/138b405f0c8aa24d8a040cc1a1cf6e3eb5a0ebc7.html
+    // https://old.reddit.com/r/suckless/comments/ox4nls/im_trying_to_build_dwm_with_swallow_patch_but/hznb3cu/
+    // https://old.reddit.com/r/suckless/comments/ux2vku/losefullscreen_patches_are_not_working_in_dwm_63/i9yujig/
+
+    // window
+    // { MODKEY,		XK_grave,	togglefloating,	{0} },
+    // { MODKEY,           XK_h,  focusmaster,    {0} },
+    // {MODKEY, XK_h, pushup, {0}},
+    // {MODKEY, XK_l, pushdown, {0}},
+    {ControlMask, XK_q, killclient, {0}},
+    {MODKEY | ControlMask | ShiftMask, XK_q, quit, {1}}, // restart, rarely used
+    {MODKEY | ShiftMask, XK_q, quit, {0}},
+
+    // workspace
+    // { MODKEY,		XK_bracketleft, shiftviewclients,	{ .i = -1 } },
+    // { MODKEY,		XK_bracketright,shiftviewclients,	{ .i = +1 } }, // cycle tag focus
+    TAGKEYS(XK_1, 0) TAGKEYS(XK_2, 1) TAGKEYS(XK_3, 2) TAGKEYS(XK_4, 3) TAGKEYS(XK_5, 4) TAGKEYS(XK_6, 5) TAGKEYS(XK_7, 6) TAGKEYS(XK_8, 7) TAGKEYS(XK_9, 8) {
+        MODKEY, XK_Tab, view, {0}
+    }, // i often use this one-handed
 
     /* {0, 0x1008ff2d, spawn, SHCMD("i3lock -c 000000")}, */
     // // kitty has poor compatibility { MODKEY,		XK_b,
@@ -214,11 +264,6 @@ static Key keys[] = {
     {MODKEY | ShiftMask, XK_w, spawn, SHCMD("wttr")},
     {MODKEY, XK_Delete, spawn, SHCMD("i3lock -c 000000")},
     {MODKEY, XK_Print, spawn, SHCMD("flameshot gui")},
-    {MODKEY, XK_b, spawn, SHCMD("book")},
-    {MODKEY, XK_c, spawn, SHCMD("kitty -e neomutt")},
-    {MODKEY, XK_q, spawn, SHCMD("nicotine")},
-    {MODKEY, XK_t, spawn, SHCMD("telegram-desktop")},
-    {MODKEY, XK_w, spawn, SHCMD("firefox")},
 
     // hardware buttons
     {0, XF86XK_AudioLowerVolume, spawn, {.v = voldown}},
@@ -238,58 +283,10 @@ static Key keys[] = {
     // screenshot
     // scrot syntax is garbage since it doesn't support true piping
     {0, XK_Print, spawn, SHCMD("maim --hidecursor --quality=10 --select | xclip -selection " "clipboard -t image/png")},
-    {MODKEY | ShiftMask, XK_p, spawn, SHCMD("maim --hidecursor --quality=10 --select | xclip -selection " "clipboard -t image/png")},
     {ControlMask, XK_Print, spawn, SHCMD("maim --hidecursor --quality=10 --window=$(xdotool getactivewindow) " "| xclip -selection clipboard -t image/png")},
     {MODKEY | ControlMask, XK_p, spawn, SHCMD("maim --hidecursor --quality=10 --window=$(xdotool getactivewindow) " "| xclip -selection clipboard -t image/png")},
+    {MODKEY | ShiftMask, XK_p, spawn, SHCMD("maim --hidecursor --quality=10 --select | xclip -selection " "clipboard -t image/png")},
     {ShiftMask, XK_Print, spawn, SHCMD("maim --hidecursor --quality=10 | tee ~/$(date -Iseconds).png | " "xclip -selection clipboard -t image/png")},
-
-    // rofi
-    {MODKEY, XK_m, spawn, SHCMD("kitty -e pmp --queue")},
-    {MODKEY, XK_r, spawn, SHCMD("o")},
-    {MODKEY, XK_s, spawn, SHCMD("kitty --hold search")}, // --hold is necessary for rust
-    {MODKEY, XK_semicolon, spawn, SHCMD("kitty -e pmp")}, // prompt
-
-    // media control
-    // {MODKEY, XK_comma, spawn, SHCMD("rmpv -b")},  // seek backward
-    // {MODKEY, XK_slash, spawn, SHCMD("rmpv -f")},  // seek forward
-    // {MODKEY, XK_x, spawn, SHCMD("rmpv -q")},      // quit
-    {0, XF86XK_AudioNext, spawn, SHCMD("rmpv -f")},
-    {0, XF86XK_AudioPlay, spawn, SHCMD("rmpv -t")},
-    {0, XF86XK_AudioPrev, spawn, SHCMD("rmpv -b")},
-    {MODKEY, XK_comma, spawn, SHCMD("rmpv -t")}, // toggle
-
-    // layout
-    {MODKEY, XK_f, setlayout, {.v = &layouts[1]}}, // fullscreen
-    {MODKEY, XK_g, setlayout, {.v = &layouts[0]}}, // default
-    {MODKEY, XK_v, setlayout, {.v = &layouts[2]}}, // deck
-
-    // note: dwm 6.3 has a new 'lockfullscreen' const, which i have not added yet
-    // https://git.suckless.org/dwm/commit/138b405f0c8aa24d8a040cc1a1cf6e3eb5a0ebc7.html
-    // https://old.reddit.com/r/suckless/comments/ox4nls/im_trying_to_build_dwm_with_swallow_patch_but/hznb3cu/
-    // https://old.reddit.com/r/suckless/comments/ux2vku/losefullscreen_patches_are_not_working_in_dwm_63/i9yujig/
-
-    // window
-    // { MODKEY,		XK_grave,	togglefloating,	{0} },
-    // { MODKEY,           XK_h,  focusmaster,    {0} },
-    // {MODKEY, XK_h, pushup, {0}},
-    // {MODKEY, XK_l, pushdown, {0}},
-    {ControlMask, XK_q, killclient, {0}},
-    {MODKEY | ControlMask | ShiftMask, XK_q, quit, {1}}, // restart, rarely used
-    {MODKEY | ShiftMask, XK_q, quit, {0}},
-    {MODKEY, XK_j, focusstack, {.i = +1}},
-    {MODKEY, XK_k, focusstack, {.i = -1}},
-    {MODKEY, XK_l,  focusmaster,    {0} },
-    {MODKEY, XK_space, zoom, {0}}, // switch master/stack, focus master
-
-    // workspace
-    // { MODKEY,		XK_bracketleft, shiftviewclients,	{ .i = -1 } },
-    // { MODKEY,		XK_bracketright,shiftviewclients,	{ .i = +1 } }, // cycle tag focus
-    TAGKEYS(XK_1, 0) TAGKEYS(XK_2, 1) TAGKEYS(XK_3, 2) TAGKEYS(XK_4, 3)
-    TAGKEYS(XK_5, 4) TAGKEYS(XK_6, 5) TAGKEYS(XK_7, 6) TAGKEYS(XK_8, 7)
-    TAGKEYS(XK_9, 8)
-    {
-        MODKEY, XK_Tab, view, {0}
-    }, // i often use this one-handed
 
     // // i am increasingly living in a single tag (and enjoying it!)
     // {MODKEY, XK_o, shiftviewclients, {.i = +1}}, // cycle tag focus
