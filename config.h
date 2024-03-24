@@ -1,9 +1,9 @@
 // patches to try: regex rules, focusadjacenttag, focusonnetactive, swapfocus,
-// switchtotag, zoomswap diff -u [old] [new] > [diff] patch < [diff]
-// overwrites the file specified in [diff]
-//				passable conflicts -> "fuzz"
-//				serious conflicts -> generates [old].rej ->
-// change specified files manually
+// switchtotag, zoomswap
+// diff -u [old] [new] > [diff]
+// patch < [diff] overwrites the file specified in [diff]
+// passable conflicts -> "fuzz"
+// serious conflicts -> generates [old].rej -> change specified files manually
 // patch -R < [diff]		undo changes (also manual ones?)
 
 // https://github.com/bakkeby/dwm-flexipatch
@@ -200,32 +200,25 @@ static Key keys[] = {
     {MODKEY, XK_d, spawn, {.v = dmenucmd}},
     {MODKEY, XK_e, spawn, {.v = termcmd}},
 
-    // < ~/dwm/config.h grep -P '^\s+\{ MODKEY,\s+XK_[a-z],' | sort | cut -f4-
-    // programs
-    // still unbound: ab=:"{}; backspace (reserved: focus master), backslash
-    // // kitty has poor compatibility { MODKEY,		XK_b,
-    // spawn, SHCMD("jacka") },	// starts qjackctl, then qsynth { MODKEY, XK_c,
-    // spawn, SHCMD("NOTMUCH_CONFIG=$HOME/.config/notmuch/config kitty -e
-    // neomutt") }, { MODKEY,		XK_z,		spawn,
-    // SHCMD("ripcord")
-    // },
+    // unbound: ahinopuxyz
+
     /* {0, 0x1008ff2d, spawn, SHCMD("i3lock -c 000000")}, */
+    // // kitty has poor compatibility { MODKEY,		XK_b,
+    // < ~/dwm/config.h grep -P '^\s+\{\s*MODKEY,\s+XK_[a-z],' | sort | cut -f4-
+    // {MODKEY | ShiftMask, XK_e, spawn, SHCMD("kitty")},
+    // {MODKEY | ShiftMask, XK_t, spawn, SHCMD("transmission-gtk")},
+    // {MODKEY, XK_a, spawn, SHCMD("musescore")},
+    // {MODKEY, XK_h, spawn, SHCMD("kitty -e htop")},
     {0, 0x1008ff2d, spawn, SHCMD("slock")},
-    {MODKEY, XK_Delete, spawn, SHCMD("i3lock -c 000000")},
-    {MODKEY, XK_Print, spawn, SHCMD("flameshot gui")},
-    {MODKEY, XK_a, spawn, SHCMD("musescore")},
-    {MODKEY, XK_b, spawn, SHCMD("book")},
-    {MODKEY, XK_c, spawn, SHCMD("kitty -e neomutt")},
-    {MODKEY, XK_n, spawn, SHCMD("kitty -e newsboat")}, // printf '\e]710;%s\007' "xft:monaco:pixelsize=16"
-    {MODKEY, XK_q, spawn, SHCMD("setxkbmap -layout us -option -option compose:rctrl,caps:menu; nicotine")},
-    {MODKEY, XK_t, spawn, SHCMD("telegram-desktop")},
-    {MODKEY, XK_w, spawn, SHCMD("firefox")},
-    {MODKEY | ShiftMask, XK_e, spawn, SHCMD("kitty")},
-    {MODKEY | ShiftMask, XK_f, spawn, SHCMD("kitty -e ranga")},
-    {MODKEY | ShiftMask, XK_h, spawn, SHCMD("kitty -e htop")},
-    {MODKEY | ShiftMask, XK_t, spawn, SHCMD("transmission-gtk")},
     {MODKEY | ShiftMask, XK_v, spawn, SHCMD("vb")}, // hacky
     {MODKEY | ShiftMask, XK_w, spawn, SHCMD("wttr")},
+    {MODKEY, XK_Delete, spawn, SHCMD("i3lock -c 000000")},
+    {MODKEY, XK_Print, spawn, SHCMD("flameshot gui")},
+    {MODKEY, XK_b, spawn, SHCMD("book")},
+    {MODKEY, XK_c, spawn, SHCMD("kitty -e neomutt")},
+    {MODKEY, XK_q, spawn, SHCMD("nicotine")},
+    {MODKEY, XK_t, spawn, SHCMD("telegram-desktop")},
+    {MODKEY, XK_w, spawn, SHCMD("firefox")},
 
     // hardware buttons
     {0, XF86XK_AudioLowerVolume, spawn, {.v = voldown}},
@@ -253,34 +246,39 @@ static Key keys[] = {
     // rofi
     {MODKEY, XK_m, spawn, SHCMD("kitty -e pmp --queue")},
     {MODKEY, XK_r, spawn, SHCMD("o")},
-    {MODKEY, XK_s, spawn, SHCMD("search")},
+    {MODKEY, XK_s, spawn, SHCMD("kitty --hold search")}, // --hold is necessary for rust
     {MODKEY, XK_semicolon, spawn, SHCMD("kitty -e pmp")}, // prompt
 
     // media control
+    // {MODKEY, XK_comma, spawn, SHCMD("rmpv -b")},  // seek backward
+    // {MODKEY, XK_slash, spawn, SHCMD("rmpv -f")},  // seek forward
+    // {MODKEY, XK_x, spawn, SHCMD("rmpv -q")},      // quit
     {0, XF86XK_AudioNext, spawn, SHCMD("rmpv -f")},
     {0, XF86XK_AudioPlay, spawn, SHCMD("rmpv -t")},
     {0, XF86XK_AudioPrev, spawn, SHCMD("rmpv -b")},
-    {MODKEY, XK_comma, spawn, SHCMD("rmpv -b")},  // seek backward
-    {MODKEY, XK_period, spawn, SHCMD("rmpv -t")}, // toggle
-    {MODKEY, XK_slash, spawn, SHCMD("rmpv -f")},  // seek forward
-    {MODKEY, XK_x, spawn, SHCMD("rmpv -q")},      // quit
+    {MODKEY, XK_comma, spawn, SHCMD("rmpv -t")}, // toggle
 
     // layout
     {MODKEY, XK_f, setlayout, {.v = &layouts[1]}}, // fullscreen
     {MODKEY, XK_g, setlayout, {.v = &layouts[0]}}, // default
     {MODKEY, XK_v, setlayout, {.v = &layouts[2]}}, // deck
 
+    // note: dwm 6.3 has a new 'lockfullscreen' const, which i have not added yet
+    // https://git.suckless.org/dwm/commit/138b405f0c8aa24d8a040cc1a1cf6e3eb5a0ebc7.html
+    // https://old.reddit.com/r/suckless/comments/ox4nls/im_trying_to_build_dwm_with_swallow_patch_but/hznb3cu/
+    // https://old.reddit.com/r/suckless/comments/ux2vku/losefullscreen_patches_are_not_working_in_dwm_63/i9yujig/
+
     // window
     // { MODKEY,		XK_grave,	togglefloating,	{0} },
+    // { MODKEY,           XK_h,  focusmaster,    {0} },
     // {MODKEY, XK_h, pushup, {0}},
     // {MODKEY, XK_l, pushdown, {0}},
-    { MODKEY|ControlMask,           XK_h,  focusmaster,    {0} },
-    { MODKEY|ControlMask,           XK_l,  focusmaster,    {0} },
     {ControlMask, XK_q, killclient, {0}},
     {MODKEY | ControlMask | ShiftMask, XK_q, quit, {1}}, // restart, rarely used
     {MODKEY | ShiftMask, XK_q, quit, {0}},
     {MODKEY, XK_j, focusstack, {.i = +1}},
     {MODKEY, XK_k, focusstack, {.i = -1}},
+    {MODKEY, XK_l,  focusmaster,    {0} },
     {MODKEY, XK_space, zoom, {0}}, // switch master/stack, focus master
 
     // workspace
@@ -288,48 +286,42 @@ static Key keys[] = {
     // { MODKEY,		XK_bracketright,shiftviewclients,	{ .i = +1 } }, // cycle tag focus
     TAGKEYS(XK_1, 0) TAGKEYS(XK_2, 1) TAGKEYS(XK_3, 2) TAGKEYS(XK_4, 3)
     TAGKEYS(XK_5, 4) TAGKEYS(XK_6, 5) TAGKEYS(XK_7, 6) TAGKEYS(XK_8, 7)
-    TAGKEYS(XK_9, 8) {
+    TAGKEYS(XK_9, 8)
+    {
         MODKEY, XK_Tab, view, {0}
-    },      // i often use this one-handed
-    {MODKEY, XK_o, shiftviewclients, {.i = +1}}, // cycle tag focus
-    {MODKEY, XK_u, view, {0}},                   // intuitive with mod+i
-    {MODKEY, XK_y, shiftviewclients, {.i = -1}},
+    }, // i often use this one-handed
 
-    // monitor
-    // { MODKEY,		XK_BackSpace,	spawn,		SHCMD("pkill
-    // picom; picom -b
-    // --config .picom.conf; notify-send 'Restarted picom'") },	// it's just a
-    // phase mom { MODKEY,		XK_b,		spawn,
-    // SHCMD("mond --on")
-    // }, { MODKEY|ShiftMask,	XK_space,	tagmon,		{.i = +1 } }, {
-    // MODKEY,		XK_0,		spawn,		SHCMD("mon --on >
-    // mon.log")
-    // }, { MODKEY,		XK_grave,	spawn,		SHCMD("mond
-    // --toggle") },
-    {MODKEY, XK_i, focusmon, {.i = +1}},           // switch mon
-    {MODKEY | ShiftMask, XK_i, tagmon, {.i = +1}}, // send to mon
+    // // i am increasingly living in a single tag (and enjoying it!)
+    // {MODKEY, XK_o, shiftviewclients, {.i = +1}}, // cycle tag focus
+    // {MODKEY, XK_u, view, {0}},                   // intuitive with mod+i
+    // {MODKEY, XK_y, shiftviewclients, {.i = -1}},
+
+    // i don't have a second monitor right now; and might not need one anymore, thanks to kvm
+    // { ControlMask,		XK_grave,	spawn,		SHCMD("mond --toggle") }, // i just use a kvm nowadays
+    // { MODKEY,		XK_0,		spawn,		SHCMD("mon --on > mon.log") },
+    // { MODKEY,		XK_b,		spawn, SHCMD("mond --on") },
+    // { MODKEY|ShiftMask,	XK_space,	tagmon,		{.i = +1 } },
+    // {MODKEY | ShiftMask, XK_i, tagmon, {.i = +1}}, // send to mon
+    // {MODKEY, XK_i, focusmon, {.i = +1}},           // switch mon
 
     // 60% keyboard workarounds
     // { MODKEY,		XK_bracketleft,	spawn,		SHCMD("") },
-    {MODKEY | ControlMask, XK_comma, spawn, {.v = voldown}},
-    {MODKEY | ControlMask, XK_period, spawn, {.v = volup}},
-    {MODKEY | Mod1Mask, XK_c, spawn, {.v = volup}},
-    {MODKEY | Mod1Mask, XK_x, spawn, {.v = voldown}},
-    {MODKEY, XK_equal, spawn, {.v = volup}},
-    {MODKEY, XK_minus, spawn, {.v = voldown}},
+    // {MODKEY | ControlMask, XK_comma, spawn, {.v = voldown}},
+    // {MODKEY | ControlMask, XK_period, spawn, {.v = volup}},
+    // {MODKEY | Mod1Mask, XK_c, spawn, {.v = volup}},
+    // {MODKEY | Mod1Mask, XK_x, spawn, {.v = voldown}},
+    // {MODKEY, XK_equal, spawn, {.v = volup}},
+    // {MODKEY, XK_minus, spawn, {.v = voldown}},
 
-    // gimmicks that i don't use
-    // { MODKEY,		XK_0,		view,		{.ui = ~0 } },
-    // // merge all workspaces
-    // { MODKEY,		XK_Left,	setmfact,	{.f = -0.05} },
-    // // widen master { MODKEY,		XK_Right,	setmfact,
-    // {.f = +0.05} },
+    // // gimmicks that i don't use
+    // { MODKEY,		XK_0,		view,		{.ui = ~0 } }, // merge all workspaces
+    // { MODKEY,		XK_Left,	setmfact,	{.f = -0.05} }, // widen master
+    // { MODKEY,		XK_Right,	setmfact, {.f = +0.05} },
     // { MODKEY,		XK_b,		togglebar,	{0} },
-    // { MODKEY|ShiftMask,	XK_0,		tag,		{.ui = ~0 } },
-    // // "sticky" { MODKEY|ShiftMask,	XK_Down,	incnmaster,
-    // {.i = -1 } },	// +1 horiz in master { MODKEY|ShiftMask,	XK_Tab,
-    // setlayout,	{0} },		// toggle between last 2 layouts {
-    // MODKEY|ShiftMask, XK_Up,		incnmaster,	{.i = +1 } },
+    // { MODKEY|ShiftMask,	XK_0,		tag,		{.ui = ~0 } }, // "sticky"
+    // { MODKEY|ShiftMask,	XK_Down,	incnmaster, {.i = -1 } },	// +1 horiz in master
+    // { MODKEY|ShiftMask,	XK_Tab, setlayout,	{0} },		// toggle between last 2 layouts
+    // { MODKEY|ShiftMask, XK_Up,		incnmaster,	{.i = +1 } },
 
 };
 
@@ -375,24 +367,19 @@ static const char *const autostart[] = {
     // anything that isn't an executable (i.e. longer than 1 word) needs the
     // full syntax
 
+    // TODO: https://wiki.archlinux.org/title/PostgreSQL#Upgrading_PostgreSQL
+
+    // to debug slow startup:
+    // journalctl -S today -o short-delta | awk '$4 > 10' | grep '^\[' | less
+
+    "dunst", NULL,
+    "udiskie", NULL, // automount all devices
+
+    "sh", "-c", "pkill picom; picom -b", NULL, // -b = daemon; run order (wrt mon) doesn't really matter
     "sh", "-c", "sleep 1; ~/scripts/wallset", NULL,
     "sh", "-c", "~/dwm/dwmstatus", NULL,
     "sh", "-c", "~/scripts/mon.py", NULL,
-    "sh", "-c", "~/scripts/reds", NULL,
-
-    "dunst", NULL,
-    "sh", "-c", "pkill picom; picom -b", NULL, // -b = daemon; run order (wrt mon) doesn't really matter
-    "udiskie", NULL, // automount all devices -- should be run last?
-
-    // "pulseaudio", NULL,
-    // "python3", "~/scripts/4chan.py", ">", "/tmp/loona",	NULL,
-    // "sh", "-c", "cup",		NULL,
-    // "sh", "-c", "dwmstatus",	NULL,
-    // "sh", "-c", "find loona | shuf | xargs -d '\n' nsxiv -S 300", NULL,
-    // "sh", "-c", "notify-send 'dwm started'", NULL,
-    // "sh", "-c", "notify-send \"$PATH\"", NULL,
-    // "sh", "-c", "sleep 1; mon --on",	NULL,	// not using sleep will produce a black or misconfigured screen
-    // "sh", "-c", "wallset",		NULL,
+    "sh", "-c", "~/scripts/reds &", NULL,
 
     NULL
 };
