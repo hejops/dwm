@@ -25,16 +25,15 @@
 static const unsigned int borderpx = 1; // border pixel of windows
 static const unsigned int snap = 32;    // snap pixel
 static const int showbar = 1;           // 0 means no bar
-static const int topbar = 1;            // 0 means bottom bar -- testing
-static const char *fonts[] = {"haskplex:size=8",
-                              /* "fira mono:size=8", */
-                              /* "ia writer mono s:size=8", */
-                              /* "monaco:size=8", */
-                              "symbola:size=8"
-                             }; // may require font-awesome
+static const int topbar = 1;            // 0 means bottom bar
+static const char *fonts[] = {
+    "haskplex:size=8",
+    "symbola:size=8"
+};
 // static const char dmenufont[]		= "monaco:size=8";
 
 // https://camo.githubusercontent.com/cdb2f2e986c564b515c0c698e6c45b4ab5d725a9/687474703a2f2f692e696d6775722e636f6d2f776136363678672e706e67
+// TODO: change these to match citruszest
 static const char blue[] = "#458688";
 static const char gray[] = "#131313";
 static const char green[] = "#98971a";
@@ -44,16 +43,18 @@ static const char white2[] = "#ebdbb2";
 static const char white[] = "#bbbbbb";
 
 static const char *colors[][3] = {
-    //			fg	bg	border
+    //		fg	bg	border
     [SchemeNorm] = {white2, gray, gray},
     [SchemeSel] = {blue, gray, blue},
 };
 
-// tag names -- testing
+// tag names
 // https://github.com/meinwald/DWM-config/blob/master/config.h#L16
 // https://libredd.it/r/suckless/comments/id0q64/how_to_get_more_than_9_tags_in_dwm/g26yhdl/?context=3
 static const char *tags[] = {
-    "main", "work", "muse", "win7", "jack", "6", "7", "8", "cal",
+    // "main", "work", "muse", "win7", "jack", "6", "7", "8", "cal",
+    // i've come to realise i don't ever need more than 3 or 4 tags
+    "term", "gui", "???",
 };
 
 static const Rule rules[] = {
@@ -79,97 +80,84 @@ static const Rule rules[] = {
 
     // https://github.com/laur89/dwm-setup/blob/603f8b26d5bba806c195e6f82a2370fd51c6faf7/.dwm/w0ngBuild/source6.0/config.h#L114
 
-    // class	instance	title		tags mask	switch	float
-    // monitor
+    // class	    instance    title   tag     switch	float	monitor
 
-    // main screen
-    // note: (physically) larger monitor must be secondary (1)
-    // { "MuseScore3",	NULL,		NULL,		1 << 4,		1, 0, 1 },
-    // { "TuxGuitar",	NULL,		NULL,		1 << 4,		1, 0, 1 },
-    {"Nicotine", NULL, NULL, 1 << 0, 1, 0, 1},
-    {"firefox", NULL, NULL, 1 << 0, 1, 0, -1}, // drag tab to monitor only works if the correct workspace is active
-    // (otherwise goes back to original monitor...)
-    {"mpv", NULL, NULL, 1 << 0, 1, 0, 1},
+    // a tag of '1 << x' means the window will be opened in tag x. to have the
+    // window open in the current tag, simply declare '0' (without '1 << ')
 
-    {"MuseScore4", NULL, NULL, 1 << 4, 3, 0, 1},
-    {"QjackCtl", NULL, NULL, 1 << 5, 3, 0, 1},
-    {"Qsynth", NULL, NULL, 1 << 5, 3, 0, 1},
-    {NULL, NULL, "calcurse", 1 << 8, 3, 0, 1},
+    // main programs
+    {"firefox",	        NULL,	NULL,	1 << 1,	1,	0,	-1},
+    {"kitty",	        NULL,	NULL,	1 << 0,	1,	0,	1},
+    {"wezterm",	        NULL,	NULL,	1 << 0,	1,	0,	1},
+
+    // common one-off programs
+    // might be better to just set tag to 0
+    {"Chromium",	NULL,	NULL,	1 << 2,	4,	0,	0},
+    {"Nicotine",	NULL,	NULL,	1 << 1,	1,	0,	1},
+    {"Zathura",	        NULL,	NULL,	1 << 1,	1,	0,	0},
+    {"feh",	        NULL,	NULL,	1 << 1,	3,	0,	0},
+    {"mpv",	        NULL,	NULL,	1 << 1,	3,	0,	1},
 
     // floats
-    {"Display", NULL, NULL, 0, 0, 1, 0}, // PIL
-    {"Gimp", NULL, NULL, 0, 0, 1, -1},
-    {"Gpick", "gpick", NULL, 0, 0, 1, -1},
-    {"PPSSPPQt", NULL, NULL, 0, 0, 1, 1},
-    {"Pavucontrol", NULL, NULL, 0, 0, 1, -1},
-    {"TelegramDesktop", NULL, NULL, 0, 0, 1, -1},
-    {"discord", NULL, NULL, 0, 0, 1, 0},
-    {"mednafen", NULL, NULL, 0, 0, 1, 1},
+    {"Display",	        NULL,	NULL,	0,	0,	1,	0},	// PIL
+    {"Gpick",       "gpick",	NULL,	0,	0,	1,	-1},
+    {"PPSSPPQt",	NULL,	NULL,	0,	0,	1,	1},
+    {"Pavucontrol",	NULL,	NULL,	0,	0,	1,	-1},
+    {"TelegramDesktop",	NULL,	NULL,	0,	0,	1,	-1}, // bad at resizing
+    {"discord",	        NULL,	NULL,	0,	0,	1,	0},
+    {"mednafen",	NULL,	NULL,	0,	0,	1,	1},
 
-    // slave screen
-    // switch should generally be 1
-    // { "libreoffice-writer",	NULL,	NULL,		0,		0, 0, 1 },
-    // { NULL,		"libreoffice",	NULL,		1 << 0,		1, 0, 0 }, // doesn't work
+    {"App.py",	        NULL,	NULL,	1 << 2,	1,	1,	0},	// playitslowly
+    {"VirtualBox Machine",	NULL,	NULL,	1 << 2,	1,	0,	0},
+    {"VirtualBox Manager",	NULL,	NULL,	1 << 2,	1,	1,	0},
+    {"Virtualbox",	NULL,	NULL,	1 << 2,	1,	1,	0},	// idk
+    {"virtualbox",	NULL,	NULL,	1 << 2,	1,	1,	0},
+    {"VirtualBox Machine",	"VirtualBox Machine",	NULL,	1 << 2,	1,	1,	0},
+    {"VirtualBox Manager",	"VirtualBox Manager",	NULL,	1 << 2,	1,	1,	0},
 
-    {"Chromium", NULL, NULL, 1 << 1, 3, 0, 0},
-    {"Com.github.xournalpp.xournalpp", NULL, NULL, 1 << 1, 1, 0, 0},
-    {"Evince", NULL, NULL, 1 << 1, 1, 0, 0},
-    {"Matplotlib", NULL, NULL, 1 << 0, 1, 0, 0},
-    {"Zathura", NULL, NULL, 1 << 0, 3, 0, 0},
-    {"feh", NULL, NULL, 1 << 0, 1, 0, 0},
-    {"imv", NULL, NULL, 1 << 0, 1, 0, 0},
-    {"libreoffice-calc", NULL, NULL, 1 << 0, 1, 0, 0},
-    {"ripcord", NULL, NULL, 1 << 0, 1, 0, 0},
-    {"teams-for-linux", NULL, NULL, 1 << 1, 3, 0, 0},
-    {"yuzu", NULL, NULL, 1 << 0, 3, 0, 0},
-    {"zoom", NULL, NULL, 1 << 1, 1, 0, 0},
-
-    {"App.py", NULL, NULL, 1 << 3, 1, 1, 0}, // playitslowly
-    {"VirtualBox Machine", NULL, NULL, 1 << 3, 1, 0, 0},
-    {"VirtualBox Machine", "VirtualBox Machine", NULL, 1 << 3, 1, 1, 0},
-    {"VirtualBox Manager", NULL, NULL, 1 << 3, 1, 1, 0},
-    {"VirtualBox Manager", "VirtualBox Manager", NULL, 1 << 3, 1, 1, 0},
-    {"Virtualbox", NULL, NULL, 1 << 3, 1, 1, 0}, // idk
-    {"virtualbox", NULL, NULL, 1 << 3, 1, 1, 0},
-
-    // TODO:
-    // WM_NAME(STRING) = "win7 on QEMU/KVM User session"
-    // _NET_WM_ICON_NAME(UTF8_STRING) = "win7 on QEMU/KVM User session"
-    // _NET_WM_NAME(UTF8_STRING) = "win7 on QEMU/KVM User session"
-    // { "FLTK",	NULL,		NULL,		0,		0, 1, 1 }, // vmd
-    // { "MestReNova",	NULL,		NULL,		1 << 1,		1, 0, 1 },
-    // { "Thunar",	NULL,		NULL,		0,		0, 1, -1 },
-    // { "Virt-manager",	NULL,	NULL,		1 << 3,		1, 0, 1 },
-    // { NULL,		NULL,		"artemis",	1 << 2,		3, 0, 1 },
-    // { NULL,		NULL,		"oceanids",	1 << 2,		3, 0, 1 },
-    // { NULL,		NULL,		"shux",		1 << 2,		3, 0, 1 },
-    // { NULL,		NULL,	"win7 on QEMU/KVM User session",1 << 3,	1, 0, 1 }, // idk
+    // {"Com.github.xournalpp.xournalpp",	NULL,	NULL,	1 << 1,	1,	0,	0},
+    // {"MuseScore4",	NULL,	NULL,	1 << 4,	3,	0,	1},
+    // {"QjackCtl",	NULL,	NULL,	1 << 5,	3,	0,	1},
+    // {"Qsynth",	        NULL,	NULL,	1 << 5,	3,	0,	1},
+    // {"TuxGuitar",	NULL,		NULL,		1 << 4,		1, 0, 1 },
+    // {"libreoffice-calc",	NULL,	NULL,	1 << 0,	1,	0,	0},
+    // {"ripcord",	        NULL,	NULL,	1 << 0,	1,	0,	0},
+    // {"yuzu",	        NULL,	NULL,	1 << 0,	3,	0,	0},
 
 };
 
-/* layout(s) */
+/* layouts */
 static const float mfact = 0.55; /* factor of master area size [0.05..0.95] */
 static const int nmaster = 1;    /* number of clients in master area */
-static const int resizehints =
-    1; /* 0 = force terminals to use up all extra space */
+static const int resizehints = 1; /* 0 = force terminals to use up all extra space */
 
 static const Layout layouts[] = {
-    {"DEF", tile}, {"FUL", monocle}, {"DEC", deck},
-    //	{ "BST",	bstack },
-    //	{ "><>",	  NULL },
+    {"[+]", tile}, // 0
+    {"[ ]", monocle}, // 1
+    {"[|]", deck}, // 2
 };
 
+// setxkbmap compose:rctrl seems to remove rctrl entirely (according to
+// xmodmap), which is why we want to use multi... but idk how to specify the
+// keycode in dwm terms
+
+// keycode 105 (keysym 0xff20, Multi_key)
+
+// https://github.com/chriskmanx/qmole/blob/0c14fa363f174b38a6ec5c6f5ffc75960add7c05/QMOLEDEV/x11vnc-0.9.13/rfb/keysym.h#L138
+
+// attempting to use a non-modifier key (e.g. XK_Multi_key) as a modifier is a
+// runtime error (not caught at compile time)
+// {XK_Multi_key, KEY, toggleview, {.ui = 1 << TAG}},                    \
+
 #define MODKEY Mod4Mask
-#define TAGKEYS(KEY, TAG)                                                      \
-  {MODKEY, KEY, view, {.ui = 1 << TAG}},                                       \
-      {Mod1Mask, KEY, toggletag, {.ui = 1 << TAG}},                            \
-      {MODKEY | ShiftMask, KEY, tag, {.ui = 1 << TAG}},                        \
-      {MODKEY | ControlMask | ShiftMask, KEY, toggleview, {.ui = 1 << TAG}},
-/* { MODKEY|ShiftMask,		KEY,	  tag,		{.ui = 1 << TAG} }, \ */
+#define TAGKEYS(KEY, TAG)                                               \
+  {MODKEY, KEY, view, {.ui = 1 << TAG}},                                \
+  {Mod1Mask, KEY, toggleview, {.ui = 1 << TAG}},                        \
+  {MODKEY | ShiftMask, KEY, tag, {.ui = 1 << TAG}},
+// the last trailing comma is required!
+
+// {Mod1Mask, KEY, toggletag, {.ui = 1 << TAG}},                            \
 // toggleview = activate (in addition), tag = send to, toggletag = duplicate to
-// these combinations are all unwieldy
-// alt+\d is unreliable
-// TODO: toggletag + view simultaneously
 
 #include <X11/XF86keysym.h> // https://cgit.freedesktop.org/xorg/proto/x11proto/tree/XF86keysym.h
 
@@ -182,7 +170,8 @@ static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() 
 static const char *brightdown[] = {"xbacklight", "-dec", "10", NULL};
 static const char *brightup[] = {"xbacklight", "-inc", "10", NULL }; // acpilight needs root
 static const char *dmenucmd[] = {"rofi", "-show", "run", NULL};
-static const char *termcmd[] = {"kitty", NULL};
+static const char *termcmd[] = {"wezterm", "start", NULL};
+// static const char *termcmd[] = {"$TERMINAL", NULL};
 static const char *voldown[] = {"vol", "-5", NULL};
 static const char *volup[] = {"vol", "+5", NULL};
 
@@ -205,16 +194,16 @@ static Key keys[] = {
     // terminal
     {MODKEY, XK_d, spawn, SHCMD("o")},
     {MODKEY, XK_e, spawn, {.v = termcmd}},
-    {MODKEY, XK_f, spawn, SHCMD("kitty -e pmp")}, // prompt
-    {MODKEY, XK_s, spawn, SHCMD("kitty --hold search")}, // --hold is necessary for rust
+    {MODKEY, XK_f, spawn, SHCMD("$TERMINAL pmp")}, // prompt
+    {MODKEY, XK_s, spawn, SHCMD("$TERMINAL search")},
 
-    {MODKEY, XK_a, spawn, SHCMD("kitty -e neomutt")},
+    {MODKEY, XK_a, spawn, SHCMD("$TERMINAL neomutt")},
     {MODKEY, XK_r, spawn, SHCMD("nicotine")},
     {MODKEY, XK_w, spawn, SHCMD("firefox")},
 
     // uo;
-    {MODKEY, XK_o, spawn, SHCMD("kitty -e pmp --queue")},
-    {MODKEY, XK_u, spawn, SHCMD("rmpv -t")}, // toggle
+    {MODKEY, XK_o, spawn, SHCMD("$TERMINAL pmp --queue")},
+    {MODKEY, XK_u, spawn, SHCMD("playerctl play-pause || $TERMINAL pmp")},
 
     {MODKEY, XK_c, setlayout, {.v = &layouts[0]}}, // default
     {MODKEY, XK_v, setlayout, {.v = &layouts[2]}}, // deck
@@ -226,10 +215,10 @@ static Key keys[] = {
 
     // ghtybn z/`'qp
 
-    // media control
-    {0, XF86XK_AudioNext, spawn, SHCMD("rmpv -f")},
-    {0, XF86XK_AudioPlay, spawn, SHCMD("rmpv -t")},
-    {0, XF86XK_AudioPrev, spawn, SHCMD("rmpv -b")},
+    // // media control
+    // {0, XF86XK_AudioNext, spawn, SHCMD("playerctl next")},
+    // {0, XF86XK_AudioPlay, spawn, SHCMD("playerctl play-pause")},
+    // {0, XF86XK_AudioPrev, spawn, SHCMD("playerctl previous")},
 
     // note: dwm 6.3 has a new 'lockfullscreen' const, which i have not added yet
     // https://git.suckless.org/dwm/commit/138b405f0c8aa24d8a040cc1a1cf6e3eb5a0ebc7.html
@@ -239,27 +228,38 @@ static Key keys[] = {
     // window
     // { MODKEY,		XK_grave,	togglefloating,	{0} },
     // { MODKEY,           XK_h,  focusmaster,    {0} },
+    // {MODKEY | ControlMask | ShiftMask, XK_q, quit, {1}}, // restart, rarely used
     // {MODKEY, XK_h, pushup, {0}},
     // {MODKEY, XK_l, pushdown, {0}},
+
+    // gtk binds this by default, so this is only to 'enforce' nicotine's
+    // exitdialog setting (which only applies to quitting via GUI, not external
+    // events)
     {ControlMask, XK_q, killclient, {0}},
-    {MODKEY | ControlMask | ShiftMask, XK_q, quit, {1}}, // restart, rarely used
+
     {MODKEY | ShiftMask, XK_q, quit, {0}},
 
-    // workspace
-    // { MODKEY,		XK_bracketleft, shiftviewclients,	{ .i = -1 } },
-    // { MODKEY,		XK_bracketright,shiftviewclients,	{ .i = +1 } }, // cycle tag focus
-    TAGKEYS(XK_1, 0) TAGKEYS(XK_2, 1) TAGKEYS(XK_3, 2) TAGKEYS(XK_4, 3) TAGKEYS(XK_5, 4) TAGKEYS(XK_6, 5) TAGKEYS(XK_7, 6) TAGKEYS(XK_8, 7) TAGKEYS(XK_9, 8) {
-        MODKEY, XK_Tab, view, {0}
-    }, // i often use this one-handed
+    // {MODKEY, XK_3, view, {.ui = 1 << 0}},
+    // {MODKEY, XK_8, view, {.ui = 1 << 1}},
+    {MODKEY, XK_7, view, {.ui = 1 << 2}},
+    // {XK_Multi_key, XK_3, view, {.ui = 1 << 0}},
 
-    /* {0, 0x1008ff2d, spawn, SHCMD("i3lock -c 000000")}, */
-    // // kitty has poor compatibility { MODKEY,		XK_b,
+    TAGKEYS(XK_3, 0) TAGKEYS(XK_8, 1) {
+        MODKEY, XK_Tab, view, {0}
+    },
+
+    // // workspace
+    // // { MODKEY,		XK_bracketleft, shiftviewclients,	{ .i = -1 } },
+    // // { MODKEY,		XK_bracketright,shiftviewclients,	{ .i = +1 } }, // cycle tag focus
+    // TAGKEYS(XK_1, 0) TAGKEYS(XK_2, 1) TAGKEYS(XK_3, 2) TAGKEYS(XK_4, 3) TAGKEYS(XK_5, 4) TAGKEYS(XK_6, 5) TAGKEYS(XK_7, 6) TAGKEYS(XK_8, 7) TAGKEYS(XK_9, 8) {
+    //     MODKEY, XK_Tab, view, {0}
+    // },
+
     // < ~/dwm/config.h grep -P '^\s+\{\s*MODKEY,\s+XK_[a-z],' | sort | cut -f4-
-    // {MODKEY | ShiftMask, XK_e, spawn, SHCMD("kitty")},
-    // {MODKEY | ShiftMask, XK_t, spawn, SHCMD("transmission-gtk")},
+    // {0, 0x1008ff2d, spawn, SHCMD("i3lock -c 000000")},
     // {MODKEY, XK_a, spawn, SHCMD("musescore")},
-    // {MODKEY, XK_h, spawn, SHCMD("kitty -e htop")},
-    {0, 0x1008ff2d, spawn, SHCMD("slock")},
+    // {MODKEY, XK_h, spawn, SHCMD("$TERMINAL htop -u joseph")},
+    {0, 0x1008ff2d, spawn, SHCMD("slock")}, // XF86XK_ScreenSaver; laptop only?
     {MODKEY | ShiftMask, XK_v, spawn, SHCMD("vb")}, // hacky
     {MODKEY | ShiftMask, XK_w, spawn, SHCMD("wttr")},
     {MODKEY, XK_Delete, spawn, SHCMD("i3lock -c 000000")},
@@ -282,10 +282,12 @@ static Key keys[] = {
 
     // screenshot
     // scrot syntax is garbage since it doesn't support true piping
+    {MODKEY, XK_p, spawn, SHCMD("maim --hidecursor --quality=10 --select | xclip -selection " "clipboard -t image/png")},
+    {MODKEY|ControlMask, XK_p, spawn, SHCMD("maim --hidecursor --quality=10 --select | xclip -selection " "clipboard -t image/png")},
+    {MODKEY|ShiftMask, XK_p, spawn, SHCMD("maim --hidecursor --quality=10 --window=$(xdotool getactivewindow) " "| xclip -selection clipboard -t image/png")},
+
     {0, XK_Print, spawn, SHCMD("maim --hidecursor --quality=10 --select | xclip -selection " "clipboard -t image/png")},
     {ControlMask, XK_Print, spawn, SHCMD("maim --hidecursor --quality=10 --window=$(xdotool getactivewindow) " "| xclip -selection clipboard -t image/png")},
-    {MODKEY | ControlMask, XK_p, spawn, SHCMD("maim --hidecursor --quality=10 --window=$(xdotool getactivewindow) " "| xclip -selection clipboard -t image/png")},
-    {MODKEY | ShiftMask, XK_p, spawn, SHCMD("maim --hidecursor --quality=10 --select | xclip -selection " "clipboard -t image/png")},
     {ShiftMask, XK_Print, spawn, SHCMD("maim --hidecursor --quality=10 | tee ~/$(date -Iseconds).png | " "xclip -selection clipboard -t image/png")},
 
     // // i am increasingly living in a single tag (and enjoying it!)
