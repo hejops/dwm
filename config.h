@@ -377,7 +377,7 @@ static const char *const autostart[] = {
     "sh", "-c", "pkill picom; picom -b", NULL, // -b = daemon; run order (wrt mon) doesn't really matter
 
     "sh", "-c", "~/gripts/dwmstatus/dwmstatus", NULL,
-    "sh", "-c", "~/gripts/wall/wall", NUL
+    "sh", "-c", "~/gripts/wall/wall", NULL,
     "sh", "-c", "~/scripts/mon.py", NULL,
     "sh", "-c", "~/scripts/reds &", NULL, // too short to warrant rewrite
     // ~ is only expanded by shell
