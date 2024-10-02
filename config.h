@@ -27,7 +27,7 @@ static const unsigned int snap = 32;    // snap pixel
 static const int showbar = 1;           // 0 means no bar
 static const int topbar = 1;            // 0 means bottom bar
 static const char *fonts[] = {
-    "haskplex:size=8",
+    "source code pro:size=8",
     "symbola:size=8"
 };
 // static const char dmenufont[]		= "monaco:size=8";
