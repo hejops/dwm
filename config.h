@@ -244,16 +244,17 @@ static Key keys[] = {
     {MODKEY, XK_7, view, {.ui = 1 << 2}},
     // {XK_Multi_key, XK_3, view, {.ui = 1 << 0}},
 
-    TAGKEYS(XK_3, 0) TAGKEYS(XK_8, 1) {
+    TAGKEYS(XK_3, 0)
+    TAGKEYS(XK_g, 0)
+    TAGKEYS(XK_8, 1)
+    TAGKEYS(XK_h, 1)
+    {
         MODKEY, XK_Tab, view, {0}
     },
 
     // // workspace
-    // // { MODKEY,		XK_bracketleft, shiftviewclients,	{ .i = -1 } },
-    // // { MODKEY,		XK_bracketright,shiftviewclients,	{ .i = +1 } }, // cycle tag focus
-    // TAGKEYS(XK_1, 0) TAGKEYS(XK_2, 1) TAGKEYS(XK_3, 2) TAGKEYS(XK_4, 3) TAGKEYS(XK_5, 4) TAGKEYS(XK_6, 5) TAGKEYS(XK_7, 6) TAGKEYS(XK_8, 7) TAGKEYS(XK_9, 8) {
-    //     MODKEY, XK_Tab, view, {0}
-    // },
+    // { MODKEY,		XK_bracketleft, shiftviewclients,	{ .i = -1 } },
+    // { MODKEY,		XK_bracketright,shiftviewclients,	{ .i = +1 } }, // cycle tag focus
 
     // < ~/dwm/config.h grep -P '^\s+\{\s*MODKEY,\s+XK_[a-z],' | sort | cut -f4-
     // {0, 0x1008ff2d, spawn, SHCMD("i3lock -c 000000")},
