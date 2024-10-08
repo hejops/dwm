@@ -27,24 +27,24 @@ static const unsigned int snap = 32;    // snap pixel
 static const int showbar = 1;           // 0 means no bar
 static const int topbar = 1;            // 0 means bottom bar
 static const char *fonts[] = {
-    "haskplex:size=8",
+    "source code pro:size=8",
+    "source han sans cn:size=8",
+    "source han sans jp:size=8",
+    "source han sans kr:size=8",
     "symbola:size=8"
 };
 // static const char dmenufont[]		= "monaco:size=8";
 
-// https://camo.githubusercontent.com/cdb2f2e986c564b515c0c698e6c45b4ab5d725a9/687474703a2f2f692e696d6775722e636f6d2f776136363678672e706e67
-// TODO: change these to match citruszest
-static const char blue[] = "#458688";
-static const char gray[] = "#131313";
-static const char green[] = "#98971a";
-static const char lightgray[] = "#282828";
-static const char red[] = "#cc241d";
-static const char white2[] = "#ebdbb2";
-static const char white[] = "#bbbbbb";
+// static const char green[] = "#00cc7a";
+// static const char lightgray[] = "#383838";
+// static const char red[] = "#ff5454";
+// static const char white2[] = "#ebdbb2";
+static const char blue[] = "#00bfff"; // citruszest
+static const char gray[] = "#121212";
+static const char white[] = "#bfbfbf";
 
 static const char *colors[][3] = {
-    //		fg	bg	border
-    [SchemeNorm] = {white2, gray, gray},
+    [SchemeNorm] = {white, gray, gray}, // fg, bg, border
     [SchemeSel] = {blue, gray, blue},
 };
 
@@ -192,18 +192,20 @@ static Key keys[] = {
     {MODKEY, XK_l, focusmaster,    {0} },
 
     // terminal
+    // {MODKEY, XK_f, spawn, SHCMD("$TERMINAL pmp")}, // deprecated
     {MODKEY, XK_d, spawn, SHCMD("o")},
     {MODKEY, XK_e, spawn, {.v = termcmd}},
-    {MODKEY, XK_f, spawn, SHCMD("$TERMINAL pmp")}, // prompt
     {MODKEY, XK_s, spawn, SHCMD("$TERMINAL search")},
 
-    {MODKEY, XK_a, spawn, SHCMD("$TERMINAL neomutt")},
+    // {MODKEY, XK_a, spawn, SHCMD("$TERMINAL neomutt")},
+    {MODKEY, XK_a, spawn, SHCMD("$TERMINAL bash -c 'TERM=xterm-direct neomutt'")},
     {MODKEY, XK_r, spawn, SHCMD("nicotine")},
     {MODKEY, XK_w, spawn, SHCMD("firefox")},
 
-    // uo;
-    {MODKEY, XK_o, spawn, SHCMD("$TERMINAL pmp --queue")},
-    {MODKEY, XK_u, spawn, SHCMD("playerctl play-pause || $TERMINAL pmp")},
+    // {MODKEY, XK_o, spawn, SHCMD("$TERMINAL pmp --queue")},
+    {MODKEY, XK_o, spawn, SHCMD("$TERMINAL ~/plaque/plaque")},
+    {MODKEY, XK_semicolon, spawn, SHCMD("kitty")}, // backup, in case of wezterm config crash
+    {MODKEY, XK_u, spawn, SHCMD("playerctl play-pause")}, // || $TERMINAL pmp")},
 
     {MODKEY, XK_c, setlayout, {.v = &layouts[0]}}, // default
     {MODKEY, XK_v, setlayout, {.v = &layouts[2]}}, // deck
@@ -374,15 +376,15 @@ static const char *const autostart[] = {
     "dunst", NULL,
     "udiskie", NULL, // automount all devices
 
-    "sh", "-c", "pkill picom; picom -b", NULL, // -b = daemon; run order (wrt mon) doesn't really matter
+    "sh", "-c", "pkill picom; picom --daemon", NULL, // run order (wrt mon) doesn't really matter
 
     "sh", "-c", "~/gripts/dwmstatus/dwmstatus", NULL,
-    "sh", "-c", "~/gripts/wall/wall", NUL
+    "sh", "-c", "~/gripts/wall/wall", NULL,
     "sh", "-c", "~/scripts/mon.py", NULL,
     "sh", "-c", "~/scripts/reds &", NULL, // too short to warrant rewrite
     // ~ is only expanded by shell
 
-    "sh", "-c", "cd ~/febe; PYTHONPATH=. poetry run streamlit run --server.headless true febe/app.py", NULL,
+    // "sh", "-c", "cd ~/febe; PYTHONPATH=. poetry run streamlit run --server.headless true febe/app.py", NULL,
 
     "firefox", NULL,
     "sh", "-c", "sleep 2 ; $TERMINAL", NULL,
