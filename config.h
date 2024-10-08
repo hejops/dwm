@@ -31,6 +31,7 @@ static const char *fonts[] = {
     "source han sans cn:size=8",
     "source han sans jp:size=8",
     "source han sans kr:size=8",
+    "haskplex:size=8",
     "symbola:size=8"
 };
 // static const char dmenufont[]		= "monaco:size=8";
@@ -86,7 +87,7 @@ static const Rule rules[] = {
     // window open in the current tag, simply declare '0' (without '1 << ')
 
     // main programs
-    {"firefox",	        NULL,	NULL,	1 << 1,	1,	0,	-1},
+    {"firefox",	        NULL,	NULL,	1 << 1,	1,	0, -1},
     {"kitty",	        NULL,	NULL,	1 << 0,	1,	0,	1},
     {"wezterm",	        NULL,	NULL,	1 << 0,	1,	0,	1},
 
@@ -100,10 +101,10 @@ static const Rule rules[] = {
 
     // floats
     {"Display",	        NULL,	NULL,	0,	0,	1,	0},	// PIL
-    {"Gpick",       "gpick",	NULL,	0,	0,	1,	-1},
+    {"Gpick",       "gpick",	NULL,	0,	0,	1, -1},
     {"PPSSPPQt",	NULL,	NULL,	0,	0,	1,	1},
-    {"Pavucontrol",	NULL,	NULL,	0,	0,	1,	-1},
-    {"TelegramDesktop",	NULL,	NULL,	0,	0,	1,	-1}, // bad at resizing
+    {"Pavucontrol",	NULL,	NULL,	0,	0,	1, -1},
+    {"TelegramDesktop",	NULL,	NULL,	0,	0,	1, -1}, // bad at resizing
     {"discord",	        NULL,	NULL,	0,	0,	1,	0},
     {"mednafen",	NULL,	NULL,	0,	0,	1,	1},
 
@@ -246,16 +247,17 @@ static Key keys[] = {
     {MODKEY, XK_7, view, {.ui = 1 << 2}},
     // {XK_Multi_key, XK_3, view, {.ui = 1 << 0}},
 
-    TAGKEYS(XK_3, 0) TAGKEYS(XK_8, 1) {
+    TAGKEYS(XK_3, 0)
+    TAGKEYS(XK_g, 0)
+    TAGKEYS(XK_8, 1)
+    TAGKEYS(XK_h, 1)
+    {
         MODKEY, XK_Tab, view, {0}
     },
 
     // // workspace
-    // // { MODKEY,		XK_bracketleft, shiftviewclients,	{ .i = -1 } },
-    // // { MODKEY,		XK_bracketright,shiftviewclients,	{ .i = +1 } }, // cycle tag focus
-    // TAGKEYS(XK_1, 0) TAGKEYS(XK_2, 1) TAGKEYS(XK_3, 2) TAGKEYS(XK_4, 3) TAGKEYS(XK_5, 4) TAGKEYS(XK_6, 5) TAGKEYS(XK_7, 6) TAGKEYS(XK_8, 7) TAGKEYS(XK_9, 8) {
-    //     MODKEY, XK_Tab, view, {0}
-    // },
+    // { MODKEY,		XK_bracketleft, shiftviewclients,	{ .i = -1 } },
+    // { MODKEY,		XK_bracketright,shiftviewclients,	{ .i = +1 } }, // cycle tag focus
 
     // < ~/dwm/config.h grep -P '^\s+\{\s*MODKEY,\s+XK_[a-z],' | sort | cut -f4-
     // {0, 0x1008ff2d, spawn, SHCMD("i3lock -c 000000")},

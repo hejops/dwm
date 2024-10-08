@@ -732,11 +732,12 @@ deck(Monitor *m) {
 	if(n == 0)
 		return;
 
-	// if(n > m->nmaster) {
-	// 	mw = m->nmaster ? m->ww * m->mfact : 0;
-	// 	snprintf(m->ltsymbol, sizeof m->ltsymbol, "[%d]", n - m->nmaster);
-	// }
-	// else
+	// skipping this if block leads to incorrect resizing to width 2
+	if(n > m->nmaster) {
+		mw = m->nmaster ? m->ww * m->mfact : 0;
+		// snprintf(m->ltsymbol, sizeof m->ltsymbol, "[%d]", n - m->nmaster);
+	}
+	else
 	mw = m->ww;
 	for(i = my = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
 		if(i < m->nmaster) {
