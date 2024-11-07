@@ -378,21 +378,15 @@ static const char *const autostart[] = {
     "dunst", NULL,
     "udiskie", NULL, // automount all devices
 
-    "sh", "-c", "pkill picom; picom --daemon", NULL, // run order (wrt mon) doesn't really matter
+    "sh", "-c", "pkill picom; picom --daemon", NULL,
 
-    "sh", "-c", "~/gripts/dwmstatus/dwmstatus", NULL,
+    "sh", "-c", "pkill dwmstatus; ~/gripts/dwmstatus/dwmstatus", NULL,
     "sh", "-c", "~/gripts/wall/wall", NULL,
-    "sh", "-c", "~/scripts/mon.py", NULL,
+    "sh", "-c", "~/scripts/mail", NULL,
     "sh", "-c", "~/scripts/reds &", NULL, // too short to warrant rewrite
     // ~ is only expanded by shell
 
-    // "sh", "-c", "cd ~/febe; PYTHONPATH=. poetry run streamlit run --server.headless true febe/app.py", NULL,
-
-    "firefox", NULL,
-    "sh", "-c", "sleep 2 ; $TERMINAL", NULL,
-
-    // "sh", "-c", "notify-send $TERMINAL", NULL,
-    // "notify-send", "$TERMINAL", NULL,
+    "sh", "-c", "~/.config/session.sh", NULL,
 
     NULL
 };
