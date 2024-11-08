@@ -86,17 +86,20 @@ static const Rule rules[] = {
     // window open in the current tag, simply declare '0' (without '1 << ')
 
     // main programs
-    {"firefox",	        NULL,	NULL,	1 << 1,	1,	0,	-1},
-    {"kitty",	        NULL,	NULL,	1 << 0,	1,	0,	1},
-    {"wezterm",	        NULL,	NULL,	1 << 0,	1,	0,	1},
+    {"firefox", NULL, NULL, 1 << 1, 1, 0, 0},
+    {"kitty", NULL, NULL, 1 << 0, 1, 0, 0},
+    {"wezterm", NULL, NULL, 1 << 0, 1, 0, 0},
+    {"org.wezfurlong.wezterm", NULL, NULL, 1 << 0, 1, 0, 0},
 
     // common one-off programs
     // might be better to just set tag to 0
-    {"Chromium",	NULL,	NULL,	1 << 2,	4,	0,	0},
-    {"Nicotine",	NULL,	NULL,	1 << 1,	1,	0,	1},
-    {"Zathura",	        NULL,	NULL,	1 << 1,	1,	0,	0},
-    {"feh",	        NULL,	NULL,	1 << 1,	3,	0,	0},
-    {"mpv",	        NULL,	NULL,	1 << 1,	3,	0,	1},
+    {"Chromium", NULL, NULL, 1 << 2, 4, 0, 1},
+    {"Nicotine", NULL, NULL, 1 << 1, 1, 0, 1},
+    {"Code", NULL, NULL, 1 << 1, 4, 0, 1},
+    {"MongoDB Compass", NULL, NULL, 1 << 1, 4, 0, 1},
+    {"Zathura", NULL, NULL, 1 << 1, 1, 0, 0},
+    {"feh", NULL, NULL, 1 << 1, 3, 0, 1},
+    {"mpv", NULL, NULL, 1 << 1, 3, 0, 1},
 
     // floats
     {"Display",	        NULL,	NULL,	0,	0,	1,	0},	// PIL
