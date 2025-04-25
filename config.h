@@ -87,9 +87,9 @@ static const Rule rules[] = {
     // window open in the current tag, simply declare '0' (without '1 << ')
 
     // main programs
-    {"firefox",	        NULL,	NULL,	1 << 1,	1,	0, -1},
-    {"kitty",	        NULL,	NULL,	1 << 0,	1,	0,	1},
-    {"wezterm",	        NULL,	NULL,	1 << 0,	1,	0,	1},
+    {"firefox", NULL, NULL, 1 << 1, 1, 0, -1},
+    {"ghostty", NULL, NULL, 1 << 0, 1, 0, 1},
+    {"wezterm", NULL, NULL, 1 << 0, 1, 0, 1},
 
     // common one-off programs
     // might be better to just set tag to 0
@@ -201,7 +201,8 @@ static Key keys[] = {
     {MODKEY, XK_w, spawn, SHCMD("firefox")},
 
     {MODKEY, XK_o, spawn, SHCMD("$TERMINAL ~/plaque/plaque")},
-    {MODKEY, XK_semicolon, spawn, SHCMD("kitty")}, // backup, in case of wezterm config crash
+    {MODKEY, XK_semicolon, spawn,
+     SHCMD("ghostty")},  // backup, in case of wezterm config crash
     {MODKEY, XK_u, spawn, SHCMD("playerctl play-pause")},
 
     {MODKEY, XK_c, setlayout, {.v = &layouts[0]}}, // default
