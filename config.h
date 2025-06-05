@@ -15,6 +15,7 @@ static const int topbar = 1;             // 0 means bottom bar
 static const char *fonts[] = {
     "source code pro:size=8", "source han sans cn:size=8",
     "source han sans jp:size=8", "source han sans kr:size=8", "symbola:size=8"};
+// static const char dmenufont[]		= "monaco:size=8";
 
 static const char blue[] = "#00bfff";  // citruszest
 static const char gray[] = "#121212";
@@ -60,16 +61,28 @@ static const Rule rules[] = {
     // window open in the current tag, simply declare '0' (without '1 << ')
 
     // main programs
-    {"firefox", NULL, NULL, 1 << 1, 1, 0, -1},
+    {"firefox", NULL, NULL, 1 << 1, 1, 0, 0},
     {"ghostty", NULL, NULL, 1 << 0, 1, 0, 1},
-    {"wezterm", NULL, NULL, 1 << 0, 1, 0, 1},
+    {"org.wezfurlong.wezterm", NULL, NULL, 1 << 0, 1, 0, 0},
+    {"wezterm", NULL, NULL, 1 << 0, 1, 0, 0},
 
     // common one-off programs
     // might be better to just set tag to 0
     {"Chromium", NULL, NULL, 1 << 2, 4, 0, 0},
+    {"Chromium", NULL, NULL, 1 << 2, 4, 0, 0},
+    {"Chromium", NULL, NULL, 1 << 2, 4, 0, 1},
+    {"Code", NULL, NULL, 1 << 1, 4, 0, 1},
+    {"MongoDB Compass", NULL, NULL, 1 << 1, 4, 0, 1},
+    {"Nicotine", NULL, NULL, 1 << 1, 1, 0, 1},
+    {"Nicotine", NULL, NULL, 1 << 1, 1, 0, 1},
     {"Nicotine", NULL, NULL, 1 << 1, 1, 0, 1},
     {"Zathura", NULL, NULL, 1 << 1, 1, 0, 0},
+    {"Zathura", NULL, NULL, 1 << 1, 1, 0, 0},
+    {"Zathura", NULL, NULL, 1 << 1, 1, 0, 0},
     {"feh", NULL, NULL, 1 << 1, 3, 0, 0},
+    {"feh", NULL, NULL, 1 << 1, 3, 0, 0},
+    {"feh", NULL, NULL, 1 << 1, 3, 0, 1},
+    {"mpv", NULL, NULL, 1 << 1, 3, 0, 1},
     {"mpv", NULL, NULL, 1 << 1, 3, 0, 1},
 
     // floats
@@ -82,12 +95,12 @@ static const Rule rules[] = {
     {"mednafen", NULL, NULL, 0, 0, 1, 1},
 
     {"App.py", NULL, NULL, 1 << 2, 1, 1, 0},  // playitslowly
+    {"VirtualBox Machine", "VirtualBox Machine", NULL, 1 << 2, 1, 1, 0},
     {"VirtualBox Machine", NULL, NULL, 1 << 2, 1, 0, 0},
+    {"VirtualBox Manager", "VirtualBox Manager", NULL, 1 << 2, 1, 1, 0},
     {"VirtualBox Manager", NULL, NULL, 1 << 2, 1, 1, 0},
     {"Virtualbox", NULL, NULL, 1 << 2, 1, 1, 0},  // idk
     {"virtualbox", NULL, NULL, 1 << 2, 1, 1, 0},
-    {"VirtualBox Machine", "VirtualBox Machine", NULL, 1 << 2, 1, 1, 0},
-    {"VirtualBox Manager", "VirtualBox Manager", NULL, 1 << 2, 1, 1, 0},
 
     // {"Com.github.xournalpp.xournalpp",	NULL,	NULL,	1 << 1,	1,
     // 0,	0},
@@ -142,6 +155,7 @@ static const Layout layouts[] = {
   {                                                      \
     .v = (const char *[]) { "/bin/sh", "-c", cmd, NULL } \
   }
+
 // https://github.com/TaylanTatli/dwm/blob/master/config.h#L15
 // https://wiki.archlinux.org/title/backlight#External_monitors
 // https://wiki.archlinux.org/title/backlight#xbacklight
@@ -289,15 +303,6 @@ static Key keys[] = {
 static Button buttons[] = {
 
     // click		event mask	button		function	argument
-    // {ClkTagBar, 0, Button3, toggleview, {0}},
-    // {ClkTagBar, 0, Button4, shiftviewclients, {.i = -1}},
-    // {ClkTagBar, 0, Button5, shiftviewclients, {.i = +1}},
-    // {ClkTagBar, MODKEY, Button3, toggletag, {0}},  // duplicate to
-    // {ClkWinTitle, 0, Button2, zoom, {0}},
-    // // togglefloating?
-    // {ClkWinTitle, 0, Button4, focusstack, {.i = -1}},
-    // // might seem useless but good for vbox
-    // {ClkWinTitle, 0, Button5, focusstack, {.i = +1}},
     // {ClkStatusText, 0, Button2, spawn, {.v = termcmd}},
     // {ClkStatusText, 0, Button3, toggleview, {0}},  // TESTING
     {ClkClientWin, MODKEY, 8, view, {0}},
